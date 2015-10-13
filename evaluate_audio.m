@@ -40,9 +40,9 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('power sparse (%d days)\n', ...
                 sum(pwr.samplingduration>=1800))];
         end
-        if sum(diff(pwr_time_all)>=7200)>0,
+        if sum(diff(pwr_time_all)>=gap_max)>0,
             warning_log = [warning_log, sprintf('power gap (%d)\n', ...
-                sum(diff(pwr_time_all)>=7200))];
+                sum(diff(pwr_time_all)>=gap_max))];
         end
         if pwr_stats.std< .001,
             warning_log = [warning_log, sprintf('power variability low\n')];
@@ -67,9 +67,9 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('frequency sparse (%d days)\n', ...
                 sum(frq.samplingduration>=1800))];
         end
-        if sum(diff(frq_time_all)>=7200) > 0,
+        if sum(diff(frq_time_all)>=gap_max) > 0,
             warning_log = [warning_log, sprintf('frequency gap (%d)\n', ...
-                sum(diff(frq_time_all)>=7200))];
+                sum(diff(frq_time_all)>=gap_max))];
         end
         if frq_stats.std < 100,
             warning_log = [warning_log, sprintf('frequency variability low\n')];

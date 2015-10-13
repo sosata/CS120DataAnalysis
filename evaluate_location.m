@@ -44,8 +44,8 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('longitude sparse (%d days)\n', ...
                 sum(lng.samplingduration>=600))];
         end
-        if sum(diff(time_all) >= 7200)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', sum(diff(time_all)>=7200))];
+        if sum(diff(time_all) >= gap_max)>0,
+            warning_log = [warning_log, sprintf('gap (%d)\n', sum(diff(time_all)>=gap_max))];
         end
         
         % checking latitude stats

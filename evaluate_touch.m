@@ -72,8 +72,8 @@ if exist(filename, 'file'),
         if sum(diff(time_all)==0)>0,
             warning_log = [warning_log, sprintf('%d/%d duplicate timestamps\n', sum(diff(time_all)==0), length(time_all))];
         end
-        if sum(diff(time_all) >= 7200)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', sum(diff(time_all)>=7200))];
+        if sum(diff(time_all) >= gap_max)>0,
+            warning_log = [warning_log, sprintf('gap (%d)\n', sum(diff(time_all)>=gap_max))];
         end
         
         if show,

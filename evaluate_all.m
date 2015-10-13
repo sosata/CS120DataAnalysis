@@ -11,7 +11,8 @@ subjects = subjects{:,1};
 
 show = false;
 
-logs = sprintf('From %s to %s\n=====================\n\n', datestr(date_start,6), datestr(date_end,6));
+logs = sprintf('From %s to %s\n=====================\n\n', datestr(date_start+datenum(1970,1,1),6), ...
+    datestr(date_end+datenum(1970,1,1),6));
 
 for i = 1:length(subjects),
     

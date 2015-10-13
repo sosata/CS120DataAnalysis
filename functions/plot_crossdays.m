@@ -9,15 +9,15 @@ function plot_crossdays(data)
 
 if isfloat(vertcat(data.value{:})),
     
-    value_max = max(vertcat(data.value{:}));
-    value_min = min(vertcat(data.value{:}));
+    value_max = max(abs(vertcat(data.value{:})));
+    %value_min = min(vertcat(data.value{:}));
     
     hold on;
     set(gca, 'position', [.1 .1 .7 .8]);
     for i=1:length(data.day),
         if ~isempty(data.value{i}),
-            if value_max~=value_min,
-                plot(data.timeofday{i}, data.day(i) - data.value{i} / (value_max-value_min) / 3, ['.', 'k']);
+            if value_max~=0,
+                plot(data.timeofday{i}, data.day(i) - data.value{i} / value_max / 3, ['.', 'k']);
             else
                 plot(data.timeofday{i}, data.day(i)*ones(size(data.timeofday{i})), ['.', 'k']);
             end
