@@ -1,8 +1,8 @@
 clear;
 close all;
 
-date_start = datenum(2015, 10, 10) - datenum(1970,1,1);
-date_end = datenum(2015, 10, 12) - datenum(1970,1,1);
+date_start = datenum(2015, 10, 12) - datenum(1970,1,1);
+date_end = datenum(2015, 10, 13) - datenum(1970,1,1);
 
 time_zone = -5;
 

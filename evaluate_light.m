@@ -35,9 +35,8 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('power sparse (%d days)\n', ...
                 sum(lux.samplingduration>=1800))];
         end
-        if sum(diff(time_all) >= gap_max)>0,
-            warning_log = [warning_log, sprintf('power gap (%d)\n', ...
-                sum(diff(time_all)>=gap_max))];
+        if get_gaps(time_all, date_start, date_end, gap_max)>0,
+            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
         end
         if lux_stats.std < 10,
             warning_log = [warning_log, sprintf('power variability low\n')];

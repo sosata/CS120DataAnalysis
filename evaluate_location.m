@@ -44,8 +44,8 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('longitude sparse (%d days)\n', ...
                 sum(lng.samplingduration>=600))];
         end
-        if sum(diff(time_all) >= gap_max)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', sum(diff(time_all)>=gap_max))];
+        if get_gaps(time_all, date_start, date_end, gap_max)>0,
+            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
         end
         
         % checking latitude stats
@@ -75,11 +75,14 @@ if exist(filename, 'file'),
         % checking accuracy
         acc_stat = check_sanity(acc_all);
         if acc_stat.min<0,
-            warning_log = [warning_log, sprintf('Accuracy out of range\n')];
+            warning_log = [warning_log, sprintf('accuracy out of range\n')];
         end
         % The returned accuracy is the radius of 68% confidence in meters.
-        if acc_stat.mean>68,
-            warning_log = [warning_log, sprintf('Accuracy low\n')];
+%         if acc_stat.mean>68,
+%             warning_log = [warning_log, sprintf('accuracy low\n')];
+%         end
+        if acc_stat.mean>100,
+            warning_log = [warning_log, sprintf('accuracy very low\n')];
         end
         
         n_zeros = sum(diff(time_all)==0);

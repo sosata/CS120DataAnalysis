@@ -40,8 +40,8 @@ if exist(filename, 'file'),
             warning_log = [warning_log, sprintf('activity sparse (%d days)\n', ...
                 sum(act.samplingduration >= 300))];
         end
-        if sum(diff(time_all)>=gap_max) > 0,
-            warning_log = [warning_log, sprintf('activity gap (%d)\n', sum(diff(time_all)>=gap_max))];
+        if get_gaps(time_all, date_start, date_end, gap_max)>0,
+            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
         end
         if get_variability(act_all) < .25,
             warning_log = [warning_log, sprintf('activity variability low\n')];
