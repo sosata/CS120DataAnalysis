@@ -1,6 +1,6 @@
 .gitignor
 useless
 settings.mat
-log_matlab.txt
+log*.txt
 *~
 *.asv
