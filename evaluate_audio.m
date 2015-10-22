@@ -4,6 +4,12 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\aud.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),
@@ -32,16 +38,17 @@ if exist(filename, 'file'),
         frq_stats = check_sanity(frq_all);
         
         % power
-        if sum(pwr.samplingduration>=86400)>0,
+        if sum(pwr.maxgap==0)>0,
             warning_log = [warning_log, sprintf('power missing (%d days)\n', ...
-                sum(pwr.samplingduration>=86400))];
+                sum(pwr.maxgap==0))];
         end
         if sum(pwr.samplingduration>=1800)>0,
             warning_log = [warning_log, sprintf('power sparse (%d days)\n', ...
                 sum(pwr.samplingduration>=1800))];
         end
-        if get_gaps(pwr_time_all, date_start, date_end, gap_max)>0,
-            warning_log = [warning_log, sprintf('power gap (%d)\n', get_gaps(pwr_time_all, date_start, date_end, gap_max))];
+        gaps = get_gaps(pwr_time_all, date_start, date_end, gap_max);
+        if ~isempty(gaps),
+            warning_log = [warning_log, sprintf('%d power gaps (av. %.1fh)\n', length(gaps), mean(gaps))];
         end
         if pwr_stats.std< .001,
             warning_log = [warning_log, sprintf('power variability low\n')];
@@ -58,16 +65,17 @@ if exist(filename, 'file'),
         end
         
         % frequency
-        if sum(frq.samplingduration>=86400) > 0,
+        if sum(frq.maxgap==0) > 0,
             warning_log = [warning_log, sprintf('frequency missing (%d days)\n', ...
-                sum(frq.samplingduration>=86400))];
+                sum(frq.maxgap==0))];
         end
         if sum(frq.samplingduration>=1800) > 0,
             warning_log = [warning_log, sprintf('frequency sparse (%d days)\n', ...
                 sum(frq.samplingduration>=1800))];
         end
-        if get_gaps(frq_time_all, date_start, date_end, gap_max)>0,
-            warning_log = [warning_log, sprintf('frequency gap (%d)\n', get_gaps(frq_time_all, date_start, date_end, gap_max))];
+        gaps = get_gaps(frq_time_all, date_start, date_end, gap_max);
+        if ~isempty(gaps),
+            warning_log = [warning_log, sprintf('%d frequency gaps (av. %.1fh)\n', length(gaps), mean(gaps))];
         end
         if frq_stats.std < 100,
             warning_log = [warning_log, sprintf('frequency variability low\n')];

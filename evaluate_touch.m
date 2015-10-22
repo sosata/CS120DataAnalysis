@@ -4,6 +4,12 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\tch.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),
@@ -31,9 +37,9 @@ if exist(filename, 'file'),
         count_stats = check_sanity(count_all);
         
         % delay
-        if sum(delay.samplingduration>=86400)>0,
+        if sum(delay.maxgap==0)>0,
             warning_log = [warning_log, sprintf('delay missing (%d days)\n', ...
-                sum(delay.samplingduration>=86400))];
+                sum(delay.maxgap==0))];
         end
         if sum(delay.samplingduration>=1800)>0,
             warning_log = [warning_log, sprintf('delay sparse (%d days)\n', ...
@@ -50,9 +56,9 @@ if exist(filename, 'file'),
         end
         
         % count
-        if sum(count.samplingduration>=86400)>0,
+        if sum(count.maxgap==0)>0,
             warning_log = [warning_log, sprintf('count missing (%d days)\n', ...
-                sum(count.samplingduration>=86400))];
+                sum(count.maxgap==0))];
         end
         if sum(count.samplingduration>=1800)>0,
             warning_log = [warning_log, sprintf('count sparse (%d days)\n', ...
@@ -72,8 +78,9 @@ if exist(filename, 'file'),
         if sum(diff(time_all)==0)>0,
             warning_log = [warning_log, sprintf('%d/%d duplicate timestamps\n', sum(diff(time_all)==0), length(time_all))];
         end
-        if get_gaps(time_all, date_start, date_end, gap_max)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
+        gaps = get_gaps(time_all, date_start, date_end, gap_max);
+        if ~isempty(gaps),
+            warning_log = [warning_log, sprintf('%d gaps (av. %.1fh)\n', length(gaps), mean(gaps))];
         end
         
         if show,

@@ -4,6 +4,12 @@ load('settings.mat');
 
 warning_log = [];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 filename = [data_dir, subject, '\fus.csv'];
 
 if exist(filename, 'file'),
@@ -28,24 +34,25 @@ if exist(filename, 'file'),
         lng_all = vertcat(lng.value{:});
         acc_all = vertcat(acc.value{:});
         
-        if sum(lat.samplingduration>=86400)>0,
+        if sum(lat.maxgap==0)>0,
             warning_log = [warning_log, sprintf('latitude missing (%d days)\n', ...
-                sum(lat.samplingduration>=86400))];
+                sum(lat.maxgap==0))];
         end
         if sum(lat.samplingduration>=600)>0,
             warning_log = [warning_log, sprintf('latitude sparse (%d days)\n', ...
                 sum(lat.samplingduration>=600))];
         end
-        if sum(lng.samplingduration>=86400)>0,
+        if sum(lng.maxgap==0)>0,
             warning_log = [warning_log, sprintf('longitude missing (%d days)\n', ...
-                sum(lng.samplingduration>=86400))];
+                sum(lng.maxgap==0))];
         end
         if sum(lng.samplingduration>=600)>0,
             warning_log = [warning_log, sprintf('longitude sparse (%d days)\n', ...
                 sum(lng.samplingduration>=600))];
         end
-        if get_gaps(time_all, date_start, date_end, gap_max)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
+        gaps = get_gaps(time_all, date_start, date_end, gap_max);
+        if ~isempty(gaps),
+            warning_log = [warning_log, sprintf('%d gaps (av. %.1fh)\n', length(gaps), mean(gaps))];
         end
         
         % checking latitude stats

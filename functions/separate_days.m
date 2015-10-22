@@ -34,7 +34,7 @@ for d=out.day,
         else
             out.samplingduration(cnt) = sd/sum(~isnan(value(ind_rng)));
         end
-        if length(ind_rng)>1,
+        if length(ind_rng)>0,%1,%%%%%%%%%%
             out.maxgap(cnt) = max(diff([d*sd;time(ind_rng);(d+1)*sd]));
         else
             out.maxgap(cnt) = 0;

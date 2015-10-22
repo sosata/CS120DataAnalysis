@@ -4,12 +4,19 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\emm.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),
     
     fid = fopen(filename, 'r');
     data = textscan(fid, '%f%f%f%f%f', 'delimiter', '\t');
+    fclose(fid);
     
     data{1} = data{1} + time_zone*3600;
     data = clip_data(data, timestamp_start, timestamp_end);
@@ -54,6 +61,8 @@ if exist(filename, 'file'),
             set(h, 'position', [495    58   672   896]);
             subplot 411;
             plot(time, stress,'.','markersize',12);
+            xlim([timestamp_start, timestamp_end]);
+            ylim([0 10]);
             set_date_ticks(gca, 1);
             ylabel('stress');
             title(sprintf('variability: %.2f \nno. states: %d \ncomplete: %.0f%%', ...
@@ -62,6 +71,8 @@ if exist(filename, 'file'),
             
             subplot 412;
             plot(time, mood,'.','markersize',12);
+            xlim([timestamp_start, timestamp_end]);
+            ylim([0 10]);
             set_date_ticks(gca, 1);
             ylabel('mood');
             title(sprintf('variability: %.2f \nno. states: %d \ncomplete: %.0f%%', ...
@@ -70,6 +81,8 @@ if exist(filename, 'file'),
             
             subplot 413;
             plot(time, energy,'.','markersize',12);
+            xlim([timestamp_start, timestamp_end]);
+            ylim([0 10]);
             ylabel('energy');
             set_date_ticks(gca, 1);
             title(sprintf('variability: %.2f \nno. states: %d \ncomplete: %.0f%%', ...
@@ -78,6 +91,8 @@ if exist(filename, 'file'),
             
             subplot 414;
             plot(time, focus,'.','markersize',12);
+            xlim([timestamp_start, timestamp_end]);
+            ylim([0 10]);
             set_date_ticks(gca, 1);
             ylabel('focus');
             title(sprintf('variability: %.2f \nno. states: %d \ncomplete: %.0f%%', ...

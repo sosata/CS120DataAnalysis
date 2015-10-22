@@ -4,6 +4,12 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\scr.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),
@@ -22,9 +28,9 @@ if exist(filename, 'file'),
         data_sep = data;
         data_sep{2} = categorical(data_sep{2});
         data_sep = separate_days(data_sep, 1, date_start, date_end);
-        if sum(data_sep.samplingduration>=86400)>0,
+        if sum(data_sep.maxgap==0)>0,
             warning_log = [warning_log, sprintf('missing (%d days)\n', ...
-                sum(data_sep.samplingduration>=86400))];
+                sum(data_sep.maxgap==0))];
         end
         if sum(diff(data{1})==0)>0,
             warning_log = [warning_log, sprintf('%d/%d duplicate timestamps\n', ...

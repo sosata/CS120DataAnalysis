@@ -4,6 +4,12 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\ems.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),

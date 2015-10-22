@@ -4,6 +4,12 @@ load('settings.mat');
 
 filename = [data_dir, subject, '\lgt.csv'];
 
+timestamp_senddata = timestamp_senddata(strcmp(subjects, subject));
+if timestamp_senddata>timestamp_start,
+    timestamp_start = timestamp_senddata;
+    date_start = floor(timestamp_start/86400);
+end
+
 warning_log = [];
 
 if exist(filename, 'file'),
@@ -27,16 +33,17 @@ if exist(filename, 'file'),
         
         lux_stats = check_sanity(lux_all);
         
-        if sum(lux.samplingduration>=86400)>0,
+        if sum(lux.maxgap==0)>0,
             warning_log = [warning_log, sprintf('power missing (%d days)\n', ...
-                sum(lux.samplingduration>=86400))];
+                sum(lux.maxgap==0))];
         end
         if sum(lux.samplingduration>=1800)>0,
             warning_log = [warning_log, sprintf('power sparse (%d days)\n', ...
                 sum(lux.samplingduration>=1800))];
         end
-        if get_gaps(time_all, date_start, date_end, gap_max)>0,
-            warning_log = [warning_log, sprintf('gap (%d)\n', get_gaps(time_all, date_start, date_end, gap_max))];
+        gaps = get_gaps(time_all, date_start, date_end, gap_max);
+        if ~isempty(gaps),
+            warning_log = [warning_log, sprintf('%d gaps (av. %.1fh)\n', length(gaps), mean(gaps))];
         end
         if lux_stats.std < 10,
             warning_log = [warning_log, sprintf('power variability low\n')];
