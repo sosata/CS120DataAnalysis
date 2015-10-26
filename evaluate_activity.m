@@ -90,7 +90,7 @@ if exist(filename, 'file'),
             title('Confidence');
         
             figure(4);
-            plot_time(time_all, 1);
+            plot_time(time_all, 5);
             title(sprintf('Confidence\n%d/%d duplicate timestamps\n', sum(diff(time_all)==0), length(time_all)));
         
         end

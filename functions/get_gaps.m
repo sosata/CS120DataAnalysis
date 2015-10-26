@@ -9,6 +9,7 @@ if size(time,2)>1,
 end
 
 dif = diff([date_start*86400;time;(date_end+1)*86400]);
+% dif = diff(time);
 
 gaps = dif(dif >= gap_max)/3600;
 

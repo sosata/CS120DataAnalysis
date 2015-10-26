@@ -5,7 +5,7 @@ addpath('.\functions\');
 load('settings.mat');
 
 show = false;
-funcs = {'activity', 'audio', 'communication', 'ema', 'light', 'location', 'screen', 'sleep', 'touch'};
+funcs = {'activity', 'audio', 'communication', 'light', 'location', 'screen', 'touch', 'wifi', 'ema', 'sleep'};
 
 logs = sprintf('From %s to %s\n=====================\n\n', datestr(date_start+datenum(1970,1,1),6), ...
     datestr(date_end+datenum(1970,1,1),6));
@@ -13,11 +13,11 @@ logs = sprintf('From %s to %s\n=====================\n\n', datestr(date_start+da
 for i = 1:length(subjects),
     
     if isinf(timestamp_senddata(i)),
-        visual(i,:,:) = ones(9,1)*[.5 .5 .5];
+        visual(i,:,:) = ones(length(funcs),1)*[.5 .5 .5];
         continue;
     end
     
-    visual(i,:,:) = ones(9,1)*[0 1 0];
+    visual(i,:,:) = ones(length(funcs),1)*[0 1 0];
 
     logs = [logs, sprintf('\n--------------\n')];
     logs = [logs, sprintf('Subject %s', subjects{i})];
@@ -31,8 +31,11 @@ for i = 1:length(subjects),
             logs = [logs, sprintf('\n')];
             if strcmp(warning_log, sprintf('no csv file\n')),
                 visual(i,j,:) = [0 0 0];
-            elseif (~isempty(strfind(warning_log, 'missing')))||(~isempty(strfind(warning_log, 'complete'))),
+            elseif ~isempty(strfind(warning_log, 'missing')),
                 visual(i,j,:) = [1 0 0];
+            elseif ~isempty(strfind(warning_log, 'complete')),
+                color = sscanf(warning_log, '%*s%d', [1 inf]);
+                visual(i,j,:) = [1-(color/100) color/100 0];
             elseif ~isempty(strfind(warning_log, 'range')),
                 visual(i,j,:) = [0 0 1];
             elseif ~isempty(strfind(warning_log, 'gap')),
@@ -54,6 +57,8 @@ h = figure(1);
 set(h, 'position', [680          0         650        1200]);
 imagesc(visual);
 set(gca, 'ytick', 1:length(subjects), 'yticklabel', subjects);
-set(gca, 'xtick', 1:length(funcs), 'xticklabel', funcs);
+set(gca, 'xtick', 1:length(funcs), 'xticklabel', cellfun(@(x) x(1:min(end,6)), funcs, 'uniformoutput', false));
+% my_xticklabels(gca, 1:length(funcs), funcs, 'rotation', 45, 'horizontalalignment', 'left');
 set(gca, 'fontsize', 8);
+title(['From ' datestr(date_start+datenum(1970,1,1),6) ' to ' datestr(date_end+datenum(1970,1,1),6)]);
 % legend('no data', 'gap', 'out of range', 'healthy', 'location', 'northeastoutside');

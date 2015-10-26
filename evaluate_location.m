@@ -119,7 +119,7 @@ if exist(filename, 'file'),
             title(sprintf('min: %.2f max: %.2f\nmean: %.4f', acc_stat.min, acc_stat.max, acc_stat.mean));
             
             figure(3);
-            plot_time(time_all, 1);
+            plot_time(time_all, 5);
             title(sprintf('Duplicate timestamps: %d', n_zeros));
             
             figure(4);

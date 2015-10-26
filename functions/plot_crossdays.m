@@ -33,22 +33,25 @@ elseif iscategorical(vertcat(data.value{:})),
         
     cats = categories(vertcat(data.value{:}));
     
+    %when category names are not in the dictionary
+    colors_alternative = jet(length(cats));
+    
     hold on;
     set(gca, 'position', [.1 .1 .7 .8]);
 
-%     for i=1:length(cats),
-%         plot(data.timeofday{1}(1), data.day(1), ['.', colors(cats{i})]);
-%     end
-%     legend(cats, 'location', 'northwestoutside');
-    
     for i=1:length(data.day),
         if ~isempty(data.value{i}),
             for j=1:length(cats),
                 if ~isempty(data.timeofday{i}(data.value{i}==cats(j))),
+                    if sum(strcmp(keys(colors),cats{1})),
+                        clr = colors(cats{j});
+                    else
+                        clr = colors_alternative(j,:);
+                    end
                     plot(ones(2,1)*data.timeofday{i}(data.value{i}==cats(j))', ...
                         [(data.day(i)*ones(length(data.timeofday{i}(data.value{i}==cats(j))),1))';...
                         (data.day(i)*ones(length(data.timeofday{i}(data.value{i}==cats(j))),1))'-.5], ...
-                        colors(cats{j}));
+                        'color', clr);
                 end
             end
         end

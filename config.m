@@ -1,8 +1,8 @@
 clear;
 close all;
 
-date_start = datenum(2015, 10, 19) - datenum(1970,1,1);
-date_end = datenum(2015, 10, 20) - datenum(1970,1,1);
+date_start = datenum(2015, 10, 23) - datenum(1970,1,1);
+date_end = datenum(2015, 10, 24) - datenum(1970,1,1);
 
 time_zone = -5;
 
@@ -10,7 +10,8 @@ timestamp_start = date_start*86400;
 timestamp_end = (date_end+1)*86400;
 
 gap_max = 2*3600;
-gap_max_activity = 12*3600;
+gap_max_activity = 9*3600;
+gap_max_wifi = 9*3600;
 
 data_dir = 'C:\Data\CS120\';
 
@@ -45,4 +46,4 @@ for i = 1:length(timestamp_senddata),
 end
 
 save('settings.mat', 'date_start', 'date_end', 'time_zone', 'data_dir' , 'subjects', 'timestamp_start', ...
-    'timestamp_end', 'gap_max', 'gap_max_activity', 'timestamp_senddata', 'date_senddata');
+    'timestamp_end', 'gap_max', 'gap_max_activity', 'gap_max_wifi', 'timestamp_senddata', 'date_senddata');
