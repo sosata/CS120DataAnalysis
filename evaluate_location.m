@@ -1,6 +1,7 @@
 function warning_log = evaluate_location(subject, show)
 
 load('settings.mat');
+load('time_senddata.mat');
 
 warning_log = [];
 

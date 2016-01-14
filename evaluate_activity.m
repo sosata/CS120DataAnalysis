@@ -1,6 +1,7 @@
 function warning_log = evaluate_activity(subject, show)
 
 load('settings.mat');
+load('time_senddata.mat');
 
 filename = [data_dir, subject, '\act.csv'];
 

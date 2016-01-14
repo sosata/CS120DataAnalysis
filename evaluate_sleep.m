@@ -1,6 +1,7 @@
 function warning_log = evaluate_sleep(subject, show)
 
 load('settings.mat');
+load('time_senddata.mat');
 
 filename = [data_dir, subject, '\ems.csv'];
 

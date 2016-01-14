@@ -3,9 +3,10 @@ close all;
 
 addpath('.\functions\');
 load('settings.mat');
+load('time_senddata.mat');
 
 show = false;
-funcs = {'activity', 'audio', 'communication', 'light', 'location', 'screen', 'touch', 'wifi', 'ema', 'sleep'};
+funcs = {'activity', 'audio', 'communication', 'light', 'location', 'screen', 'touch', 'wifi', 'ema', 'sleep', 'selflocation', 'selfcommunication'};
 
 logs = sprintf('From %s to %s\n=====================\n\n', datestr(date_start+datenum(1970,1,1),6), ...
     datestr(date_end+datenum(1970,1,1),6));
@@ -54,11 +55,9 @@ disp(['Number of subjects: ', num2str(length(subjects))]);
 disp(['Data available: ', num2str(sum(~isinf(timestamp_senddata)))]);
 
 h = figure(1);
-set(h, 'position', [680          0         650        1200]);
+set(h, 'position', [680          0         650        1400]);
 imagesc(visual);
 set(gca, 'ytick', 1:length(subjects), 'yticklabel', subjects);
 set(gca, 'xtick', 1:length(funcs), 'xticklabel', cellfun(@(x) x(1:min(end,6)), funcs, 'uniformoutput', false));
-% my_xticklabels(gca, 1:length(funcs), funcs, 'rotation', 45, 'horizontalalignment', 'left');
-set(gca, 'fontsize', 8);
+set(gca, 'fontsize', 6);
 title(['From ' datestr(date_start+datenum(1970,1,1),6) ' to ' datestr(date_end+datenum(1970,1,1),6)]);
-% legend('no data', 'gap', 'out of range', 'healthy', 'location', 'northeastoutside');

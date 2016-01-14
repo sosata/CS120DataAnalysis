@@ -1,6 +1,7 @@
 function warning_log = evaluate_communication(subject, show)
 
 load('settings.mat');
+load('time_senddata.mat');
 
 filename = [data_dir, subject, '\coe.csv'];
 
