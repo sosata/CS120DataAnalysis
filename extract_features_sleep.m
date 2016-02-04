@@ -1,8 +1,7 @@
 clear;
 close all;
 
-% assumptions:
-% 1. 
+extract_workday = true;
 
 addpath('functions');
 load('settings.mat');
@@ -30,6 +29,15 @@ for i = 1:length(subjects),
     time_sleep = data{3}/1000 + time_zone*3600;
     time_wake = data{4}/1000 + time_zone*3600;
     time_up = data{5}/1000 + time_zone*3600;
+    
+    if extract_workday,
+        workday = categorical(data{7});
+        workday_new = zeros(length(workday),1);
+        workday_new(workday=='off') = 0;
+        workday_new(workday=='partial') = 1;
+        workday_new(workday=='normal') = 2;
+        workday = workday_new;
+    end
     
     % loading location data
     filename = [data_dir, subjects{i}, '\fus.csv'];
@@ -177,6 +185,10 @@ for i = 1:length(subjects),
                     cellfun(@(x) mode(x{6})>0, data_int)', ... %battery charging?
                     cellfun(@(x) sum(char(mode(x{7}))), data_int)']; ... %dominant wifi name
                 
+                if extract_workday,
+                    ft = [ft, workday(j)*ones(length(data_int),1)];
+                end
+                
                 ft(isnan(ft(:,2)),:) = [];
                 ft(isnan(ft(:,3)),:) = [];
                 ft(isnan(ft(:,4)),:) = [];
@@ -208,5 +220,9 @@ for i = 1:length(subjects),
 end
 
 if save_results,
-    save('features_sleep.mat', 'feature', 'state');
+    if extract_workday,
+        save('features_sleep_workdayinfo.mat', 'feature', 'state');
+    else
+        save('features_sleep.mat', 'feature', 'state');
+    end
 end

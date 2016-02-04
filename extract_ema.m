@@ -1,3 +1,5 @@
+%% This function calculates daily averages of each self-reported variable
+
 clear;
 close all;
 

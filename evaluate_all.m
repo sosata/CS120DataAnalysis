@@ -1,7 +1,7 @@
 clear;
 close all;
 
-addpath('.\functions\');
+addpath('functions');
 load('settings.mat');
 load('time_senddata.mat');
 

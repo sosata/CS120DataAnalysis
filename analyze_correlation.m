@@ -3,14 +3,15 @@ close all;
 
 plot_results = false;
 correlation_type = 'spearman';
-target_type = 'factor'; % 'normal','diff','factor'
+target_type = 'normal'; % 'normal','diff','factor'
 
 %% loading data
 % load('features_stress.mat');
 % load('features_mood.mat');
 % load('features_energy.mat');
 % load('features_focus.mat');
-load('features_ema.mat');
+% load('features_ema.mat');
+load('features_workday.mat');
 
 %% global correlation
 feature_all = [];
@@ -27,12 +28,18 @@ for i = 1:length(feature),
     if strcmp(target_type,'factor'),
         state_all = [state_all; [calm{i},mood{i},energy{i},focus{i}]*[0.5;0.5;0.5;0.5]];
     else
-        state_all = [state_all; energy{i}];
+        state_all = [state_all; state{i}];
     end
 end
 
 % To handle NaN values %%%%%%
 feature_all(isnan(feature_all)) = 0;
+
+% To handle categorical states
+if iscategorical(state_all),
+    state_u = unique(state_all);
+    state_all = cat2num(state_all);
+end
 
 for i=1:size(feature_all,2),
     [r, p] = corr(feature_all(:,i), state_all, 'type', correlation_type);

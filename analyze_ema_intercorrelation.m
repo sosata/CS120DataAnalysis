@@ -1,6 +1,8 @@
 clear;
 close all;
 
+slsh = '/';
+
 % addpath('functions\');
 load('settings.mat');
 
@@ -15,18 +17,16 @@ cnt = 1;
 for i = 1:length(subjects),
     
     % loading focus data
-    filename = [data_dir, subjects{i}, '\emm.csv'];
+    filename = [data_dir, subjects{i}, slsh, 'emm.csv'];
     if ~exist(filename, 'file'),
         disp(['No EMA data for ', subjects{i}]);
     else
-        fid = fopen(filename, 'r');
-        data = textscan(fid, '%f%f%f%f%f', 'delimiter', '\t');
-        fclose(fid);
-        time{cnt} = data{1} + time_zone*3600;
-        stress{cnt} = data{2};  
-        mood{cnt} = data{3};  
-        energy{cnt} = data{4}; 
-        focus{cnt} = data{5};  
+        data = readtable(filename, 'delimiter', '\t', 'ReadVariableNames', false);
+        time{cnt} = data.Var1 + time_zone*3600;
+        stress{cnt} = data.Var2;  
+        mood{cnt} = data.Var3;  
+        energy{cnt} = data.Var4; 
+        focus{cnt} = data.Var5;  
         cnt = cnt+1;
     end
     
@@ -38,10 +38,10 @@ mood_all = [];
 energy_all = [];
 focus_all = [];
 for i=1:length(time),
-    stress_all = [stress_all; zscore(stress{i})];
-    mood_all = [mood_all; zscore(mood{i})];
-    energy_all = [energy_all; zscore(energy{i})];
-    focus_all = [focus_all; zscore(focus{i})];
+    stress_all = [stress_all; stress{i}];
+    mood_all = [mood_all; mood{i}];
+    energy_all = [energy_all; energy{i}];
+    focus_all = [focus_all; focus{i}];
 end
 [r, p] = corr(stress_all,mood_all);
 fprintf('stress vs mood: %.3f (%.3f)\n', r, p);
@@ -83,8 +83,6 @@ ylabel('r');
 [coefs, score, latent] = pca([stress_all, mood_all, energy_all, focus_all]);
 % coefs = nnmf([stress_all, mood_all, energy_all, focus_all],4);
 
-return;
-
 %% plotting relationships
 h = figure;
 pic_sf = zeros(range(stress_all)+1, range(focus_all)+1);
@@ -98,23 +96,19 @@ for i = 1:length(stress_all),
     pic_sm(stress_all(i)+1,mood_all(i)+1) = pic_sm(stress_all(i)+1,mood_all(i)+1) + 1;
 end
 subplot 221;
-imagesc(pic_sf');
-set(gca, 'ydir','normal');
+scatter_discrete(stress_all,focus_all);
 xlabel('stress');
 ylabel('focus');
 subplot 222;
-imagesc(pic_fm');
-set(gca, 'ydir','normal');
+scatter_discrete(focus_all,mood_all);
 xlabel('focus');
 ylabel('mood');
 subplot 223;
-imagesc(pic_em');
-set(gca, 'ydir','normal');
+scatter_discrete(energy_all,mood_all);
 xlabel('energy');
 ylabel('mood');
 subplot 224;
-imagesc(pic_sm');
-set(gca, 'ydir','normal');
+scatter_discrete(stress_all,mood_all);
 xlabel('stress');
 ylabel('mood');
 

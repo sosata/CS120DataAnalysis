@@ -1,10 +1,13 @@
-function [duration, frequency] = estimate_usage(time, state, dur_threshold_low, dur_threshold_high)
+%% Phone usage stats per day
+
+function [screen, duration, frequency] = estimate_usage(time, state, dur_threshold_low, dur_threshold_high)
 
 states = unique(state);
 
 if length(states)<2,
     duration = 0;
     frequency = 0;
+    screen = 0;
     return;
 end
 
@@ -23,7 +26,8 @@ for k = 2:length(state),
     end
 end
 
-duration = sum(dur);
-frequency = length(dur);
+duration = sum(dur)/(time(end)-time(1))*86400;
+frequency = length(dur)/(time(end)-time(1))*86400;
+screen = length(time)/(time(end)-time(1))*86400;
 
 end
