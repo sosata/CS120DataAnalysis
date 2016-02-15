@@ -12,7 +12,7 @@ cnt = 1;
 for i = 1:length(subjects),
     
     % loading emc data
-    filename = [data_dir, subjects{i}, slsh, 'emc2.csv'];
+    filename = [data_dir, subjects{i}, slsh, 'emc.csv'];
     if ~exist(filename, 'file'),
         disp(['No contact self-report data for ', subjects{i}]);
         continue;
