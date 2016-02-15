@@ -1,6 +1,6 @@
 .gitignor
 useless
-settings.mat
+*.mat
 log*.txt
 *~
 *.asv
