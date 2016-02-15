@@ -17,7 +17,8 @@ list(1) = [];
 
 data_contact = cell(length(subjects),1);
 
-disp('reading tables...');
+disp('Reading tables...');
+
 for i = 1:length(list),
     
     fprintf('%d/%d\n', i, length(list));
@@ -43,13 +44,19 @@ for i = 1:length(list),
     
 end
 
-disp('writing tables to subject directories...');
+disp('Writing tables to subject directories...');
 
 inds = find(cellfun(@(x) ~isempty(x), data_contact));
 
 for i=1:length(inds),
     fprintf('%d/%d\n', i, length(inds));
-    if exist([data_dir, subjects{inds(i)}]),
+    if exist([data_dir, subjects{inds(i)}], 'dir'),
+        for j=1:length(data_contact{inds(i)}.date),
+            dt = data_contact{inds(i)}.date{j};
+            dt(dt=='T') = ' ';
+            dt = (datenum(dt) - datenum(1970,1,1))*86400;
+            data_contact{inds(i)}.date{j} = dt;
+        end
         writetable(data_contact{inds(i)}, [data_dir, subjects{inds(i)}, '\emc2.csv'], 'delimiter', '\t', 'writerownames', false);
     else
         disp('Target directory does not exist. Skipping...');
