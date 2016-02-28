@@ -1,10 +1,10 @@
 clear;
 close all;
 
-extract_time_senddata = false;
+extract_time_senddata = true;
 
 date_start = datenum(2015, 10, 28) - datenum(1970,1,1);
-date_end = datenum(2016, 1, 25) - datenum(1970,1,1);
+date_end = datenum(2016, 1, 27) - datenum(1970,1,1);
 
 time_zone = -5;
 
@@ -17,15 +17,15 @@ gap_max_wifi = 10*3600;
 
 % data_dir = 'C:\Data\CS120\';
 % data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
-% data_dir = '~/Dropbox/Data/CS120/';
-data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
+data_dir = '~/Dropbox/Data/CS120/';
+% data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
 
 addpath('functions');
 
 % subjects_info = 'C:\Users\sst485\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
 % subjects_info = 'C:\Users\Sohrob\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
-% subjects_info = '~/Dropbox/Code/Python/PG2CSV_CS120/subject_info_cs120.csv';
-subjects_info = 'C:\Users\cbits\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
+subjects_info = '~/Dropbox/Code/Python/PG2CSV_CS120/subject_info_cs120.csv';
+% subjects_info = 'C:\Users\cbits\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
 
 % finding start times
 
@@ -35,7 +35,7 @@ fclose(fid);
 subjects = subjects{:,1};
 
 %%%%%%%%%%%%%%%%%% due to a problem with this subject's app data %%%%%%%%
-subjects(127) = [];
+subjects(117) = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 save('settings.mat', 'date_start', 'date_end', 'time_zone', 'data_dir' , 'subjects', 'timestamp_start', ...
@@ -45,10 +45,10 @@ if extract_time_senddata,
     
     timestamp_senddata = ones(1,length(subjects))*inf;
     for i = 1:length(subjects),
-        files = dir([data_dir, subjects{i}, '\*.csv']);
+        files = dir([data_dir, subjects{i}, '/*.csv']);
         if ~isempty(files),
             for j = 1:length(files),
-                data = readtable([data_dir, subjects{i}, '\', files(j).name], 'delimiter', '\t', 'readvariablenames', false);
+                data = readtable([data_dir, subjects{i}, '/', files(j).name], 'delimiter', '\t', 'readvariablenames', false);
                 start = data.Var1(1) + time_zone*3600;
                 if timestamp_senddata(i) > start,
                     timestamp_senddata(i) = start;
