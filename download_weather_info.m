@@ -26,6 +26,8 @@ for i=1:length(subjects),
     else
         % read data
         tab = readtable(filename, 'delimiter', '\t', 'readvariablenames', false);
+        
+        return;
         time = tab.Var1;
         lat = tab.Var2;
         lng = tab.Var3;

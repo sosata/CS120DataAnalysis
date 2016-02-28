@@ -1,57 +1,49 @@
 % This function breaks data into separate days.
-% The first cell is assumed to contain Unix timestamps in ascending order.
-% attribute: The dimention (attribute) to be extracted
+% Data must be in table format.
+% The first column is Unix timestamps in ascending order, and the rest are
+% attribute values.
 
-function out = separate_days(data, dim, date_start, date_end)
+function [out, date, stats] = separate_days(data, date_start, date_end, extract_stats)
 
-if length(data)<2,
-    error('Data format incorrect.');
+if ~istable(data),
+    error('Data must be in table format.');
 end
 
-time = data{1};
-value = data{dim+1};
-clear data;
+time = data.Var1;
 
-if isempty(time)||isempty(value),
-    error('Data contains no values in dimension #%d',dim);
+if isempty(time),
+    error('Table contains no data');
 end
 
 sd = 86400; % seconds in a day
 
-out.day = date_start:date_end;
+date = date_start:date_end;
+
+out = cell(length(date),1);
+stats = cell(length(date),1);
 
 cnt = 0;
-for d=out.day,
+for d = date,
+    
     cnt = cnt+1;
-    out.date{cnt} = datestr(d + datenum(1970,1,1), 6);
+    %out.date{cnt} = datestr(d + datenum(1970,1,1), 6);
     ind_rng = find(time>=d*sd,1,'first'):find(time<=(d+1)*sd,1,'last');
+    
     if ~isempty(ind_rng)
-        out.timestamp{cnt} = time(ind_rng);
-        out.timeofday{cnt} = mod(time(ind_rng),sd);
-        out.value{cnt} = value(ind_rng);
-        if iscategorical(value),
-            out.samplingduration(cnt) = sd/length(ind_rng);
-        else
-            out.samplingduration(cnt) = sd/sum(~isnan(value(ind_rng)));
+        
+        out{cnt} = data(ind_rng, :);
+        
+        if extract_stats,
+            stats{cnt}.samplingduration = sd/length(ind_rng);
+            stats{cnt}.maxgap(cnt) = max(diff([d*sd;time(ind_rng);(d+1)*sd]));
         end
-        if length(ind_rng)>0,%1,%%%%%%%%%%
-            out.maxgap(cnt) = max(diff([d*sd;time(ind_rng);(d+1)*sd]));
-            %out.maxgap(cnt) = max(diff(time(ind_rng)));
-%         elseif length(ind_rng)==1,
-%             out.maxgap(cnt) = max(diff([d*sd;time(ind_rng);(d+1)*sd]));
-        else
-            out.maxgap(cnt) = 0;
-        end
+        
     else
-        out.timestamp{cnt} = [];
-        out.timeofday{cnt} = [];
-        out.value{cnt} = [];
-        out.samplingduration(cnt) = sd;
-        out.maxgap(cnt) = sd;
+        
+        out{cnt} = [];
+        stats{cnt} = [];
+        
     end
 end
-
-% out.original.time = time;
-% out.original.value = value;
 
 end
