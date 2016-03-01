@@ -109,7 +109,9 @@ end
 
 if query_weather,
     
-    for i = 1:1,%length(loc.subject),
+    for i = 7:length(loc.subject),  %%%%
+        
+        fprintf('\nSubject %d/%d\n', i, length(loc.subject));
         
         timestamp = [];
         tempm = [];
@@ -130,7 +132,7 @@ if query_weather,
         
         for j=1:length(loc.jour{i}),
             
-            fprintf('\nday %d\n', j);
+            fprintf('%d ', j);
             jourstr = datestr(loc.jour{i}(j)+datenum(1970,1,1),'yyyymmdd');
             cent_round = round(loc.centroid{i}{j}*10)/10; % since Wunderground's precision is .1
 
@@ -145,38 +147,39 @@ if query_weather,
                 
                 wdata_loc = wdata{loc.lab{i}{j}(k)};
                 
+                if ~isfield(wdata_loc,'history'),
+                    warning('some history did not exist. skipping...');
+                    continue;
+                end
+                
                 % finding the closest report
                 time_report = [];
                 for kk = 1:length(wdata_loc.history.observations),
-                    
                     time_report(kk) = str2num(wdata_loc.history.observations{kk}.date.hour)*3600 + ...
                         str2num(wdata_loc.history.observations{kk}.date.hour)*60;
-                    
                 end
-                
                 [~, ind] = min(abs(time_report-mod(loc.time{i}{j}(k),86400)));
                 
-                fprintf('reading location %d report %d\n', loc.lab{i}{j}(k), ind);
+                %fprintf('reading location %d report %d\n', loc.lab{i}{j}(k), ind);
                 
                 % reading weather data
-                % TODO
-                
+                % mean is added to generate NaN when record is empty
                 timestamp = [timestamp; loc.time{i}{j}(k)];
-                tempm = [tempm; str2num(wdata_loc.history.observations{ind}.tempm)];
-                hum = [hum; str2num(wdata_loc.history.observations{ind}.hum)];
-                dewptm = [dewptm; str2num(wdata_loc.history.observations{ind}.dewptm)];
-                wspdm = [wspdm; str2num(wdata_loc.history.observations{ind}.wspdm)];
-                vism = [vism; str2num(wdata_loc.history.observations{ind}.vism)];
-                pressurem = [pressurem; str2num(wdata_loc.history.observations{ind}.pressurem)];
-                windchillm = [windchillm; str2num(wdata_loc.history.observations{ind}.windchillm)];
-                precipm = [precipm; str2num(wdata_loc.history.observations{ind}.precipm)];
+                tempm = [tempm; mean(str2num(wdata_loc.history.observations{ind}.tempm))];
+                hum = [hum; mean(str2num(wdata_loc.history.observations{ind}.hum))];
+                dewptm = [dewptm; mean(str2num(wdata_loc.history.observations{ind}.dewptm))];
+                wspdm = [wspdm; mean(str2num(wdata_loc.history.observations{ind}.wspdm))];
+                vism = [vism; mean(str2num(wdata_loc.history.observations{ind}.vism))];
+                pressurem = [pressurem; mean(str2num(wdata_loc.history.observations{ind}.pressurem))];
+                windchillm = [windchillm; mean(str2num(wdata_loc.history.observations{ind}.windchillm))];
+                precipm = [precipm; mean(str2num(wdata_loc.history.observations{ind}.precipm))];
                 conds = [conds; wdata_loc.history.observations{ind}.conds];
-                fog = [fog; str2num(wdata_loc.history.observations{ind}.fog)];
-                rain = [rain; str2num(wdata_loc.history.observations{ind}.rain)];
-                snow = [snow; str2num(wdata_loc.history.observations{ind}.snow)];
-                hail = [hail; str2num(wdata_loc.history.observations{ind}.hail)];
-                thunder = [thunder; str2num(wdata_loc.history.observations{ind}.thunder)];
-                tornado = [tornado; str2num(wdata_loc.history.observations{ind}.tornado)];
+                fog = [fog; mean(str2num(wdata_loc.history.observations{ind}.fog))];
+                rain = [rain; mean(str2num(wdata_loc.history.observations{ind}.rain))];
+                snow = [snow; mean(str2num(wdata_loc.history.observations{ind}.snow))];
+                hail = [hail; mean(str2num(wdata_loc.history.observations{ind}.hail))];
+                thunder = [thunder; mean(str2num(wdata_loc.history.observations{ind}.thunder))];
+                tornado = [tornado; mean(str2num(wdata_loc.history.observations{ind}.tornado))];
                 
             end
             
@@ -191,6 +194,7 @@ if query_weather,
             rain, snow, hail, thunder, tornado), [pth, '/wtr.csv'], 'delimiter', '\t', ...
             'writevariablenames', false);
         
+        fprintf('\nWritten to file.\n');
     end
     
 end
