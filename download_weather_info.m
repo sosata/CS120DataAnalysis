@@ -109,7 +109,7 @@ end
 
 if query_weather,
     
-    for i = 7:length(loc.subject),  %%%%
+    for i = 99:length(loc.subject),  %%%%
         
         fprintf('\nSubject %d/%d\n', i, length(loc.subject));
         
@@ -148,7 +148,12 @@ if query_weather,
                 wdata_loc = wdata{loc.lab{i}{j}(k)};
                 
                 if ~isfield(wdata_loc,'history'),
-                    warning('some history did not exist. skipping...');
+                    warning('\nsome history did not exist. skipping...');
+                    continue;
+                end
+                
+                if isempty(wdata_loc.history.observations),
+                    warning('\nobservations is empty. skipping...');
                     continue;
                 end
                 
@@ -173,13 +178,14 @@ if query_weather,
                 pressurem = [pressurem; mean(str2num(wdata_loc.history.observations{ind}.pressurem))];
                 windchillm = [windchillm; mean(str2num(wdata_loc.history.observations{ind}.windchillm))];
                 precipm = [precipm; mean(str2num(wdata_loc.history.observations{ind}.precipm))];
-                conds = [conds; wdata_loc.history.observations{ind}.conds];
                 fog = [fog; mean(str2num(wdata_loc.history.observations{ind}.fog))];
                 rain = [rain; mean(str2num(wdata_loc.history.observations{ind}.rain))];
                 snow = [snow; mean(str2num(wdata_loc.history.observations{ind}.snow))];
                 hail = [hail; mean(str2num(wdata_loc.history.observations{ind}.hail))];
                 thunder = [thunder; mean(str2num(wdata_loc.history.observations{ind}.thunder))];
                 tornado = [tornado; mean(str2num(wdata_loc.history.observations{ind}.tornado))];
+                conds{end+1,1} = wdata_loc.history.observations{ind}.conds;   %%%
+                
                 
             end
             
