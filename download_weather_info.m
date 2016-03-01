@@ -5,11 +5,12 @@ load('settings.mat');
 addpath('features');
 addpath('functions');
 
-extract_locations = true;
-query_weather = false;
+extract_locations = false;
+query_weather = true;
 
 plot_clusters = false;
 
+weather_dir = '~/Dropbox/Data/CS120Weather/';
 
 % latitude parameters (independent of location)
 lat_km = 111;
@@ -107,10 +108,88 @@ else
 end
 
 if query_weather,
-    %TODO
+    
     for i = 1:1,%length(loc.subject),
         
+        timestamp = [];
+        tempm = [];
+        hum = [];
+        dewptm = [];
+        wspdm = [];
+        vism = [];
+        pressurem = [];
+        windchillm = [];
+        precipm = [];
+        conds = {};
+        fog = [];
+        rain = [];
+        snow = [];
+        hail = [];
+        thunder = [];
+        tornado = [];
         
+        for j=1:length(loc.jour{i}),
+            
+            fprintf('\nday %d\n', j);
+            jourstr = datestr(loc.jour{i}(j)+datenum(1970,1,1),'yyyymmdd');
+            cent_round = round(loc.centroid{i}{j}*10)/10; % since Wunderground's precision is .1
+
+            wdata = cell(size(cent_round,1),1);
+            for k = 1:size(cent_round,1),
+                query = sprintf('http://api.wunderground.com/api/0bc17b8eda068aba/history/q/%.1f,%.1f.json', ...
+                    cent_round(k,2), cent_round(k,1));
+                wdata{k} = JSON.parse(urlread(query));
+            end
+            
+            for k = 1:length(loc.time{i}{j}),
+                
+                wdata_loc = wdata{loc.lab{i}{j}(k)};
+                
+                % finding the closest report
+                time_report = [];
+                for kk = 1:length(wdata_loc.history.observations),
+                    
+                    time_report(kk) = str2num(wdata_loc.history.observations{kk}.date.hour)*3600 + ...
+                        str2num(wdata_loc.history.observations{kk}.date.hour)*60;
+                    
+                end
+                
+                [~, ind] = min(abs(time_report-mod(loc.time{i}{j}(k),86400)));
+                
+                fprintf('reading location %d report %d\n', loc.lab{i}{j}(k), ind);
+                
+                % reading weather data
+                % TODO
+                
+                timestamp = [timestamp; loc.time{i}{j}(k)];
+                tempm = [tempm; str2num(wdata_loc.history.observations{ind}.tempm)];
+                hum = [hum; str2num(wdata_loc.history.observations{ind}.hum)];
+                dewptm = [dewptm; str2num(wdata_loc.history.observations{ind}.dewptm)];
+                wspdm = [wspdm; str2num(wdata_loc.history.observations{ind}.wspdm)];
+                vism = [vism; str2num(wdata_loc.history.observations{ind}.vism)];
+                pressurem = [pressurem; str2num(wdata_loc.history.observations{ind}.pressurem)];
+                windchillm = [windchillm; str2num(wdata_loc.history.observations{ind}.windchillm)];
+                precipm = [precipm; str2num(wdata_loc.history.observations{ind}.precipm)];
+                conds = [conds; wdata_loc.history.observations{ind}.conds];
+                fog = [fog; str2num(wdata_loc.history.observations{ind}.fog)];
+                rain = [rain; str2num(wdata_loc.history.observations{ind}.rain)];
+                snow = [snow; str2num(wdata_loc.history.observations{ind}.snow)];
+                hail = [hail; str2num(wdata_loc.history.observations{ind}.hail)];
+                thunder = [thunder; str2num(wdata_loc.history.observations{ind}.thunder)];
+                tornado = [tornado; str2num(wdata_loc.history.observations{ind}.tornado)];
+                
+            end
+            
+        end
+        
+        % writing to file
+        pth = [weather_dir, loc.subject{i}];
+        if ~exist(pth,'dir'),
+            mkdir(pth);
+        end
+        writetable(table(timestamp, tempm, hum, dewptm, wspdm, vism, pressurem, windchillm, precipm, conds, fog, ...
+            rain, snow, hail, thunder, tornado), [pth, '/wtr.csv'], 'delimiter', '\t', ...
+            'writevariablenames', false);
         
     end
     
