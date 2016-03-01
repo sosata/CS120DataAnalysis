@@ -3,7 +3,7 @@
 % The first column is Unix timestamps in ascending order, and the rest are
 % attribute values.
 
-function [out, date, stats] = separate_days(data, date_start, date_end, extract_stats)
+function [out, jour, stats] = separate_days(data, extract_stats)
 
 if ~istable(data),
     error('Data must be in table format.');
@@ -17,13 +17,15 @@ end
 
 sd = 86400; % seconds in a day
 
-date = date_start:date_end;
+date_start = floor(data.Var1(1)/sd);
+date_end = floor(data.Var1(end)/sd);
+jour = date_start:date_end;
 
-out = cell(length(date),1);
-stats = cell(length(date),1);
+out = cell(length(jour),1);
+stats = cell(length(jour),1);
 
 cnt = 0;
-for d = date,
+for d = jour,
     
     cnt = cnt+1;
     %out.date{cnt} = datestr(d + datenum(1970,1,1), 6);

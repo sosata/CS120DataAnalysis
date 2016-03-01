@@ -14,7 +14,7 @@ for i=1:length(indx),
     ind = [ind; find((abs(lng-centers_x(indx(i)))<rad_x)&(abs(lat-centers_y(indy(i)))<rad_y))];
 end
 ind = sort(ind);
-fprintf('%.0f%% of data removed by histogram filtering.\n',(length(lng)-length(ind))/length(lng)*100);
+%fprintf('%.0f%% of data removed by histogram filtering.\n',(length(lng)-length(ind))/length(lng)*100);
 lng_out = lng(ind);
 lat_out = lat(ind);
 time_out = time(ind);

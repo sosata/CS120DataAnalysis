@@ -1,7 +1,7 @@
 clear;
 close all;
 
-extract_time_senddata = true;
+extract_time_senddata = false;
 
 date_start = datenum(2015, 10, 28) - datenum(1970,1,1);
 date_end = datenum(2016, 1, 27) - datenum(1970,1,1);
