@@ -103,7 +103,7 @@ for i = 1:length(subjects),
             end
         end
         
-        [screen, use_dur, use_freq] = estimate_usage(sensor_clp.scr{1}, sensor_clp.scr{2}, 30, Inf);
+        [screen, use_dur, use_freq] = extract_features_usage(sensor_clp.scr{1}, sensor_clp.scr{2}, 30, Inf);
         
 %         inds = find(diff(sensor_clp.fus{1})==0);
 %         sensor_clp.fus{1}(inds) = [];

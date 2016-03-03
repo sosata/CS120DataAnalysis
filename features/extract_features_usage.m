@@ -1,13 +1,20 @@
 %% Phone usage stats per day
 
-function [screen, duration, frequency] = estimate_usage(time, state, dur_threshold_low, dur_threshold_high)
+function [feature, feature_label] = extract_features_usage(data, dur_threshold_low, dur_threshold_high)
 
+feature_label = {'screen','duration','frequency'};
+
+if isempty(data),
+    feature = [0 0 0];
+    return;
+end
+
+time = data{1};
+state = data{2};
 states = unique(state);
 
 if length(states)<2,
-    duration = 0;
-    frequency = 0;
-    screen = 0;
+    feature = [0 0 0];
     return;
 end
 
@@ -29,5 +36,7 @@ end
 duration = sum(dur)/(time(end)-time(1))*86400;
 frequency = length(dur)/(time(end)-time(1))*86400;
 screen = length(time)/(time(end)-time(1))*86400;
+
+feature = [screen, duration, frequency];
 
 end

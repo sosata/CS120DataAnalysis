@@ -10,7 +10,8 @@ query_weather = true;
 
 plot_clusters = false;
 
-weather_dir = '~/Dropbox/Data/CS120Weather/';
+% weather_dir = '~/Dropbox/Data/CS120Weather/';
+weather_dir = 'C:\Users\cbits\Dropbox\Data\CS120Weather\';
 
 % latitude parameters (independent of location)
 lat_km = 111;
@@ -109,7 +110,7 @@ end
 
 if query_weather,
     
-    for i = 99:length(loc.subject),  %%%%
+    for i = 137:length(loc.subject),  %%%%
         
         fprintf('\nSubject %d/%d\n', i, length(loc.subject));
         

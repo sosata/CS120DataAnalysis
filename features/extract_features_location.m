@@ -1,4 +1,22 @@
-function [features, feature_labels] = extract_features_location(time, lat, lng)
+function [features, feature_labels] = extract_features_location(data)
+
+feature_labels = {'Total Distance', 'Location Variance', ...
+    'Circadian Movement', 'Number of Clusters', 'Entropy', 'Normalized Entropy', 'Continuous Entropy', ...
+    'Home Stay', 'Transition Time', 'Cluster Circadian Movement'};
+
+if isempty(data),
+    features = ones(1,10)*NaN;
+    return;
+end
+
+time = data{1};
+lat = data{2};
+lng = data{3};
+clear data;
+if isempty(time),
+    features = ones(1,10)*NaN;
+    return;
+end
 
 histogram_filter = true;
 speed_filter = true;
@@ -11,7 +29,7 @@ hist_res_lng = 0.5/lng_km; % (500m) histogram resolution in longitude
 hist_threshold = 1;%%%%
 speed_max = 1/latlong_km/3600; % (deg/s) (=1 km/h) to find static location for filtering location data
 n_kmeans_init = 1;
-kmeans_distance_max = (0.5/latlong_km)^2; % 500m 
+kmeans_distance_max = 0.5/latlong_km; %(0.5/latlong_km)^2; % 500m 
 speed_gap_threshold = 30*60; % (5 min) to remove gaps prior to estimating the speed
 
 lat_zm = lat - mean(lat);
@@ -51,8 +69,6 @@ end
 
 if isempty(time),
     features = ones(1,10)*NaN;
-    feature_labels = {'Total Distance', 'Location Variance', ...
-    'Circadian Movement', 'Number of Clusters', 'Entropy', 'Normalized Entropy', 'Continuous Entropy', 'Home Stay', 'Transition Time'};
     return;
 end
 
@@ -80,10 +96,6 @@ clus_circadian_movement = estimate_circadian_rhythmicity(time(find(diff(labs)>0)
 
 features = [displacement, location_variance, circadian_movement, ...
     num_clusters, ent, ent_norm, ent_cont, home_stay, out_time, clus_circadian_movement];
-
-feature_labels = {'Total Distance', 'Location Variance', ...
-    'Circadian Movement', 'Number of Clusters', 'Entropy', 'Normalized Entropy', 'Continuous Entropy', ...
-    'Home Stay', 'Transition Time', 'Cluster Circadian Movement'};
 
 
 end
