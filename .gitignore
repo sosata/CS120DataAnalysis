@@ -1,5 +1,5 @@
 .gitignor
-useless
+Results
 *.mat
 log*.txt
 *~
