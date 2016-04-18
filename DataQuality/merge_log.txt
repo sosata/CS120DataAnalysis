@@ -1,0 +1,209 @@
+subject 1002060: 1 device
+subject 1013558: 1 device
+subject 1022235: 1 device
+subject 1027472: 1 device
+subject 1041304: 1 device
+subject 1041667: 1 device
+subject 1051651: 1 device
+subject 1054952: 2 devices; only 1 has data
+subject 1055808: 1 device
+subject 1056017: 1 device
+subject 1057121: 1 device
+subject 1061128: 1 device
+subject 106743: 1 device
+subject 1078563: 1 device
+subject 1079411: 1 device
+subject 1080326: 1 device
+subject 1084240: 1 device
+subject 1097633: 1 device
+subject 1114936: 1 device
+subject 1124659: 1 device
+subject 1126438: 1 device
+subject 1126979: 1 device
+subject 1128660: 1 device
+subject 1130163: 1 device
+subject 1130955: 1 device
+subject 1135515: 1 device
+subject 1142152: 1 device
+subject 1143410: 1 device
+subject 1145713: 1 device
+subject 1147164: 1 device
+subject 1148714: 1 device
+subject 1150915: 2 devices; merging TODO
+subject 1155329: 1 device
+subject 1157796: 2 devices; merging TODO
+subject 1164303: 1 device
+subject 1165040: 1 device
+subject 1170978: 1 device
+subject 1177977: 1 device
+subject 1178484: 1 device
+subject 1179075: 1 device
+subject 1183252: 1 device
+subject 1184498: 1 device
+subject 1186533: 1 device
+subject 1189725: 1 device
+subject 1197009: 1 device
+subject 1199841: 1 device
+subject 1203725: 1 device
+subject 1207041: 1 device
+subject 1208813: 1 device
+subject 1210517: 1 device
+subject 1213494: 1 device
+subject 1213535: 1 device
+subject 1213906: 1 device
+subject 1217425: 1 device
+subject 1219403: 1 device
+subject 1225160: 1 device
+subject 1229114: 1 device
+subject 1230637: 1 device
+subject 1234088: 2 devices; merging TODO
+subject 1244644: 1 device
+subject 1255682: 2 devices; merging TODO
+subject 1270329: 1 device
+subject 1272711: 2 devices; only 1 has data
+subject 1288818: 1 device
+subject 1294671: 1 device
+subject 1299151: 1 device
+subject 1305690: 1 device
+subject 1307868: 2 devices; only 1 has data
+subject 1307899: 1 device
+subject 1312819: 2 devices; merging TODO
+subject 1327952: 1 device
+subject 1328568: 1 device
+subject 1328707: 1 device
+subject 1334243: 2 devices; only 1 has data
+subject 1336140: 1 device
+subject 1355344: 1 device
+subject 1367477: 1 device
+subject 1370566: 2 devices; merging TODO
+subject 1374066: 2 devices; only 1 has data
+subject 1380734: 1 device
+subject 1381257: 1 device
+subject 1382086: 1 device
+subject 1385032: 1 device
+subject 1388630: 1 device
+subject 1401811: 1 device
+subject 1401878: 1 device
+subject 1403756: 1 device
+subject 1407619: 1 device
+subject 1409046: 1 device
+subject 1411525: 1 device
+subject 1422927: 1 device
+subject 1425272: 1 device
+subject 1428949: 1 device
+subject 1433908: 1 device
+subject 1439160: 1 device
+subject 1444502: 1 device
+subject 1464458: 1 device
+subject 1479464: 1 device
+subject 1483186: 1 device
+subject 1495049: 1 device
+subject 1495360: 1 device
+subject 1496251: 1 device
+subject 1497026: 1 device
+subject 1503395: 1 device
+subject 1505268: 1 device
+subject 1515656: 1 device
+subject 1521517: 1 device
+subject 1523880: 1 device
+subject 1524496: 1 device
+subject 1524947: 1 device
+subject 1531633: 2 devices; only 1 has data
+subject 1533327: 1 device
+subject 1535103: 1 device
+subject 1536580: 1 device
+subject 1537431: 2 devices; only 1 has data
+subject 1549226: 1 device
+subject 1550259: 1 device
+subject 1553373: 1 device
+subject 1553904: 1 device
+subject 1557966: 1 device
+subject 1559190: 1 device
+subject 1560722: 1 device
+subject 1560782: 1 device
+subject 1564420: 1 device
+subject 1565499: 1 device
+subject 1567198: 1 device
+subject 1567871: 1 device
+subject 1569348: 1 device
+subject 1569370: 1 device
+subject 1571376: 2 devices; merging TODO
+subject 1573207: 1 device
+subject 1578395: 1 device
+subject 1579481: 1 device
+subject 249499: 1 device
+subject 25349: 1 device
+subject 345921: 1 device
+subject 38880: 1 device
+subject 391378: 1 device
+subject 39468: 1 device
+subject 411896: 1 device
+subject 428255: 1 device
+subject 433874: 1 device
+subject 489868: 1 device
+subject 506107: 1 device
+subject 510909: 1 device
+subject 555220: 1 device
+subject 560623: 1 device
+subject 564447: 1 device
+subject 575209: 1 device
+subject 606449: 1 device
+subject 616751: 2 devices; only 1 has data
+subject 619634: 2 devices; only 1 has data
+subject 62977: 1 device
+subject 630742: 1 device
+subject 636646: 1 device
+subject 639010: 1 device
+subject 662410: 1 device
+subject 733021: 1 device
+subject 765488: 2 devices; only 1 has data
+subject 820387: 1 device
+subject 827285: 1 device
+subject 828778: 1 device
+subject 831987: 1 device
+subject 856513: 1 device
+subject 871322: 1 device
+subject 872451: 1 device
+subject 906629: 1 device
+subject 913164: 1 device
+subject 919141: 1 device
+subject 920558: 1 device
+subject 952207: 1 device
+subject 964685: 1 device
+subject 97397: 1 device
+subject 98384: 1 device
+subject 984221: 1 device
+subject AC363GY: 2 devices; merging TODO
+subject BD921DW: 1 device
+subject BJ540PT: 1 device
+subject CB832WW: 1 device
+subject CL263NI: 2 devices; merging TODO
+subject CP140WM: 1 device
+subject DB233EI: 1 device
+subject EW057DI: The system cannot find the file specified. 
+1 device
+subject EW057EV: 2 devices; merging TODO
+subject FJ227MJ: 1 device
+subject FM387DI: 2 devices; merging TODO
+subject HE593LT: 3 devices; merging TODO
+subject HH880DL: 1 device
+subject HI713WB: 3 devices; merging TODO
+subject HU113HP: 2 devices; merging TODO
+subject IK750RN: 1 device
+subject IP417XX: 1 device
+subject IQ300QN: 1 device
+subject JB320SW: 2 devices; merging TODO
+subject JK130XR: 1 device
+subject JS253NF: 1 device
+subject MQ077WG: 1 device
+subject NJ280ID: 1 device
+subject NQ003SV: 1 device
+subject QC647KS: 1 device
+subject QE210HJ: 1 device
+subject QG620BT: 1 device
+subject SP157RF: 2 devices; merging TODO
+subject TP903SN: 2 devices; merging TODO
+subject UQ050PR: 2 devices; merging TODO
+subject WT253RB: 1 device
+subject XF600QF: 1 device
+subject XU620RL: 1 device

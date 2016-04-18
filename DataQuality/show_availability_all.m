@@ -1,9 +1,9 @@
 clear;
 close all;
 
-load_results = true;
+load_results = false;
 
-addpath('functions');
+addpath('../functions');
 
 data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
 % data_dir = 'C:\Data\CS120\';
@@ -29,9 +29,9 @@ else
         % estimating sensor times
         for j=1:length(sensor),
             % due to a problem with this subject's app csv file
-            if strcmp(subject, '4667dacb7f27afd0933bc46dbc07405e')&&j==2,
-                continue;
-            end
+%             if strcmp(subject, '4667dacb7f27afd0933bc46dbc07405e')&&j==2,
+%                 continue;
+%             end
             filename = [data_dir, subject, '/', sensor{j}, '.csv'];
             if exist(filename,'file'),
                 tab = readtable(filename, 'delimiter','\t','readvariablenames',false);

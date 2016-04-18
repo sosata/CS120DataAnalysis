@@ -1,17 +1,17 @@
 clear;
 close all;
 
-addpath('functions');
+addpath('../Functions');
 
 do_clustering = true;
 do_permutation = false;
 do_filter_demo = false;
 do_switch_sign = false;
 
-load('features_biweekly');
-load('phq9.mat');
-load('gad7.mat');
-load('demo.mat');
+load('../General/features_biweekly');
+load('../Assessment/phq9.mat');
+load('../Assessment/gad7.mat');
+load('../Demographics/demo.mat');
 
 %% inclusion based on demographics
 if do_filter_demo,
