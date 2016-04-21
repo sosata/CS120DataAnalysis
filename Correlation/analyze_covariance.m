@@ -1,7 +1,7 @@
 clear;
 close all;
 
-addpath('../Functions');
+addpath('../functions');
 
 do_clustering = true;
 do_permutation = false;
@@ -12,19 +12,22 @@ load('../General/features_biweekly');
 load('../Assessment/phq9.mat');
 load('../Assessment/gad7.mat');
 load('../Demographics/demo.mat');
+load('../Assessment/tipi.mat');
+load('../Assessment/spin.mat');
+load('../Assessment/dast.mat');
 
 %% inclusion based on demographics
 if do_filter_demo,
     subjects_include = subject_demo(age<=27);
     ind_include = [];
     for i=1:length(subjects_include),
-        ind = find(strcmp(subjects, subjects_include{i}));
+        ind = find(strcmp(subject_feature, subjects_include{i}));
         if ~isempty(ind),
-            ind_include = [ind_include, find(strcmp(subjects, subjects_include{i}))];
+            ind_include = [ind_include, find(strcmp(subject_feature, subjects_include{i}))];
         end
     end
-    fprintf('%d/%d subjects included based on demographics criteria.\n', length(ind_include),length(subjects));
-    subjects = subjects(ind_include);
+    fprintf('%d/%d subject_feature included based on demographics criteria.\n', length(ind_include),length(subject_feature));
+    subject_feature = subject_feature(ind_include);
     feature = feature(ind_include);
 end
 
@@ -37,7 +40,6 @@ if do_permutation,
     gad.w3 = randsample(gad.w3, length(gad.w3));
     gad.w6 = randsample(gad.w6, length(gad.w6));
 end
-
 
 if do_switch_sign,
     inds = [find(strcmp(feature_label,'sleep quality mean')), ...
@@ -53,7 +55,7 @@ end
 
 feature_label = [feature_label, {'PHQ9 W0','PHQ9 W3','PHQ9 W6','PHQ9 W3-0','PHQ9 W6-3',...
     'GAD7 W0','GAD7 W3','GAD7 W6','GAD7 W3-0','GAD7 W6-3',...
-    'age','female'}];
+    'age','female'}, tipi_label, 'SPIN','DAST','AUDIT'];
 
 num_weeks = 1;%median(cellfun(@(x) size(x,1), feature));
 
@@ -67,19 +69,19 @@ for w = 1:num_weeks,
             
             % find PHQ9 score
             % mean is used to turn empty to NaN
-            ind = find(strcmp(subject_phq.w0,subjects{s}));
+            ind = find(strcmp(subject_phq.w0,subject_feature{s}));
             if isempty(ind),
                 phqw0 = NaN;
             else
                 phqw0 = mean(phq.w0(ind));
             end
-            ind = find(strcmp(subject_phq.w3,subjects{s}));
+            ind = find(strcmp(subject_phq.w3,subject_feature{s}));
             if isempty(ind),
                 phqw3 = NaN;
             else
                 phqw3 = mean(phq.w3(ind));
             end
-            ind = find(strcmp(subject_phq.w6,subjects{s}));
+            ind = find(strcmp(subject_phq.w6,subject_feature{s}));
             if isempty(ind),
                 phqw6 = NaN;
             else
@@ -87,19 +89,19 @@ for w = 1:num_weeks,
             end
             
             % find GAD7 score
-            ind = find(strcmp(subject_gad.w0,subjects{s}));
+            ind = find(strcmp(subject_gad.w0,subject_feature{s}));
             if isempty(ind),
                 gadw0 = NaN;
             else
                 gadw0 = mean(gad.w0(ind));
             end
-            ind = find(strcmp(subject_gad.w3,subjects{s}));
+            ind = find(strcmp(subject_gad.w3,subject_feature{s}));
             if isempty(ind),
                 gadw3 = NaN;
             else
                 gadw3 = mean(gad.w3(ind));
             end
-            ind = find(strcmp(subject_gad.w6,subjects{s}));
+            ind = find(strcmp(subject_gad.w6,subject_feature{s}));
             if isempty(ind),
                 gadw6 = NaN;
             else
@@ -107,7 +109,7 @@ for w = 1:num_weeks,
             end
             
             % find demo info
-            ind = find(strcmp(subject_demo,subjects{s}));
+            ind = find(strcmp(subject_demo,subject_feature{s}));
             if isempty(ind),
                 demoage = NaN;
                 demofemale = NaN;
@@ -116,12 +118,38 @@ for w = 1:num_weeks,
                 demofemale = mean(female(ind));
             end
             
+            % find tipi scores
+            ind = find(strcmp(subject_tipi,subject_feature{s}));
+            if isempty(ind),
+                tipiscore = NaN*ones(1,5);
+            else
+                tipiscore = tipi(ind,:);
+            end
+            
+            % find spin scores
+            ind = find(strcmp(subject_spin,subject_feature{s}));
+            if isempty(ind),
+                spinscore = NaN;
+            else
+                spinscore = spin(ind);
+            end
+            
+            % find dast/audit data
+            ind = find(strcmp(subject_dast,subject_feature{s}));
+            if isempty(ind),
+                dastscore = NaN;
+                auditscore = NaN;
+            else
+                dastscore = dast(ind);
+                auditscore = audit(ind);
+            end
+            
             ft = [ft; [feature{s}(w,:), phqw0, phqw3, phqw6, phqw3-phqw0,phqw6-phqw3, ...
                 gadw0, gadw3, gadw6, gadw3-gadw0,gadw6-gadw3, ...
-                demoage, demofemale]];
+                demoage, demofemale, tipiscore, spinscore, dastscore, auditscore]];
             
         else
-            fprintf('Week %d: subject %s removed due to lack of data', w, subjects{s});
+            fprintf('Week %d: subject %s removed due to lack of data', w, subject_feature{s});
         end
     end
     

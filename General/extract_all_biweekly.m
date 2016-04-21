@@ -4,16 +4,17 @@ close all;
 save_results = true;
 remove_duplicates = true;
 
-load('settings');
-addpath('features');
-addpath('functions');
-clear date_start date_end timestamp_start
+load('../settings');
+addpath('../features');
+addpath('../functions');
+clear date_start date_end timestamp_start;
 
-weather_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120Weather\';
-% weather_dir = '~/Dropbox/Data/CS120Weather/';
+% weather_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120Weather\';
+weather_dir = '~/Dropbox/Data/CS120Weather/';
 
-probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'wif', 'wtr', 'emc', 'eml', 'emm', 'ems'};
-win_shift_size = 7;
+probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'tch', 'wif', 'wtr', 'emc', 'eml', 'emm', 'ems'};
+win_size = 14;
+win_shift_size = Inf;
 
 % start time will be determined by the start time of mood data
 cnt = 1;
@@ -88,12 +89,12 @@ parfor i = 1:length(subjects),
             if isempty(data.(probes{j})),
                 datac.(probes{j}) = [];
             else
-                datac.(probes{j}) = clip_data(data.(probes{j}), d*86400, (d+14)*86400);
+                datac.(probes{j}) = clip_data(data.(probes{j}), d*86400, (d+win_size)*86400);
             end
         end
         
         % extracting features
-        %TODO
+        
         [ft, ft_lab] = extract_features_location(datac.fus);
         feature_win = ft;
         feature_win_lab = ft_lab;
@@ -121,18 +122,22 @@ parfor i = 1:length(subjects),
         [ft, ft_lab] = extract_features_light(datac.lgt);
         feature_win = [feature_win, ft];
         feature_win_lab = [feature_win_lab, ft_lab];
-
-        [ft, ft_lab] = extract_features_affect(datac.emm);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_sleep(datac.ems);
+        [ft, ft_lab] = extract_features_app(datac.app);
         feature_win = [feature_win, ft];
         feature_win_lab = [feature_win_lab, ft_lab];
 
-        [ft, ft_lab] = extract_features_locationreport(datac.eml);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_affect(datac.emm);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
+        
+%         [ft, ft_lab] = extract_features_sleep(datac.ems);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
+
+%         [ft, ft_lab] = extract_features_locationreport(datac.eml);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
         % big feature vector
         feature{i} = [feature{i}; feature_win];
@@ -144,5 +149,6 @@ end
 
 if save_results,
     feature_label = feature_label{1};
-    save('features_biweekly.mat', 'feature', 'feature_label', 'subjects');
+    subject_feature = subjects;
+    save('features_biweekly.mat', 'feature', 'feature_label', 'subject_feature');
 end

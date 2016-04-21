@@ -17,25 +17,29 @@ gap_max_wifi = 10*3600;
 
 % data_dir = 'C:\Data\CS120\';
 % data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
-% data_dir = '~/Dropbox/Data/CS120/';
-data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
+data_dir = '~/Dropbox/Data/CS120/';
+% data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
 
 addpath('functions');
 
 % subjects_info = 'C:\Users\sst485\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
 % subjects_info = 'C:\Users\Sohrob\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
 % subjects_info = '~/Dropbox/Code/Python/PG2CSV_CS120/subject_info_cs120.csv';
-subjects_info = 'C:\Users\cbits\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
+% subjects_info = 'C:\Users\cbits\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
 
 % finding start times
 
-fid = fopen(subjects_info,'r');
-subjects = textscan(fid, '%s%s','delimiter',';');
-fclose(fid);
-subjects = subjects{:,1};
+% fid = fopen(subjects_info,'r');
+% subjects = textscan(fid, '%s%s','delimiter',';');
+% fclose(fid);
+% subjects = subjects{:,1};
+
+folders = dir(data_dir);
+folders(1:2) = [];
+subjects = {folders.name};
 
 %%%%%%%%%%%%%%%%%% due to a problem with this subject's app data %%%%%%%%
-subjects(117) = [];
+% subjects(117) = [];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 save('settings.mat', 'date_start', 'date_end', 'time_zone', 'data_dir' , 'subjects', 'timestamp_start', ...

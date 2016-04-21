@@ -1,10 +1,15 @@
 function [features, feature_labels] = extract_features_location(data)
 
 feature_labels = {'total distance', 'loc variance', ...
-    'circadian movement', 'n clusters', 'entropy', 'normalized entropy', 'continuous entropy', ...
-    'home stay', 'transition time', 'cluster cm', 'lat mean', 'lng mean'};
+    'circadian movement', 'num clusters', 'entropy', 'norm entropy', 'continuous entropy', ...
+    'home stay', 'transition time', 'cluster cm', 'lat mean', 'lng mean', 'rare entropy', 'rare norm entropy', 'rare time'};
 
 if isempty(data),
+    features = ones(1,length(feature_labels))*NaN;
+    return;
+end
+
+if isempty(data{1}),
     features = ones(1,length(feature_labels))*NaN;
     return;
 end
@@ -13,10 +18,6 @@ time = data{1};
 lat = data{2};
 lng = data{3};
 clear data;
-if isempty(time),
-    features = ones(1,length(feature_labels))*NaN;
-    return;
-end
 
 histogram_filter = true;
 speed_filter = true;
@@ -90,7 +91,6 @@ else
     ent_norm = 0;
 end
 ent_cont = estimate_entropy_cont(lat, 10) + estimate_entropy_cont(lng, 10);
-%home_stay = estimate_homestay(labs, mode(labs));
 home_stay = estimate_homestay(time, labs);
 
 %% cluster circadian movement
@@ -101,10 +101,31 @@ clus_circadian_movement = estimate_circadian_rhythmicity(time(find(diff(labs)>0)
 % feature_labels = {'Speed Mean', 'Speed Variance', 'Total Distance', 'Location Variance', ...
 %     'Circadian Movement', 'Number of Clusters', 'Entropy', 'Normalized Entropy', 'Continuous Entropy', 'Home Stay', 'Transition Time'};
 
-num_clusters
+%% metrics for less visited locations
+if num_clusters>2,
+    for i=1:num_clusters,
+        freq(i) = sum(labs==i);
+    end
+    [~, ind] = sort(freq);
+    ind_remove = [find(labs==ind(end))', find(labs==ind(end-1))'];
+    labs(ind_remove) = [];
+    
+    ent_rare = estimate_entropy(labs);
+    if ent_rare~=0,
+        ent_norm_rare = ent_rare/log(num_clusters-2);
+    else
+        ent_norm_rare = 0;
+    end
+    time_rare = length(labs)/(time(end)-time(1))*5*60;
+else
+    ent_rare = 0;
+    ent_norm_rare = 0;
+    time_rare = 0;
+end
 
 features = [displacement, location_variance, circadian_movement, ...
-    num_clusters, ent, ent_norm, ent_cont, home_stay, out_time, clus_circadian_movement, lat_mean, lng_mean];
+    num_clusters, ent, ent_norm, ent_cont, home_stay, out_time, clus_circadian_movement, lat_mean, lng_mean, ...
+    ent_rare, ent_norm_rare, time_rare];
 
 
 end

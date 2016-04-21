@@ -5,7 +5,7 @@ load_results = false;
 
 addpath('../functions');
 
-data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
+data_dir = 'C:\Users\sohrob\Dropbox\Data\CS120\';
 % data_dir = 'C:\Data\CS120\';
 
 ema = {'emc','eml','emm','ems'};

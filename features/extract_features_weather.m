@@ -1,7 +1,7 @@
 function [feature, feature_labels] = extract_features_weather(data)
 
 feature_labels = {'temp mean','temp max','temp min','temp var','hum mean', 'hum var', 'press mean', ...
-    'press var', 'precip mean', 'precip var', 'weather badness'};
+    'press var', 'weather badness'};
 
 if isempty(data),
     feature = ones(1,length(feature_labels))*NaN;
@@ -37,7 +37,7 @@ wspdm = data{5};
 vism = data{6};
 pressurem = data{7};
 windchillm = data{8};
-precipm = data{9};
+% precipm = data{9};
 conds = data{10};
 fog = data{11};
 rain = data{12};
@@ -68,8 +68,8 @@ press_mean = mean(pressurem);
 press_var = var(pressurem);
 
 % precipitation
-prec_mean = mean(precipm);
-prec_var = var(precipm);
+% prec_mean = mean(precipm);
+% prec_var = var(precipm);
 
 % encoding conditions
 cond_code = zeros(length(conds),1);
@@ -107,6 +107,6 @@ cond_most = mean(cond_code);
 %     warning('WU condition was mostly empty');
 % end
 
-feature = [temp_mean, temp_max, temp_min, temp_var, hum_mean, hum_var, press_mean, press_var, prec_mean, prec_var, cond_most];
+feature = [temp_mean, temp_max, temp_min, temp_var, hum_mean, hum_var, press_mean, press_var, cond_most];
 
 end

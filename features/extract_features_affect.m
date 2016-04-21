@@ -1,7 +1,7 @@
 function [feature, feature_label] = extract_features_affect(data)
 
-feature_label = {'stress mean', 'mood mean', 'energy mean', 'focus mean', 'stress var', 'mood var', 'energy var', ...
-    'focus var', 'stress change', 'mood change', 'energy change', 'focus change', 'compliance'};
+feature_label = {'calm mean', 'mood mean', 'energy mean', 'focus mean', 'calm var', 'mood var', 'energy var', ...
+    'focus var', 'calm change', 'mood change', 'energy change', 'focus change', 'compliance'};
 
 if isempty(data),
     feature = NaN*ones(1,length(feature_label));

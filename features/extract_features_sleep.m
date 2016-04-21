@@ -12,6 +12,12 @@ if isempty(data{1}),
     return;
 end
 
+% timestamps are in ms
+data{2} = data{2}/1000;
+data{3} = data{2}/1000;
+data{4} = data{2}/1000;
+data{5} = data{2}/1000;
+
 sleep_duration_mean = nanmean(data{4}-data{3});
 bed_duration_mean = nanmean(data{5}-data{2});
 sleep_quality_mean = nanmean(data{6});
