@@ -12,9 +12,32 @@ load('../Assessment/spin.mat');
 load('../Assessment/tipi.mat');
 load('../Demographics/demo.mat');
 
+% PHQ-9 change
+% from baseline to week 3
+cnt = 1;
+for i = 1:length(phq.w3),
+    ind = find(strcmp(subject_phq.w0, subject_phq.w3{i}));
+    if ~isempty(ind),
+        subject_phq03{cnt} = subject_phq.w3{i};
+        phq03(cnt) = phq.w3(i) - phq.w0(ind);
+        cnt = cnt+1;
+    end
+end
+        
+% from week 3 to 6
+cnt = 1;
+for i = 1:length(phq.w6),
+    ind = find(strcmp(subject_phq.w3, subject_phq.w6{i}));
+    if ~isempty(ind),
+        subject_phq36{cnt} = subject_phq.w6{i};
+        phq36(cnt) = phq.w6(i) - phq.w3(ind);
+        cnt = cnt+1;
+    end
+end
+
 % target assessment
-assessment = tipi(:,5);
-subject_assessment = subject_tipi;
+assessment = phq36;
+subject_assessment = subject_phq36;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -43,7 +66,7 @@ for win = win_to_analyze,
         end
         
         % find subject in Big5 data
-%         ind_tipi = find(strcmp(subject_tipi, subject_assessment{i}));
+        ind_tipi = find(strcmp(subject_tipi, subject_assessment{i}));
 
         % find subject in demo data
         ind_demo = find(strcmp(subject_demo, subject_assessment{i}));
@@ -51,8 +74,8 @@ for win = win_to_analyze,
         if ~isempty(ind_ft),
             target(cnt,1) = assessment(i);
             feature_new{cnt} = [feature{ind_ft}(win,:), ...
-                age(ind_demo), female(ind_demo)];%, ...   % adding age and gender
-%                 tipi(ind_tipi, :)]; % adding big5
+                age(ind_demo), female(ind_demo) ...   % adding age and gender
+                tipi(ind_tipi, :)]; % adding big5
             cnt = cnt+1;
         else
             disp('subject from assessment was not found in feature data.');
@@ -101,7 +124,7 @@ for win = win_to_analyze,
         
     end
     
-    fprintf('\nWin %d n_subject=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+    fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
     
 %     target_all = combine_subjects(target_all);
 %     out_all = combine_subjects(out_all);
@@ -109,4 +132,4 @@ for win = win_to_analyze,
 end
 
 % save('prediction.mat', 'R2', 'out_all', 'target_all');
-save('prediction.mat', 'R2');
+save('results/prediction.mat', 'R2');
