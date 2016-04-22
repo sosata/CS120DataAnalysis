@@ -14,9 +14,9 @@ weather_dir = '~/Dropbox/Data/CS120Weather/';
 
 probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'tch', 'wif', 'wtr', 'emc', 'eml', 'emm', 'ems'};
 win_size = 14;
-win_shift_size = Inf;
+win_shift_size = 7;
 
-% start time will be determined by the start time of mood data
+% start and end time will be determined by the affect self-report data
 cnt = 1;
 for i = 1:length(subjects),
     filename = [data_dir, subjects{i}, '/', 'emm.csv'];

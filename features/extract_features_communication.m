@@ -1,7 +1,8 @@
 function [feature, feature_label] = extract_features_communication(data)
 
 feature_label = {'call in','call out','call miss','call diff','sms in','sms out','sms diff','resp time',...
-    'call miss ratio','call in circ','call out circ','sms in circ','sms out circ','late communication'};
+    'call miss ratio','call in circ','call out circ','sms in circ','sms out circ','late communication', ...
+    'contact ent', 'contact norm ent'};
 
 if isempty(data),
     feature = NaN*ones(1,length(feature_label));
@@ -69,9 +70,14 @@ circ_sms_out = estimate_circadian_rhythmicity(time(strcmp(data{4},'SMS')&strcmp(
 comm_late = sum((mod(time,86400)>18*3600)|(mod(time,86400)<3*3600))/length(time);
 
 % contacts
-% TODO
+contact_entropy = estimate_entropy(data{2});
+if length(unique(data{2}))>1,
+    contact_normalized_entropy = contact_entropy/log(length(unique(data{2})));
+else
+    contact_normalized_entropy = 0;
+end
 
 feature = [phone_in,phone_out,phone_miss,phone_diff,sms_in,sms_out,sms_diff,t_resp,phone_miss_ratio, ...
-    circ_call_in, circ_call_out, circ_sms_in, circ_sms_out, comm_late];
+    circ_call_in, circ_call_out, circ_sms_in, circ_sms_out, comm_late, contact_entropy, contact_normalized_entropy];
 
 end
