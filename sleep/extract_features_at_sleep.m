@@ -3,7 +3,7 @@ close all;
 
 extract_workday = true;
 
-addpath('../Functions');
+addpath('../functions');
 load('../settings.mat');
 
 window_awake = 6*3600;  % time window before sleep and after wake to be considered as awake
@@ -16,7 +16,7 @@ cnt = 1;
 for i = 1:length(subjects),
     
     % loading focus data
-    filename = [data_dir, subjects{i}, '\ems.csv'];
+    filename = [data_dir, subjects{i}, '/ems.csv'];
     if ~exist(filename, 'file'),
         disp(['No sleep data for ', subjects{i}]);
         continue;
@@ -25,6 +25,7 @@ for i = 1:length(subjects),
     data = textscan(fid, '%f%f%f%f%f%d%s', 'delimiter', '\t');
     fclose(fid);
 
+    % times are in ms
     time_bed = data{2}/1000 + time_zone*3600;
     time_sleep = data{3}/1000 + time_zone*3600;
     time_wake = data{4}/1000 + time_zone*3600;
@@ -40,7 +41,7 @@ for i = 1:length(subjects),
     end
     
     % loading location data
-    filename = [data_dir, subjects{i}, '\fus.csv'];
+    filename = [data_dir, subjects{i}, '/fus.csv'];
     if ~exist(filename, 'file'),
         disp(['No location data for ', subjects{i}]);
         continue;
@@ -55,7 +56,7 @@ for i = 1:length(subjects),
     data_loc(3) = [];
 
     % loading light data
-    filename = [data_dir, subjects{i}, '\lgt.csv'];
+    filename = [data_dir, subjects{i}, '/lgt.csv'];
     if ~exist(filename, 'file'),
         disp(['No light data for ', subjects{i}]);
         continue;
@@ -67,7 +68,7 @@ for i = 1:length(subjects),
     data_lgt(3) = [];
 
     % loading audio data
-    filename = [data_dir, subjects{i}, '\aud.csv'];
+    filename = [data_dir, subjects{i}, '/aud.csv'];
     if ~exist(filename, 'file'),
         disp(['No audio data for ', subjects{i}]);
         continue;
@@ -80,7 +81,7 @@ for i = 1:length(subjects),
     data_aud(3) = [];
     
     % loading activity data
-    filename = [data_dir, subjects{i}, '\act.csv'];
+    filename = [data_dir, subjects{i}, '/act.csv'];
     if ~exist(filename, 'file'),
         disp(['No activity data for ', subjects{i}]);
         continue;
@@ -93,7 +94,7 @@ for i = 1:length(subjects),
     data_act(3) = [];
 
     % loading screen data
-    filename = [data_dir, subjects{i}, '\scr.csv'];
+    filename = [data_dir, subjects{i}, '/scr.csv'];
     if ~exist(filename, 'file'),
         disp(['No screen data for ', subjects{i}]);
         continue;
@@ -105,7 +106,7 @@ for i = 1:length(subjects),
     data_scr{2} = categorical(data_scr{2});
 
     % loading battery data
-    filename = [data_dir, subjects{i}, '\bat.csv'];
+    filename = [data_dir, subjects{i}, '/bat.csv'];
     if ~exist(filename, 'file'),
         disp(['No battery data for ', subjects{i}]);
         continue;
@@ -118,7 +119,7 @@ for i = 1:length(subjects),
     data_bat(3) = [];
 
     % loading wifi data
-    filename = [data_dir, subjects{i}, '\wif.csv'];
+    filename = [data_dir, subjects{i}, '/wif.csv'];
     if ~exist(filename, 'file'),
         disp(['No wifi data for ', subjects{i}]);
         continue;

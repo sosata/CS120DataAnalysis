@@ -5,7 +5,7 @@ n_bins = 20;
 h = figure;
 set(h, 'position', [374   491   746   457]);
 
-addpath('functions');
+addpath('../functions');
 
 load('results_sleep');
 auc_1 = auc;

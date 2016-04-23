@@ -38,7 +38,7 @@ for i = 1:length(state),
 %     if i==44 || i==109,%%%%%%%%%%%%%%%%
 %         continue;
 %     end
-    
+
     for k=1:n_bootstrap,
         
         state_train = [];
