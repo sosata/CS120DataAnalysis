@@ -9,14 +9,14 @@ if isempty(data),
     return;
 end
 
-if isempty(data{1}),
+if isempty(data.Var1),
     features = ones(1,length(feature_labels))*NaN;
     return;
 end
 
-time = data{1};
-lat = data{2};
-lng = data{3};
+time = data.Var1;
+lat = data.Var2;
+lng = data.Var3;
 clear data;
 
 histogram_filter = true;

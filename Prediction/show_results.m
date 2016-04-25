@@ -1,6 +1,8 @@
 clear;
 close all;
 
+addpath('results');
+
 h = figure;
 set(h, 'position', [560   234   560   714]);
 
@@ -81,3 +83,31 @@ ylabel('R^2');
 ylim([-.05 .2]);
 xlim([1 5]);
 legend('Assessment','Extraversion','Agreeableness','Conscientiousness','Neuroticism','Openness','location','eastoutside');
+
+figure;
+subplot 211;
+plot([5 5],[-.05 .2],'g','linewidth',4); hold on;
+load('prediction_phq_weekend.mat');
+errorbar(mean(R2,2), std(R2,[],2)/sqrt(size(R2,2)),'b');
+load('prediction_phq_weekday.mat');
+errorbar(mean(R2,2), std(R2,[],2)/sqrt(size(R2,2)),'r');
+legend('assessment','weekend','weekday','location','eastoutside');
+set(gca,'xtick',1:5);
+xlabel('Window #');
+ylabel('R^2');
+ylim([0 .2]);
+xlim([1 5]);
+title('PHQ-9 Prediction');
+subplot 212;
+plot([5 5],[-.05 .2],'g','linewidth',4); hold on;
+load('prediction_gad_weekend.mat');
+errorbar(mean(R2,2), std(R2,[],2)/sqrt(size(R2,2)),'b');
+load('prediction_gad_weekday.mat');
+errorbar(mean(R2,2), std(R2,[],2)/sqrt(size(R2,2)),'r');
+legend('assessment','weekend','weekday','location','eastoutside');
+set(gca,'xtick',1:5);
+xlabel('Window #');
+ylabel('R^2');
+ylim([0 .2]);
+xlim([1 5]);
+title('GAD-7 Prediction');

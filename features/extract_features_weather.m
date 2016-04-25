@@ -29,22 +29,22 @@ conditions_dark = {'Drizzle','Rain','Ice Crystals','Ice Pellets','Hail','Mist','
     'Freezing Drizzle','Freezing Rain','Freezing Fog','Patches of Fog','Shallow Fog','Partial Fog','Overcast',...
     'Mostly Cloudy','Small Hail','Squalls','Funnel Cloud'};
 
-timestamp = data{1};
-tempm = data{2};
-hum = data{3};
-dewptm = data{4};
-wspdm = data{5};
-vism = data{6};
-pressurem = data{7};
-windchillm = data{8};
-% precipm = data{9};
-conds = data{10};
-fog = data{11};
-rain = data{12};
-snow = data{13};
-hail = data{14};
-thunder = data{15};
-tornado = data{16};
+timestamp = data.Var1;
+tempm = data.Var2;
+hum = data.Var3;
+dewptm = data.Var4;
+wspdm = data.Var5;
+vism = data.Var6;
+pressurem = data.Var7;
+windchillm = data.Var8;
+% precipm = data.Var9;
+conds = data.Var10;
+fog = data.Var11;
+rain = data.Var12;
+snow = data.Var13;
+hail = data.Var14;
+thunder = data.Var15;
+tornado = data.Var16;
 
 clear data;
 

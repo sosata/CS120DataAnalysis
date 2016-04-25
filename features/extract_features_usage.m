@@ -9,8 +9,8 @@ if isempty(data),
     return;
 end
 
-time = data{1};
-state = data{2};
+time = data.Var1;
+state = data.Var2;
 states = unique(state);
 
 if length(states)<2,

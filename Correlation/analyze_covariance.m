@@ -8,7 +8,7 @@ do_permutation = false;
 do_filter_demo = false;
 do_switch_sign = false;
 
-load('../General/features_biweekly');
+load('../General/features_biweekly_weekend');
 load('../Assessment/phq9.mat');
 load('../Assessment/gad7.mat');
 load('../Demographics/demo.mat');

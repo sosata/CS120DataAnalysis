@@ -7,14 +7,16 @@ if isempty(data),
     return;
 end
 
-if isempty(data{1}),
+if isempty(data.Var1),
     feature = NaN*ones(1,length(feature_label));
     return;
 end
 
-time = data{1};
+time = data.Var1;
 ndays = (time(end)-time(1))/86400;
-act = data{2};
+act = data.Var2;
+
+clear data;
 
 classes_still = {'IN_VEHICLE','STILL','TILTING'};
 classes_active = {'ON_BICYCLE','ON_FOOT','RUNNING','WALKING'};

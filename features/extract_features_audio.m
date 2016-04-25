@@ -7,15 +7,15 @@ if isempty(data),
     return;
 end
 
-if isempty(data{1}),
+if isempty(data.Var1),
     feature = NaN*ones(1,length(feature_label));
     return;
 end
 
-power_mean = nanmean(data{2});
-power_var = nanvar(data{2});
-frequency_mean = nanmean(data{3});
-frequency_var = nanvar(data{3});
+power_mean = nanmean(data.Var2);
+power_var = nanvar(data.Var2);
+frequency_mean = nanmean(data.Var3);
+frequency_var = nanvar(data.Var3);
 
 feature = [power_mean,power_var,frequency_mean,frequency_var];
 

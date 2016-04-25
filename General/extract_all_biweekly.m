@@ -1,6 +1,10 @@
 clear;
 close all;
 
+runtype = 'weekend'; %'all','weekend','weekday'
+
+disp(['run type: ', runtype]);
+
 save_results = true;
 remove_duplicates = true;
 
@@ -62,16 +66,27 @@ parfor i = 1:length(subjects),
             if isempty(tab),
                 data.(probes{j}) = [];
             else
-                for k=1:size(tab,2),
-                    data.(probes{j}){k} = tab.(sprintf('Var%d',k));
-                end
-                data.(probes{j}){1} = data.(probes{j}){1} + time_zone*3600;
+%                 for k=1:size(tab,2),
+%                     data.(probes{j}){k} = tab.(sprintf('Var%d',k));
+%                 end
+%                 data.(probes{j}){1} = data.(probes{j}){1} + time_zone*3600;
+                
+                data.(probes{j}) = tab;
+                data.(probes{j}).Var1 = data.(probes{j}).Var1 + time_zone*3600;
                 
                 if remove_duplicates,
-                    ind = find(diff(data.(probes{j}){1})==0)+1;
-                    for k=1:length(data.(probes{j})),
-                        data.(probes{j}){k}(ind) = [];
-                    end
+                    ind = find(diff(data.(probes{j}).Var1)==0)+1;
+%                     for k=1:length(data.(probes{j})),
+%                         data.(probes{j}){k}(ind) = [];
+%                     end
+                    data.(probes{j})(ind,:) = [];
+                end
+                
+                % separating weekend and weekday data
+                if strcmp(runtype, 'weekend'),
+                    [~, data.(probes{j}), ~] = separate_day_type(data.(probes{j}));
+                elseif strcmp(runtype, 'weekday'),
+                    [data.(probes{j}), ~, ~] = separate_day_type(data.(probes{j}));
                 end
                 
             end
@@ -139,7 +154,7 @@ parfor i = 1:length(subjects),
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
 
-        % big feature vector
+        % adding all features to the main feature vector
         feature{i} = [feature{i}; feature_win];
         feature_label{i} = feature_win_lab;
         
