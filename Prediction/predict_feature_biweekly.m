@@ -43,8 +43,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = spin;
-subject_assessment = subject_spin;
+assessment = spin.w6;
+subject_assessment = subject_spin.w6;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);

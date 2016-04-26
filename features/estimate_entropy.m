@@ -10,8 +10,8 @@ if iscell(lab),
         ent = ent - p*log(p);
     end
 else
-    for i=labs',
-        p = sum(lab==i)/length(lab);
+    for i=1:length(labs),
+        p = sum(lab==labs(i))/length(lab);
         ent = ent - p*log(p);
     end
 end
