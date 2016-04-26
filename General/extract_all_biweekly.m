@@ -1,7 +1,7 @@
 clear;
 close all;
 
-runtype = 'weekend'; %'all','weekend','weekday'
+runtype = 'workday'; %'all','weekend','weekday','workday','offday'
 
 disp(['run type: ', runtype]);
 
@@ -87,11 +87,36 @@ parfor i = 1:length(subjects),
                     [~, data.(probes{j}), ~] = separate_day_type(data.(probes{j}));
                 elseif strcmp(runtype, 'weekday'),
                     [data.(probes{j}), ~, ~] = separate_day_type(data.(probes{j}));
+                    
                 end
                 
             end
         end
+        
+        
     end
+    
+    % separating work/off days out
+    if strcmp(runtype, 'offday')||strcmp(runtype, 'workday'),
+        if isempty(data.ems.Var1),
+            fprintf('No workday (sleep) report data. Skipping subject.\n');
+            for j = 1:length(probes),
+                data.(probes{j}) = [];
+            end
+        else
+            day_type = [];
+            day_type.time = data.ems.Var1;
+            day_type.type = categorical(data.ems.Var7);
+            for j = 1:length(probes),
+                if strcmp(runtype, 'offday'),
+                    [~, data.(probes{j})] = separate_workday(data.(probes{j}), day_type);
+                elseif strcmp(runtype, 'workday'),
+                    [data.(probes{j}), ~] = separate_workday(data.(probes{j}), day_type);
+                end
+            end
+        end
+    end
+    
     
     % bi-weekly windows
     day_range = day_start(i):win_shift_size:day_end(i);

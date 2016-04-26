@@ -10,7 +10,9 @@ n_bootstrap = 12*10;
 
 % load('../General/features_biweekly.mat');
 % load('../General/features_biweekly_weekend.mat');
-load('../General/features_biweekly_weekday.mat');
+% load('../General/features_biweekly_weekday.mat');
+% load('../General/features_biweekly_offday.mat');
+load('../General/features_biweekly_workday.mat');
 load('../Assessment/phq9.mat');
 load('../Assessment/gad7.mat');
 load('../Assessment/spin.mat');
@@ -41,8 +43,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = gad.w6;
-subject_assessment = subject_gad.w6;
+assessment = spin;
+subject_assessment = subject_spin;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);

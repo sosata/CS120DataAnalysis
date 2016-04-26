@@ -1,7 +1,16 @@
-function [sensor_normal, sensor_off] =separate_workday(sensor, day_type)
+% data must be in table format
+% day_type must be in categorical format
+
+function [data_normal, data_off] =separate_workday(data, day_type)
+
+if isempty(data),
+    data_normal = [];
+    data_off = [];
+    return;
+end
 
 day_type_day = floor(day_type.time/86400);
-sensor_day = floor(sensor{1}/86400);
+sensor_day = floor(data.Var1/86400);
 
 % finding and removing duplicates in day_type
 inds = find(diff(day_type_day)==0);
@@ -22,20 +31,23 @@ end
 day_normal = day_type_day(ind_normal);
 day_off = day_type_day(ind_off);
 
-for i=1:length(sensor),
-    sensor_normal{i} = sensor{i}(ismember(sensor_day,day_normal));
-    sensor_off{i} = sensor{i}(ismember(sensor_day,day_off));
+% for i=1:length(data),
+%     data_normal{i} = data{i}(ismember(sensor_day,day_normal));
+%     data_off{i} = data{i}(ismember(sensor_day,day_off));
+% end
+data_normal = data(ismember(sensor_day,day_normal),:);
+data_off = data(ismember(sensor_day,day_off),:);
+
+
+if length(data_normal.Var1)+length(data_off.Var1)<length(data.Var1),
+    fprintf('%.0f%% sensor data removed because there was no normal/off day label.\n', 100-(length(data_normal.Var1)+length(data_off.Var1))/length(data.Var1)*100);
 end
 
-if length(sensor_normal{1})+length(sensor_off{1})<length(sensor{1}),
-    fprintf('%.0f%% sensor data removed because there was no normal/off day label.\n', (length(sensor_normal{1})+length(sensor_off{1}))/length(sensor{1})*100);
-end
-
-if length(sensor_normal{1})+length(sensor_off{1})>length(sensor{1}),
-    length(sensor_normal{1})
-    length(sensor_off{1})
-    length(sensor{1})
-    error('Something is wrong.');
+if length(data_normal.Var1)+length(data_off.Var1)>length(data.Var1),
+    length(data_normal{1})
+    length(data_off{1})
+    length(data{1})
+    error('Something is terribly wrong.');
 end
 
 end
