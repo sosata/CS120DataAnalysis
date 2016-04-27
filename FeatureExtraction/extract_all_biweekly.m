@@ -1,12 +1,12 @@
 clear;
 close all;
 
-runtype = 'workday'; %'all','weekend','weekday','workday','offday'
+runtype = 'all'; %'all','weekend','weekday','workday','offday'
 
 disp(['run type: ', runtype]);
 
 save_results = true;
-remove_duplicates = false;
+remove_duplicates = true;
 
 load('../settings');
 addpath('../features');
@@ -17,6 +17,8 @@ clear date_start date_end timestamp_start;
 weather_dir = '~/Dropbox/Data/CS120Weather/';
 
 probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'tch', 'wif', 'wtr', 'emc', 'eml', 'emm', 'ems'};
+probes_remove_duplicate = {'fus'};  % probes for which duplicate timestamps data are removed
+
 win_size = 14;
 win_shift_size = 7;
 
@@ -66,19 +68,12 @@ parfor i = 1:length(subjects),
             if isempty(tab),
                 data.(probes{j}) = [];
             else
-%                 for k=1:size(tab,2),
-%                     data.(probes{j}){k} = tab.(sprintf('Var%d',k));
-%                 end
-%                 data.(probes{j}){1} = data.(probes{j}){1} + time_zone*3600;
                 
                 data.(probes{j}) = tab;
                 data.(probes{j}).Var1 = data.(probes{j}).Var1 + time_zone*3600;
                 
-                if remove_duplicates,
+                if remove_duplicates&&sum(strcmp(probes_remove_duplicate,probes{j})),
                     ind = find(diff(data.(probes{j}).Var1)==0)+1;
-%                     for k=1:length(data.(probes{j})),
-%                         data.(probes{j}){k}(ind) = [];
-%                     end
                     data.(probes{j})(ind,:) = [];
                 end
                 
@@ -120,7 +115,6 @@ parfor i = 1:length(subjects),
     
     % bi-weekly windows
     day_range = day_start(i):win_shift_size:day_end(i);
-    %fprintf('extracting features...\n');
     for d=day_range,
         
         % clipping data
@@ -171,9 +165,9 @@ parfor i = 1:length(subjects),
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
         
-%         [ft, ft_lab] = extract_features_sleep(datac.ems);
-%         feature_win = [feature_win, ft];
-%         feature_win_lab = [feature_win_lab, ft_lab];
+        [ft, ft_lab] = extract_features_sleep(datac.ems);
+        feature_win = [feature_win, ft];
+        feature_win_lab = [feature_win_lab, ft_lab];
 
 %         [ft, ft_lab] = extract_features_locationreport(datac.eml);
 %         feature_win = [feature_win, ft];
@@ -190,5 +184,5 @@ end
 if save_results,
     feature_label = feature_label{1};
     subject_feature = subjects;
-    save('features_biweekly.mat', 'feature', 'feature_label', 'subject_feature');
+    save(sprintf('features_biweekly_%s.mat',runtype), 'feature', 'feature_label', 'subject_feature');
 end
