@@ -15,6 +15,7 @@ load('../Demographics/demo.mat');
 load('../Assessment/tipi.mat');
 load('../Assessment/spin.mat');
 load('../Assessment/dast.mat');
+load('../Assessment/psqi.mat');
 
 %% inclusion based on demographics
 if do_filter_demo,
@@ -55,7 +56,7 @@ end
 
 feature_label = [feature_label, {'PHQ9 W0','PHQ9 W3','PHQ9 W6','PHQ9 W3-0','PHQ9 W6-3',...
     'GAD7 W0','GAD7 W3','GAD7 W6','GAD7 W3-0','GAD7 W6-3',...
-    'age','female'}, tipi_label, 'SPIN','DAST','AUDIT'];
+    'age','female'}, tipi_label,'SPIN W0','SPIN W3','SPIN W6','DAST','AUDIT','PSQI W0','PSQI W3','PSQI W6'];
 
 num_weeks = 1;%median(cellfun(@(x) size(x,1), feature));
 
@@ -127,11 +128,23 @@ for w = 1:num_weeks,
             end
             
             % find spin scores
-            ind = find(strcmp(subject_spin,subject_feature{s}));
+            ind = find(strcmp(subject_spin.w0,subject_feature{s}));
             if isempty(ind),
-                spinscore = NaN;
+                spinscorew0 = NaN;
             else
-                spinscore = spin(ind);
+                spinscorew0 = spin.w0(ind);
+            end
+            ind = find(strcmp(subject_spin.w3,subject_feature{s}));
+            if isempty(ind),
+                spinscorew3 = NaN;
+            else
+                spinscorew3 = spin.w3(ind);
+            end
+            ind = find(strcmp(subject_spin.w6,subject_feature{s}));
+            if isempty(ind),
+                spinscorew6 = NaN;
+            else
+                spinscorew6 = spin.w6(ind);
             end
             
             % find dast/audit data
@@ -144,9 +157,29 @@ for w = 1:num_weeks,
                 auditscore = audit(ind);
             end
             
+            % find psqi score
+            ind = find(strcmp(subject_psqi.w0,subject_feature{s}));
+            if isempty(ind),
+                psqiscorew0 = NaN;
+            else
+                psqiscorew0 = psqi.w0(ind);
+            end
+            ind = find(strcmp(subject_psqi.w3,subject_feature{s}));
+            if isempty(ind),
+                psqiscorew3 = NaN;
+            else
+                psqiscorew3 = psqi.w3(ind);
+            end
+            ind = find(strcmp(subject_psqi.w6,subject_feature{s}));
+            if isempty(ind),
+                psqiscorew6 = NaN;
+            else
+                psqiscorew6 = psqi.w6(ind);
+            end
+            
             ft = [ft; [feature{s}(w,:), phqw0, phqw3, phqw6, phqw3-phqw0,phqw6-phqw3, ...
                 gadw0, gadw3, gadw6, gadw3-gadw0,gadw6-gadw3, ...
-                demoage, demofemale, tipiscore, spinscore, dastscore, auditscore]];
+                demoage, demofemale, tipiscore, spinscorew0, spinscorew3, spinscorew6, dastscore, auditscore, psqiscorew0, psqiscorew3, psqiscorew6]];
             
         else
             fprintf('Week %d: subject %s removed due to lack of data', w, subject_feature{s});

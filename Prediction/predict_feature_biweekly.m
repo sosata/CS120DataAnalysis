@@ -17,6 +17,7 @@ load('../Assessment/phq9.mat');
 load('../Assessment/gad7.mat');
 load('../Assessment/spin.mat');
 load('../Assessment/tipi.mat');
+load('../Assessment/psqi.mat');
 load('../Demographics/demo.mat');
 
 % PHQ-9 change
@@ -43,8 +44,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = spin.w6;
-subject_assessment = subject_spin.w6;
+assessment = psqi.w3;
+subject_assessment = subject_psqi.w3;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);

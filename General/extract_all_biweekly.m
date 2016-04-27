@@ -6,7 +6,7 @@ runtype = 'workday'; %'all','weekend','weekday','workday','offday'
 disp(['run type: ', runtype]);
 
 save_results = true;
-remove_duplicates = true;
+remove_duplicates = false;
 
 load('../settings');
 addpath('../features');
