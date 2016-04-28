@@ -55,7 +55,6 @@ if do_switch_sign,
         find(strcmp(feature_label,'call diff'))];
 end
 
-
 feature_label = [feature_label, {'PHQ9 W0','PHQ9 W3','PHQ9 W6','PHQ9 W3-0','PHQ9 W6-3',...
     'GAD7 W0','GAD7 W3','GAD7 W6','GAD7 W3-0','GAD7 W6-3',...
     'age','female'}, tipi_label,'SPIN W0','SPIN W3','SPIN W6','DAST','AUDIT','PSQI W0','PSQI W3','PSQI W6'];
@@ -67,6 +66,8 @@ r = cell(num_weeks,1);
 for w = 1:num_weeks,
    
     ft = [];
+    subject_analyze = {};
+    
     for s = 1:length(feature),
         if size(feature{s},1)>=w,
             
@@ -183,6 +184,8 @@ for w = 1:num_weeks,
                 gadw0, gadw3, gadw6, gadw3-gadw0,gadw6-gadw3, ...
                 demoage, demofemale, tipiscore, spinscorew0, spinscorew3, spinscorew6, dastscore, auditscore, psqiscorew0, psqiscorew3, psqiscorew6]];
             
+            subject_analyze = [subject_analyze, subject_feature{s}];
+            
         else
             fprintf('Week %d: subject %s removed due to lack of data', w, subject_feature{s});
         end
@@ -231,5 +234,6 @@ for w = 1:num_weeks,
     end
     h = colorbar;
     ylabel(h,'correlation coefficient (r)');
+    text(size(ft,2)/2, size(ft,2)+5, sprintf('week #%d',w),'fontsize',14);
     
 end

@@ -44,8 +44,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = psqi.w6;
-subject_assessment = subject_psqi.w6;
+assessment = psqi.w0;
+subject_assessment = subject_psqi.w0;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -84,6 +84,7 @@ for win = win_to_analyze,
             feature_new{cnt} = [feature{ind_ft}(win,:), ...
                 age(ind_demo), female(ind_demo) ...   % adding age and gender
                 tipi(ind_tipi, :)]; % adding big5
+            %subject_analyze{cnt} = subject_assessment{i};
             cnt = cnt+1;
         else
             disp('subject from assessment was not found in feature data.');
