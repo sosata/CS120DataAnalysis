@@ -4,6 +4,7 @@ close all;
 addpath('../functions');
 
 n_bootstrap = 12*10;
+n_tree = 1000;
 
 % delete(gcp('nocreate'));
 % pool = parpool(24);
@@ -44,8 +45,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = psqi.w0;
-subject_assessment = subject_psqi.w0;
+assessment = phq.w6;
+subject_assessment = subject_phq.w6;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -57,7 +58,7 @@ win_to_analyze = [1 2 3 4 5];
 
 R2 = zeros(length(win_to_analyze), n_bootstrap);
 
-for win = win_to_analyze,
+for win = 1,%win_to_analyze,
     
     cnt = 1;
     target = [];
@@ -81,9 +82,9 @@ for win = win_to_analyze,
         
         if ~isempty(ind_ft),
             target(cnt,1) = assessment(i);
-            feature_new{cnt} = [feature{ind_ft}(win,:), ...
-                age(ind_demo), female(ind_demo) ...   % adding age and gender
-                tipi(ind_tipi, :)]; % adding big5
+            feature_new{cnt} = [feature{ind_ft}(win,:)];%, ...
+%                 age(ind_demo), female(ind_demo)];% ...   % adding age and gender
+%                 tipi(ind_tipi, :)]; % adding big5
             %subject_analyze{cnt} = subject_assessment{i};
             cnt = cnt+1;
         else
@@ -96,10 +97,14 @@ for win = win_to_analyze,
     
     % zscore
     % feature_all = myzscore(feature_all);
+    ind_good = [0, 1, 3, 8, 11, 13, 15, 16, 17, 37, 41, 47, 52, 68, 71, 77, 78]+1;
+%     feature_all = feature_all(:,ind_good); 
+    
+    target = randsample(target, length(target), false);
     
     parfor k=1:n_bootstrap,
         
-%         fprintf('%d ',k);
+        
         
         ind_train = randsample(1:size(feature_all,1), round(size(feature_all,1)*.7), false);
         ind_test = 1:size(feature_all,1);
@@ -110,8 +115,13 @@ for win = win_to_analyze,
         end
         
         % random forest
-        mdl = TreeBagger(800, feature_all(ind_train,:), target(ind_train), 'Method', 'regression');
+        mdl = TreeBagger(n_tree, feature_all(ind_train,:), target(ind_train), 'Method', 'regression');
         out = predict(mdl, feature_all(ind_test,:));
+        
+        % SSVM
+%         feature_all(ind_train,:) = myzscore(feature_all(ind_train,:));
+%         mdl = fitrsvm(feature_all(ind_train,:), target(ind_train));
+%         out = predict(mdl, feature_all(ind_test,:));
         
         % elastic net GLM
         %     feature_train = feature_all(ind_train,:);
@@ -126,7 +136,7 @@ for win = win_to_analyze,
         %     feature_test(isnan(feature_test)) = 0;
         %     out = feature_test*B_best + Inter_best;
         
-        R2(win,k) = 1-mean((out-target(ind_test)).^2)/mean((mean(target(ind_train))-target(ind_test)).^2);
+        R2(win,k) = 1-mean((out-target_new(ind_test)).^2)/mean((mean(target(ind_train))-target(ind_test)).^2);
         
         out_all{k} = out;
         target_all{k} = target(ind_test);

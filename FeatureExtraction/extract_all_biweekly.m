@@ -173,6 +173,10 @@ parfor i = 1:length(subjects),
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
 
+        [ft, ft_lab] = extract_features_slinter(datac);
+        feature_win = [feature_win, ft];
+        feature_win_lab = [feature_win_lab, ft_lab];
+
         % adding all features to the main feature vector
         feature{i} = [feature{i}; feature_win];
         feature_label{i} = feature_win_lab;
