@@ -6,7 +6,7 @@ extract_workday = true;
 addpath('../functions');
 load('../settings.mat');
 
-probes = {'ems','fus','lgt','aud','act','scr','bat','wif'};
+probes = {'ems','fus','lgt','aud','act','scr','bat','wif','app'};
 
 window_awake = 6*3600;  % time window before sleep and after wake to be considered as awake
 window_sensor = 10*60;

@@ -2,8 +2,9 @@ clear;
 close all;
 
 addpath('../functions');
+addpath('../Regressors');
 
-n_bootstrap = 12*10;
+n_bootstrap = 12*2;
 n_tree = 1000;
 
 % delete(gcp('nocreate'));
@@ -45,8 +46,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = phq.w6;
-subject_assessment = subject_phq.w6;
+assessment = psqi.w6;
+subject_assessment = subject_psqi.w6;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -97,52 +98,40 @@ for win = 1,%win_to_analyze,
     
     % zscore
     % feature_all = myzscore(feature_all);
-    ind_good = [0, 1, 3, 8, 11, 13, 15, 16, 17, 37, 41, 47, 52, 68, 71, 77, 78]+1;
+
+%     ind_good = [0, 1, 3, 8, 11, 13, 15, 16, 17, 37, 41, 47, 52, 68, 71, 77, 78]+1;
 %     feature_all = feature_all(:,ind_good); 
     
-    target = randsample(target, length(target), false);
-    
-    parfor k=1:n_bootstrap,
-        
-        
-        
-        ind_train = randsample(1:size(feature_all,1), round(size(feature_all,1)*.7), false);
-        ind_test = 1:size(feature_all,1);
-        ind_test(unique(ind_train)) = [];
-        if isempty(ind_test),
-            disp('empty test set. skipping...');
-            continue;
+%     target = randsample(target, length(target), false);
+
+    ind_good = 1;
+    R2(win,:) = rf_regressor(feature_all(:,ind_good), target, n_tree, n_bootstrap);
+    fprintf('R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+    fprintf('first pass...\n');
+    for i=2:size(feature_all,2),
+        R2_new = rf_regressor(feature_all(:,[ind_good, i]), target, n_tree, n_bootstrap);
+        if mean(R2_new)>mean(R2(win,:)),
+            ind_good = [ind_good, i];
+            R2(win,:) = R2_new;
+            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+            fprintf('% d', ind_good);
+            fprintf('\n');            
         end
-        
-        % random forest
-        mdl = TreeBagger(n_tree, feature_all(ind_train,:), target(ind_train), 'Method', 'regression');
-        out = predict(mdl, feature_all(ind_test,:));
-        
-        % SSVM
-%         feature_all(ind_train,:) = myzscore(feature_all(ind_train,:));
-%         mdl = fitrsvm(feature_all(ind_train,:), target(ind_train));
-%         out = predict(mdl, feature_all(ind_test,:));
-        
-        % elastic net GLM
-        %     feature_train = feature_all(ind_train,:);
-        %     % replacing missing values with zero
-        %     feature_train(isnan(feature_train)) = 0;
-        %     [B, fitinfo] = lassoglm(feature_train, target(ind_train), 'normal', 'alpha', 0.9, 'CV', 2);
-        %     [~, ind] = min(fitinfo.SE);
-        %     B_best = B(:,ind);
-        %     Inter_best = fitinfo.Intercept(ind);
-        %     % to handle NaN values in features
-        %     feature_test = feature_all(ind_test,:);
-        %     feature_test(isnan(feature_test)) = 0;
-        %     out = feature_test*B_best + Inter_best;
-        
-        R2(win,k) = 1-mean((out-target_new(ind_test)).^2)/mean((mean(target(ind_train))-target(ind_test)).^2);
-        
-        out_all{k} = out;
-        target_all{k} = target(ind_test);
-        
     end
-    
+    fprintf('second pass...\n');
+    for i=1:length(ind_good),
+        inds = ind_good([1:i-1,i+1:end]);
+        inds(isnan(inds)) = [];
+        R2_new = rf_regressor(feature_all(:,inds), target, n_tree, n_bootstrap);
+        if mean(R2_new)>mean(R2(win,:)),
+            ind_good(i) = nan;
+            R2(win,:) = R2_new;
+            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+            fprintf('% d', ind_good);
+            fprintf('\n');            
+        end
+    end
+
     fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
     
 %     target_all = combine_subjects(target_all);
