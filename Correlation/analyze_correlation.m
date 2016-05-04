@@ -13,7 +13,8 @@ do_switch_sign = false;
 load('../FeatureExtraction/features_biweekly_all');
 load('../Assessment/phq9.mat');
 load('../Assessment/gad7.mat');
-load('../Demographics/demo.mat');
+load('../Demographics/demo_basic.mat');
+load('../Demographics/demo_baseline.mat');
 load('../Assessment/tipi.mat');
 load('../Assessment/spin.mat');
 load('../Assessment/dast.mat');
@@ -57,7 +58,7 @@ end
 
 feature_label = [feature_label, {'PHQ9 W0','PHQ9 W3','PHQ9 W6','PHQ9 W3-0','PHQ9 W6-3',...
     'GAD7 W0','GAD7 W3','GAD7 W6','GAD7 W3-0','GAD7 W6-3',...
-    'age','female'}, tipi_label,'SPIN W0','SPIN W3','SPIN W6','DAST','AUDIT','PSQI W0','PSQI W3','PSQI W6'];
+    'age','female','alone','sleep alone','employed','num jobs'}, tipi_label,'SPIN W0','SPIN W3','SPIN W6','DAST','AUDIT','PSQI W0','PSQI W3','PSQI W6'];
 
 num_weeks = 1;%median(cellfun(@(x) size(x,1), feature));
 
@@ -112,14 +113,28 @@ for w = 1:num_weeks,
                 gadw6 = mean(gad.w6(ind));
             end
             
-            % find demo info
-            ind = find(strcmp(subject_demo,subject_feature{s}));
+            % find basic demo info
+            ind = find(strcmp(subject_basic,subject_feature{s}));
             if isempty(ind),
                 demoage = NaN;
                 demofemale = NaN;
             else
                 demoage = mean(age(ind));
                 demofemale = mean(female(ind));
+            end
+            
+            % find baseline demo info
+            ind = find(strcmp(subject_baseline,subject_feature{s}));
+            if isempty(ind),
+                demoalone = NaN;
+                demosleepalone = NaN;
+                demoemployed = NaN;
+                demonumjobs = NaN;
+            else
+                demoalone = alone(ind);
+                demosleepalone = sleepalone(ind);
+                demoemployed = employed(ind);
+                demonumjobs = numjobs(ind);
             end
             
             % find tipi scores
@@ -182,7 +197,8 @@ for w = 1:num_weeks,
             
             ft = [ft; [feature{s}(w,:), phqw0, phqw3, phqw6, phqw3-phqw0,phqw6-phqw3, ...
                 gadw0, gadw3, gadw6, gadw3-gadw0,gadw6-gadw3, ...
-                demoage, demofemale, tipiscore, spinscorew0, spinscorew3, spinscorew6, dastscore, auditscore, psqiscorew0, psqiscorew3, psqiscorew6]];
+                demoage, demofemale, demoalone, demosleepalone, demoemployed, demonumjobs...
+                tipiscore, spinscorew0, spinscorew3, spinscorew6, dastscore, auditscore, psqiscorew0, psqiscorew3, psqiscorew6]];
             
             subject_analyze = [subject_analyze, subject_feature{s}];
             

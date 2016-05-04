@@ -8,6 +8,9 @@ addpath('../features');
 
 load('../settings.mat');
 
+% demo data
+
+
 probes = {'ems','fus','lgt','aud','act','scr','bat','wif','coe','app'};
 
 save_results = true;
