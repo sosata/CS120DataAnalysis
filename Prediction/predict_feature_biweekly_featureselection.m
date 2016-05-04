@@ -4,7 +4,7 @@ close all;
 addpath('../functions');
 addpath('../Regressors');
 
-n_bootstrap = 12*10;
+n_bootstrap = 12*2;
 n_tree = 1000;
 
 % delete(gcp('nocreate'));
@@ -46,8 +46,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = psqi.w0;
-subject_assessment = subject_psqi.w0;
+assessment = psqi.w6;
+subject_assessment = subject_psqi.w6;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -104,8 +104,34 @@ for win = 1,%win_to_analyze,
     
 %     target = randsample(target, length(target), false);
 
-    R2(win,:) = rf_regressor(feature_all, target, n_tree, n_bootstrap);
-    
+    ind_good = 1;
+    R2(win,:) = rf_regressor(feature_all(:,ind_good), target, n_tree, n_bootstrap);
+    fprintf('R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+    fprintf('first pass...\n');
+    for i=2:size(feature_all,2),
+        R2_new = rf_regressor(feature_all(:,[ind_good, i]), target, n_tree, n_bootstrap);
+        if mean(R2_new)>mean(R2(win,:)),
+            ind_good = [ind_good, i];
+            R2(win,:) = R2_new;
+            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+            fprintf('% d', ind_good);
+            fprintf('\n');            
+        end
+    end
+    fprintf('second pass...\n');
+    for i=1:length(ind_good),
+        inds = ind_good([1:i-1,i+1:end]);
+        inds(isnan(inds)) = [];
+        R2_new = rf_regressor(feature_all(:,inds), target, n_tree, n_bootstrap);
+        if mean(R2_new)>mean(R2(win,:)),
+            ind_good(i) = nan;
+            R2(win,:) = R2_new;
+            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+            fprintf('% d', ind_good);
+            fprintf('\n');            
+        end
+    end
+
     fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
     
 %     target_all = combine_subjects(target_all);

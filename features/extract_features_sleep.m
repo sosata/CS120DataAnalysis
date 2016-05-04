@@ -1,3 +1,5 @@
+% NOTE: All times must already been corrected
+
 function [feature, feature_label] = extract_features_sleep(data)
 
 % feature_label = {'sleep mean', 'bed mean', 'sleep quality mean', 'sleep var', 'bed var', 'sleep quality var', 'no workdays'};
@@ -25,10 +27,10 @@ if ~isempty(ind_neg),
 end
 
 % timestamps are in ms
-t_bed = data.Var2/1000;
-t_sleep = data.Var3/1000;
-t_wake = data.Var4/1000;
-t_getup = data.Var5/1000;
+t_bed = data.Var2;
+t_sleep = data.Var3;
+t_wake = data.Var4;
+t_getup = data.Var5;
 
 sleep_duration_mean = nanmean((t_wake - t_sleep)/3600);
 bed_duration_mean = nanmean((t_getup - t_bed)/3600);

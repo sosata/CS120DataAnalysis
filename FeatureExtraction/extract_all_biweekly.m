@@ -69,12 +69,22 @@ parfor i = 1:length(subjects),
                 data.(probes{j}) = [];
             else
                 
+                % correcting timestamps
                 data.(probes{j}) = tab;
                 data.(probes{j}).Var1 = data.(probes{j}).Var1 + time_zone*3600;
                 
+                % removing duplicate timestamps from specific probes
                 if remove_duplicates&&sum(strcmp(probes_remove_duplicate,probes{j})),
                     ind = find(diff(data.(probes{j}).Var1)==0)+1;
                     data.(probes{j})(ind,:) = [];
+                end
+                
+                % correcting sleep times
+                if strcmp(probes{j},'ems'),
+                    data.ems.Var2 = data.ems.Var2/1000 + time_zone*3600;
+                    data.ems.Var3 = data.ems.Var3/1000 + time_zone*3600;
+                    data.ems.Var4 = data.ems.Var4/1000 + time_zone*3600;
+                    data.ems.Var5 = data.ems.Var5/1000 + time_zone*3600;
                 end
                 
                 % separating weekend and weekday data
@@ -87,7 +97,6 @@ parfor i = 1:length(subjects),
                 
             end
         end
-        
         
     end
     
