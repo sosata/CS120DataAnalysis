@@ -5,7 +5,7 @@ addpath('../functions');
 addpath('../Regressors');
 
 n_bootstrap = 12*2;
-n_tree = 1000;
+n_tree = 100;
 
 % delete(gcp('nocreate'));
 % pool = parpool(24);
@@ -20,7 +20,8 @@ load('../Assessment/gad7.mat');
 load('../Assessment/spin.mat');
 load('../Assessment/tipi.mat');
 load('../Assessment/psqi.mat');
-load('../Demographics/demo.mat');
+load('../Demographics/demo_basic.mat');
+load('../Demographics/demo_baseline.mat');
 
 % PHQ-9 change
 % from baseline to week 3
@@ -55,11 +56,13 @@ assessment(indnan) = [];
 subject_assessment(indnan) = [];
 
 % which 2-week blocks to consider for the analysis
-win_to_analyze = [1 2 3 4 5];
+win_to_analyze = 1;%[1 2 3 4 5];
 
 R2 = zeros(length(win_to_analyze), n_bootstrap);
 
-for win = 1,%win_to_analyze,
+for win = win_to_analyze,
+    
+    fprintf('win #%d\n',win);
     
     cnt = 1;
     target = [];
@@ -79,12 +82,14 @@ for win = 1,%win_to_analyze,
         ind_tipi = find(strcmp(subject_tipi, subject_assessment{i}));
 
         % find subject in demo data
-        ind_demo = find(strcmp(subject_demo, subject_assessment{i}));
+        ind_demo_basic = find(strcmp(subject_basic, subject_assessment{i}));
+        ind_demo_baseline = find(strcmp(subject_baseline, subject_assessment{i}));
         
         if ~isempty(ind_ft),
             target(cnt,1) = assessment(i);
-            feature_new{cnt} = [feature{ind_ft}(win,:)];%, ...
-%                 age(ind_demo), female(ind_demo)];% ...   % adding age and gender
+            feature_new{cnt} = [feature{ind_ft}(win,:), ...
+                age(ind_demo_basic), female(ind_demo_basic), ...   % adding in age and gender
+                alone(ind_demo_baseline), sleepalone(ind_demo_baseline), employed(ind_demo_baseline), numjobs(ind_demo_baseline)]; % adding in other demo info
 %                 tipi(ind_tipi, :)]; % adding big5
             %subject_analyze{cnt} = subject_assessment{i};
             cnt = cnt+1;
@@ -99,17 +104,22 @@ for win = 1,%win_to_analyze,
     % zscore
     % feature_all = myzscore(feature_all);
 
-%     ind_good = [0, 1, 3, 8, 11, 13, 15, 16, 17, 37, 41, 47, 52, 68, 71, 77, 78]+1;
-%     feature_all = feature_all(:,ind_good); 
+    % breaking data into 'meta-training' and 'meta-test' for feature selection
+    ind_metatrain = randsample(1:size(feature_all,1), size(feature_all,1)*.5, false);
+    ind_metatest = 1:size(feature_all,1);
+    ind_metatest(ind_metatrain) = [];
     
-%     target = randsample(target, length(target), false);
+    feature_metatrain = feature_all(ind_metatrain,:);
+    target_metatrain = target(ind_metatrain);
+    feature_metatest = feature_all(ind_metatest,:);
+    target_metatest = target(ind_metatest);
 
     ind_good = 1;
-    R2(win,:) = rf_regressor(feature_all(:,ind_good), target, n_tree, n_bootstrap);
+    R2(win,:) = rf_regressor(feature_metatrain(:,ind_good), target_metatrain, n_tree, n_bootstrap);
     fprintf('R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
     fprintf('first pass...\n');
-    for i=2:size(feature_all,2),
-        R2_new = rf_regressor(feature_all(:,[ind_good, i]), target, n_tree, n_bootstrap);
+    for i=2:size(feature_metatrain,2),
+        R2_new = rf_regressor(feature_metatrain(:,[ind_good, i]), target_metatrain, n_tree, n_bootstrap);
         if mean(R2_new)>mean(R2(win,:)),
             ind_good = [ind_good, i];
             R2(win,:) = R2_new;
@@ -122,7 +132,7 @@ for win = 1,%win_to_analyze,
     for i=1:length(ind_good),
         inds = ind_good([1:i-1,i+1:end]);
         inds(isnan(inds)) = [];
-        R2_new = rf_regressor(feature_all(:,inds), target, n_tree, n_bootstrap);
+        R2_new = rf_regressor(feature_metatrain(:,inds), target_metatrain, n_tree, n_bootstrap);
         if mean(R2_new)>mean(R2(win,:)),
             ind_good(i) = nan;
             R2(win,:) = R2_new;
@@ -131,8 +141,16 @@ for win = 1,%win_to_analyze,
             fprintf('\n');            
         end
     end
+    ind_good(isnan(ind_good)) = [];
+    fprintf('final set: ');
+    fprintf('%d ',ind_good);
+    fprintf('\n');
 
-    fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+    fprintf('Meta-Training R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
+    
+    R2_metatest(win,:) = rf_regressor(feature_metatest(:,ind_good), target_metatest, n_tree, n_bootstrap);
+
+    fprintf('Meta-Test R2: %.3f (%.3f)\n', mean(R2_metatest(win,:)), std(R2_metatest(win,:))/sqrt(n_bootstrap));
     
 %     target_all = combine_subjects(target_all);
 %     out_all = combine_subjects(out_all);

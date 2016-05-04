@@ -8,9 +8,6 @@ addpath('../features');
 
 load('../settings.mat');
 
-% demo data
-
-
 probes = {'ems','fus','lgt','aud','act','scr','bat','wif','coe','app'};
 
 save_results = true;
@@ -79,6 +76,7 @@ parfor i = 1:length(subjects),
             'variablenames',{'Var1','Var2','Var3','Var4','Var5','Var6'});
         
         [ft, ft_label] = extract_features_slinter(datasleep);
+        
         feature{i} = [feature{i}; ft];
         state{i} = [state{i}; sleep_quality(j)];
         

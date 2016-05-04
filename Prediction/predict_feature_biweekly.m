@@ -5,7 +5,7 @@ addpath('../functions');
 addpath('../Regressors');
 
 n_bootstrap = 12*10;
-n_tree = 1000;
+n_tree = 10000;
 
 % delete(gcp('nocreate'));
 % pool = parpool(24);
@@ -20,7 +20,8 @@ load('../Assessment/gad7.mat');
 load('../Assessment/spin.mat');
 load('../Assessment/tipi.mat');
 load('../Assessment/psqi.mat');
-load('../Demographics/demo.mat');
+load('../Demographics/demo_basic.mat');
+load('../Demographics/demo_baseline.mat');
 
 % PHQ-9 change
 % from baseline to week 3
@@ -46,8 +47,8 @@ for i = 1:length(phq.w6),
 end
 
 % target assessment
-assessment = psqi.w0;
-subject_assessment = subject_psqi.w0;
+assessment = psqi.w3;
+subject_assessment = subject_psqi.w3;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
 indnan = isnan(assessment);
@@ -79,12 +80,14 @@ for win = 1,%win_to_analyze,
         ind_tipi = find(strcmp(subject_tipi, subject_assessment{i}));
 
         % find subject in demo data
-        ind_demo = find(strcmp(subject_demo, subject_assessment{i}));
+        ind_demo_basic = find(strcmp(subject_basic, subject_assessment{i}));
+        ind_demo_baseline = find(strcmp(subject_baseline, subject_assessment{i}));
         
         if ~isempty(ind_ft),
             target(cnt,1) = assessment(i);
-            feature_new{cnt} = [feature{ind_ft}(win,:)];%, ...
-%                 age(ind_demo), female(ind_demo)];% ...   % adding age and gender
+            feature_new{cnt} = [feature{ind_ft}(win,:), ...
+                age(ind_demo_basic), female(ind_demo_basic), ...   % adding in age and gender
+                alone(ind_demo_baseline), sleepalone(ind_demo_baseline), employed(ind_demo_baseline), numjobs(ind_demo_baseline)]; % adding in other demo info
 %                 tipi(ind_tipi, :)]; % adding big5
             %subject_analyze{cnt} = subject_assessment{i};
             cnt = cnt+1;
