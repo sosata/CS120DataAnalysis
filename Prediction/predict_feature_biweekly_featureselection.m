@@ -2,7 +2,7 @@ clear;
 close all;
 
 addpath('../functions');
-addpath('../Regressors');
+addpath('../ML');
 
 n_bootstrap = 12*2;
 n_tree = 100;
@@ -51,14 +51,12 @@ assessment = psqi.w6;
 subject_assessment = subject_psqi.w6;
 
 % remove if NaN (for big5 only) %%%%%%%%%%
-indnan = isnan(assessment);
-assessment(indnan) = [];
-subject_assessment(indnan) = [];
+% indnan = isnan(assessment);
+% assessment(indnan) = [];
+% subject_assessment(indnan) = [];
 
 % which 2-week blocks to consider for the analysis
 win_to_analyze = 1;%[1 2 3 4 5];
-
-R2 = zeros(length(win_to_analyze), n_bootstrap);
 
 for win = win_to_analyze,
     
@@ -91,7 +89,6 @@ for win = win_to_analyze,
                 age(ind_demo_basic), female(ind_demo_basic), ...   % adding in age and gender
                 alone(ind_demo_baseline), sleepalone(ind_demo_baseline), employed(ind_demo_baseline), numjobs(ind_demo_baseline)]; % adding in other demo info
 %                 tipi(ind_tipi, :)]; % adding big5
-            %subject_analyze{cnt} = subject_assessment{i};
             cnt = cnt+1;
         else
             disp('subject from assessment was not found in feature data.');
@@ -113,49 +110,15 @@ for win = win_to_analyze,
     target_metatrain = target(ind_metatrain);
     feature_metatest = feature_all(ind_metatest,:);
     target_metatest = target(ind_metatest);
-
-    ind_good = 1;
-    R2(win,:) = rf_regressor(feature_metatrain(:,ind_good), target_metatrain, n_tree, n_bootstrap);
-    fprintf('R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
-    fprintf('first pass...\n');
-    for i=2:size(feature_metatrain,2),
-        R2_new = rf_regressor(feature_metatrain(:,[ind_good, i]), target_metatrain, n_tree, n_bootstrap);
-        if mean(R2_new)>mean(R2(win,:)),
-            ind_good = [ind_good, i];
-            R2(win,:) = R2_new;
-            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
-            fprintf('% d', ind_good);
-            fprintf('\n');            
-        end
-    end
-    fprintf('second pass...\n');
-    for i=1:length(ind_good),
-        inds = ind_good([1:i-1,i+1:end]);
-        inds(isnan(inds)) = [];
-        R2_new = rf_regressor(feature_metatrain(:,inds), target_metatrain, n_tree, n_bootstrap);
-        if mean(R2_new)>mean(R2(win,:)),
-            ind_good(i) = nan;
-            R2(win,:) = R2_new;
-            fprintf('New R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
-            fprintf('% d', ind_good);
-            fprintf('\n');            
-        end
-    end
-    ind_good(isnan(ind_good)) = [];
-    fprintf('final set: ');
-    fprintf('%d ',ind_good);
-    fprintf('\n');
-
-    fprintf('Meta-Training R2: %.3f (%.3f)\n', mean(R2(win,:)), std(R2(win,:))/sqrt(n_bootstrap));
     
-    R2_metatest(win,:) = rf_regressor(feature_metatest(:,ind_good), target_metatest, n_tree, n_bootstrap);
-
-    fprintf('Meta-Test R2: %.3f (%.3f)\n', mean(R2_metatest(win,:)), std(R2_metatest(win,:))/sqrt(n_bootstrap));
+    % feature selection
+    [ind_select, R2(win,:)] = feature_selection(feature_metatrain, target_metatrain, @rf_regressor, 1);
+    fprintf('Meta-Training R2: %.3f (%.3f)\n', mean(R2(win,:)), std(mean(R2(win,:)))/sqrt(size(R2,2)));
     
-%     target_all = combine_subjects(target_all);
-%     out_all = combine_subjects(out_all);
+    % cross-validation
+    R2_test(win,:) = rf_regressor(feature_metatest(:,ind_select), target_metatest);
+    fprintf('Meta-Test R2: %.3f (%.3f)\n', mean(R2_test(win,:)), std(R2_test(win,:))/sqrt(size(R2_test,2)));
     
 end
 
-% save('prediction.mat', 'R2', 'out_all', 'target_all');
 save('results/prediction.mat', 'R2');
