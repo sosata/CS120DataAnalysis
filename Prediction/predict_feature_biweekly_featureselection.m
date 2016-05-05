@@ -4,8 +4,8 @@ close all;
 addpath('../functions');
 addpath('../ML');
 
-n_bootstrap = 12*2;
-n_tree = 100;
+% n_bootstrap = 12*2;
+% n_tree = 100;
 
 % delete(gcp('nocreate'));
 % pool = parpool(24);
@@ -112,7 +112,7 @@ for win = win_to_analyze,
     target_metatest = target(ind_metatest);
     
     % feature selection
-    [ind_select, R2(win,:)] = feature_selection(feature_metatrain, target_metatrain, @rf_regressor, 1);
+    [ind_select, R2(win,:)] = feature_selection(feature_metatrain, target_metatrain, @rf_regressor, 10);
     fprintf('Meta-Training R2: %.3f (%.3f)\n', mean(R2(win,:)), std(mean(R2(win,:)))/sqrt(size(R2,2)));
     
     % cross-validation

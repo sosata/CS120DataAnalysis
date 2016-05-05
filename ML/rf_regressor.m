@@ -1,24 +1,16 @@
-function R2 = rf_regressor(x, y)
+function R2 = rf_regressor(xtrain, ytrain, xtest, ytest)
 
-n_tree = 100;
-n_bootstrap = 12*10;
+n_tree = 1000;
 
-parfor k=1:n_bootstrap,
+if isempty(xtrain)||isempty(xtest),
+    R2 = -Inf;
+else
     
-    ind_train = randsample(1:size(x,1), round(size(x,1)*.7), false);
-    ind_test = 1:size(x,1);
-    ind_test(unique(ind_train)) = [];
-    if isempty(ind_test),
-        fprintf('empty test set. skipping...\n');
-        continue;
-    end
+    mdl = TreeBagger(n_tree, xtrain, ytrain, 'Method', 'regression');
+    out = predict(mdl, xtest);
     
-    mdl = TreeBagger(n_tree, x(ind_train,:), y(ind_train), 'Method', 'regression');
-    out = predict(mdl, x(ind_test,:));
-    
-    R2(k) = 1-mean((out-y(ind_test)).^2)/mean((mean(y(ind_train))-y(ind_test)).^2);
+    R2 = 1-mean((out-ytest).^2)/mean((mean(ytrain)-ytest).^2);
     
 end
-
 
 end

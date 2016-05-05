@@ -3,13 +3,16 @@ function [ind_feature, R2] = feature_selection(feature, target, regressor, n_pas
 alpha_add = 1.1;
 alpha_remove = 0.9;
 
-ind_feature = 1;
+ind_feature = [];
+R2 = -Inf;
 for p = 1:n_pass,
     fprintf('pass #%d\n',p);
-    R2 = regressor(feature(:,ind_feature), target);
+%     R2 = regressor(feature(:,ind_feature), target);
     fprintf('R2: %.3f (%.3f)\n', mean(R2), std(R2)/sqrt(length(R2)));
     fprintf('add...\n');
-    for i=2:size(feature,2),
+    ind_feature_out = 1:size(feature,2);
+    ind_feature_out(ind_feature) = [];
+    for i=ind_feature_out,
         R2_new = regressor(feature(:,[ind_feature; i]), target);
         if mean(R2_new)>alpha_add*mean(R2),
             ind_feature = [ind_feature; i];

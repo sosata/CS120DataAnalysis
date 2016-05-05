@@ -6,7 +6,7 @@ close all;
 
 %% reading baseline (screener) scores
 
-tab = readtable('../../../Data/CS120Clinical/CS120Final_Screener.xlsx');
+tab = readtable('../../../../Data/CS120Clinical/CS120Final_Screener.xlsx');
 ind = cellfun(@(x) isempty(x), tab.ID);
 tab(ind, :) = [];
 
@@ -16,15 +16,9 @@ for x=1:8,
     phq.w0 = phq.w0 + str2num(cell2mat(tab.(sprintf('phq0%d',x))));
 end
 
-subject_gad.w0 = tab.ID;
-gad.w0 = zeros(size(tab,1),1);
-for x=1:7,
-    gad.w0 = gad.w0 + str2num(cell2mat(tab.(sprintf('gad0%d',x))));
-end
-
 %% reading week 3 scores
 
-tab = readtable('../../../Data/CS120Clinical/CS120Final_3week.xlsx');
+tab = readtable('../../../../Data/CS120Clinical/CS120Final_3week.xlsx');
 ind = cellfun(@(x) isempty(x), tab.ID);
 tab(ind, :) = [];
 
@@ -41,21 +35,9 @@ ind = find(phq.w3>=999);
 subject_phq.w3(ind) = [];
 phq.w3(ind) = [];
 
-subject_gad.w3 = tab.ID;
-gad.w3 = cellfun(@(x) str2num(x), tab.gadintro01_3wkBecomingEasilyAnnoyedOrIrritable)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkBeingSoRestlessThatItIsHardToSitStill)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkFeelingAfraidAsIfSomethingAwfulMightHappen)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkFeelingNervous_Anxious_OrOnEdge)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkHavingTroubleRelaxing)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkNotBeingAbleToStopOrControlWorrying)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_3wkWorryingTooMuchAboutDifferentThings);
-ind = find(gad.w3>=999);
-subject_gad.w3(ind) = [];
-gad.w3(ind) = [];
-
 %% reading week 6 scores
 
-tab = readtable('../../../Data/CS120Clinical/CS120Final_6week.xlsx');
+tab = readtable('../../../../Data/CS120Clinical/CS120Final_6week.xlsx');
 ind = cellfun(@(x) isempty(x), tab.ID);
 tab(ind, :) = [];
 
@@ -72,35 +54,28 @@ ind = find(phq.w6>=999);
 subject_phq.w6(ind) = [];
 phq.w6(ind) = [];
 
-subject_gad.w6 = tab.ID;
-gad.w6 = cellfun(@(x) str2num(x), tab.gadintro01_6wkBecomingEasilyAnnoyedOrIrritable)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkBeingSoRestlessThatItIsHardToSitStill)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkFeelingAfraidAsIfSomethingAwfulMightHappen)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkFeelingNervous_Anxious_OrOnEdge)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkHavingTroubleRelaxing)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkNotBeingAbleToStopOrControlWorrying)+...
-    cellfun(@(x) str2num(x), tab.gadintro01_6wkWorryingTooMuchAboutDifferentThings);
-ind = find(gad.w6>=999);
-subject_gad.w6(ind) = [];
-gad.w6(ind) = [];
+%% change in scores
 
-subplot 321;
-hist(phq.w0, 24);
-title('PHQ9');
-ylabel('week 0');
-subplot 322;
-hist(gad.w0, 21);
-title('GAD7');
-subplot 323;
-hist(phq.w3, 24);
-ylabel('week 3');
-subplot 324;
-hist(gad.w3, 21);
-subplot 325;
-hist(phq.w6, 24);
-ylabel('week 6');
-subplot 326;
-hist(gad.w6, 21);
+% from baseline to week 3
+cnt = 1;
+for i = 1:length(phq.w3),
+    ind = find(strcmp(subject_phq.w0, subject_phq.w3{i}));
+    if ~isempty(ind),
+        subject_phq.w03{cnt} = subject_phq.w3{i};
+        phq.w03(cnt) = phq.w3(i) - phq.w0(ind);
+        cnt = cnt+1;
+    end
+end
+% from week 3 to 6
+cnt = 1;
+for i = 1:length(phq.w6),
+    ind = find(strcmp(subject_phq.w3, subject_phq.w6{i}));
+    if ~isempty(ind),
+        subject_phq.w36{cnt} = subject_phq.w6{i};
+        phq.w36(cnt) = phq.w6(i) - phq.w3(ind);
+        cnt = cnt+1;
+    end
+end
 
 save('phq9.mat', 'subject_phq', 'phq');
-save('gad7.mat', 'subject_gad', 'gad');
+
