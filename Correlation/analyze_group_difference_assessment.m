@@ -3,11 +3,11 @@ close all;
 
 addpath('../functions');
 
-load('../Assessment/phq9.mat');
+load('../Assessment/psqi.mat');
 load('../FeatureExtraction/features_biweekly_all');
 
-assessment = phq.w3;
-subject_assessment = subject_phq.w3;
+assessment = psqi.w6;
+subject_assessment = subject_psqi.w6;
 
 prc_low = prctile(assessment, 27);
 prc_high = prctile(assessment, 73);
@@ -40,7 +40,7 @@ num_weeks = 5;
 groups = unique(subject_labels);
 colors = [0 .6 0; 1 0 0];
 
-for w = 1,%:num_weeks,
+for w = 2,%:num_weeks,
     
     ft = [];
     for s = 1:length(feature),
