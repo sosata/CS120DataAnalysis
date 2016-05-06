@@ -6,10 +6,7 @@ alpha_remove = 0.9;
 ind_feature = [];
 R2 = -Inf;
 for p = 1:n_pass,
-    fprintf('pass #%d\n',p);
-%     R2 = regressor(feature(:,ind_feature), target);
-    fprintf('R2: %.3f (%.3f)\n', mean(R2), std(R2)/sqrt(length(R2)));
-    fprintf('add...\n');
+    fprintf('pass #%d\nadd...\n',p);
     ind_feature_out = 1:size(feature,2);
     ind_feature_out(ind_feature) = [];
     for i=ind_feature_out,

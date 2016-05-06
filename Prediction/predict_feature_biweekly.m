@@ -29,7 +29,7 @@ for win = win_to_analyze,
     
     cnt = 1;
     target = [];
-    feature_new = [];
+    feature_to_analyze = [];
     
     for i=1:length(subject_assessment),
 
@@ -49,8 +49,8 @@ for win = win_to_analyze,
         ind_demo_baseline = find(strcmp(subject_baseline, subject_assessment{i}));
         
         if ~isempty(ind_ft),
-            target(cnt,1) = assessment(i);
-            feature_new{cnt} = [feature{ind_ft}(win,:), ...
+            target{cnt} = assessment(i);
+            feature_to_analyze{cnt} = [feature{ind_ft}(win,:), ...
                 age(ind_demo_basic), female(ind_demo_basic), ...   % adding in age and gender
                 alone(ind_demo_baseline), sleepalone(ind_demo_baseline), employed(ind_demo_baseline), numjobs(ind_demo_baseline)]; % adding in other demo info
 %                 tipi(ind_tipi, :)]; % adding big5
@@ -61,14 +61,10 @@ for win = win_to_analyze,
         
     end
     
-    feature_all = combine_subjects(feature_new);
+    %R2{win} = train_randsample(feature_to_analyze, target, 12*10, .7, @rf_regressor);
+    R2{win} = train_loso(feature_to_analyze, target, @rf_regressor);
     
-    % zscore
-    % feature_all = myzscore(feature_all);
-    
-    R2(win,:) = train_randsample(feature_all, target, 12*10, .7, @rf_regressor);
-    
-    fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2(win,:)), std(R2(win,:))/sqrt(size(R2,2)));
+    fprintf('\nwin#%d n=%d R2: %.3f (%.3f)\n', win, length(target), mean(R2{win}), std(R2{win})/sqrt(length(R2{win})));
     
 end
 

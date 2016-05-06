@@ -6,6 +6,16 @@ if isempty(x),
     
 else
     
+    if iscell(x),
+        x = combine_subjects(x);
+    end
+    if iscell(y),
+        y = combine_subjects(y);
+    end
+    if size(x,1)~=length(y),
+        error('train_randsample: x and y must have the same number of rows.')
+    end
+    
     R2 = zeros(n_bootstrap,1);
     
     parfor k=1:n_bootstrap,
