@@ -6,7 +6,7 @@ if isempty(xtrain)||isempty(xtest),
     R2 = -Inf;
 else
     
-    mdl = TreeBagger(n_tree, xtrain, ytrain, 'Method', 'regression');
+    mdl = TreeBagger(n_tree, xtrain, ytrain, 'Method', 'regression','UseParallel',true);
     out = predict(mdl, xtest);
     
     R2 = 1-mean((out-ytest).^2)/mean((mean(ytrain)-ytest).^2);

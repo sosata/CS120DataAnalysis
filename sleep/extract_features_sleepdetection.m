@@ -1,12 +1,12 @@
 clear;
 close all;
 
-extract_workday = true;
+add_workday = true;
 
 addpath('../functions');
 load('../settings.mat');
 
-probes = {'ems','fus','lgt','aud','act','scr','bat','wif','app'};
+probes = {'ems','fus','lgt','aud','act','scr','bat','wif'};
 
 window_awake = 6*3600;  % time window before sleep and after wake to be considered as awake
 window_sensor = 10*60;
@@ -14,13 +14,17 @@ overlap = 0;
 
 save_results = true;
 
-cnt = 1;
-for i = 1:length(subjects),
+% cnt = 1;
+feature = cell(length(subjects),1);
+state = cell(length(subjects),1);
+
+parfor i = 1:length(subjects),
     
     fprintf('%d/%d\n', i, length(subjects));
     
     % loading data
     empty_probe = false;
+    data = [];
     for p = 1:length(probes),
         filename = [data_dir, subjects{i}, '/', probes{p}, '.csv'];
         if ~exist(filename, 'file'),
@@ -43,7 +47,7 @@ for i = 1:length(subjects),
     time_wake = data.ems.Var4/1000 + time_zone*3600;
     time_up = data.ems.Var5/1000 + time_zone*3600;
     
-    if extract_workday,
+    if add_workday,
         workday = categorical(data.ems.Var7);
         workday_new = zeros(length(workday),1);
         workday_new(workday=='off') = 0;
@@ -59,8 +63,8 @@ for i = 1:length(subjects),
     data.bat.Var2 = data.bat.Var3;
     data.wif.Var2 = categorical(data.wif.Var2);
     
-    feature{cnt} = [];
-    state{cnt} = [];
+%     feature{i} = [];
+%     state{i} = [];
     
     for j = 1:length(time_bed),
         
@@ -91,7 +95,7 @@ for i = 1:length(subjects),
                     cellfun(@(x) mode(x{6})>0, data_int)', ... %battery charging?
                     cellfun(@(x) sum(char(mode(x{7}))), data_int)']; ... %dominant wifi name
                 
-                if extract_workday,
+                if add_workday,
                     ft = [ft, workday(j)*ones(length(data_int),1)];
                 end
                 
@@ -101,12 +105,12 @@ for i = 1:length(subjects),
                 ft(isnan(ft(:,6)),:) = [];
                 ft(isnan(ft(:,8)),:) = [];
                 
-                feature{cnt} = [feature{cnt}; ft];
+                feature{i} = [feature{i}; ft];
                 
                 if strcmp(period{k}, 'during'),
-                    state{cnt} = [state{cnt}; 2*ones(size(ft,1),1)];
+                    state{i} = [state{i}; 2*ones(size(ft,1),1)];
                 else
-                    state{cnt} = [state{cnt}; ones(size(ft,1),1)];
+                    state{i} = [state{i}; 1*ones(size(ft,1),1)];
                 end
             end
 
@@ -114,20 +118,32 @@ for i = 1:length(subjects),
 
     end
     
-    if size(feature{cnt},1)<=1,
-        continue;
-    end
-    if length(unique(state{cnt}))<2,
+    if size(feature{i},1)<=1,
+        feature{i} = [];
+        state{i} = [];
         continue;
     end
     
-    cnt = cnt+1;
+    if length(unique(state{i}))<2,
+        feature{i} = [];
+        state{i} = [];
+    end
+    
+%     cnt = cnt+1;
     
 end
 
+ind = find(cellfun(@isempty, feature));
+if sum(ind~=find(cellfun(@isempty, state)))>1,
+    error('something is wrong');
+end
+feature(ind) = [];
+state(ind) = [];
+        
+
 if save_results,
-    if extract_workday,
-        save('features_sleep_workdayinfo.mat', 'feature', 'state');
+    if add_workday,
+        save('features_sleep_workdayinfo2.mat', 'feature', 'state');
     else
         save('features_sleep.mat', 'feature', 'state');
     end

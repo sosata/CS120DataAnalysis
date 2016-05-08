@@ -1,10 +1,10 @@
 % leave one-subject-out
 
-function R2 = train_loso(x, y, regressor)
+function perf = train_loso(x, y, regressor)
 
 if isempty(x),
     
-    R2 = -Inf;
+    perf = -Inf;
     
 else
     
@@ -12,9 +12,11 @@ else
         error('train_loso: x and y must cell arrays.')
     end
     
-    R2 = zeros(length(y),1);
+    perf2 = [];
     
     parfor k=1:length(y),
+        
+        fprintf('%d/%d\n',k,length(y));
         
         xtrain = x([1:k-1,k+1:end]);
         xtrain = combine_subjects(xtrain);
@@ -24,9 +26,12 @@ else
         xtest = x{k};
         ytest = y{k};
         
-        R2(k) = regressor(xtrain, ytrain, xtest, ytest);
+        perf2(k,:) = regressor(xtrain, ytrain, xtest, ytest);
         
     end
+    
+    perf = nanmean(perf2,1);
+    
 end
 
 end

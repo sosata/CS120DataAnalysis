@@ -10,7 +10,7 @@ else
         error('train_personal_random: each subject data must be in a cell.');
     end
     
-    perf = zeros(length(x),1);
+    perf = [];
     for i = 1:length(x),
         
         fprintf('%d/%d\n',i,length(x));
@@ -19,14 +19,14 @@ else
             perf(i) = nan;
         else
             
-            out = zeros(n_bootstrap,1);
+            out = [];
             parfor k=1:n_bootstrap,
                 
                 state_train = [];
                 state_test = [];
                 while (length(unique(state_train))~=2)||(length(unique(state_test))~=2),
-                    ind_train = randsample(1:length(y), round(length(y)*p_train), false);
-                    ind_test = 1:length(y);
+                    ind_train = randsample(1:length(y{i}), round(length(y{i})*p_train), false);
+                    ind_test = 1:length(y{i});
                     ind_test(ind_train) = [];
                     feature_train = x{i}(ind_train, :);
                     state_train = y{i}(ind_train);
@@ -38,11 +38,12 @@ else
                 %[feature_train, state_train] = stratify(feature_train, state_train);
                 %[feature_test, state_test] = stratify(feature_test, state_test);
                 
-                out(k) = regressor(feature_train, state_train, feature_test, state_test);
+                out(k,:) = regressor(feature_train, state_train, feature_test, state_test);
                 
             end
-            perf(i) = mean(out);
-            fprintf('acc: %.2f\n',perf(i));
+            perf(i,:) = mean(out,1);
+            fprintf(' %.2f',perf(i,:));
+            fprintf('\n');
         end
     end
     
