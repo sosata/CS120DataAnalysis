@@ -27,8 +27,8 @@ else
                 state_train = y{i}([1:((k-1)*foldsize),(k*foldsize+1):end]);
                 state_test = y{i}(((k-1)*foldsize+1):k*foldsize);
                 if (length(unique(state_train))~=2),
-                    fprintf('training set did not include all classes. skipping subject %d...\n',i);
-                    perf2(k) = nan;
+                    fprintf('training set did not include all classes. skipping subject %d - fold %d...\n',i,k);
+                    perf2(k,:) = nan;
                 else
                     perf2(k,:) = regressor(feature_train, state_train, feature_test, state_test);
                 end

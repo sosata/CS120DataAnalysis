@@ -139,12 +139,13 @@ if sum(ind~=find(cellfun(@isempty, state)))>1,
 end
 feature(ind) = [];
 state(ind) = [];
-        
+subject_sleep = subjects;
+subject_sleep(ind) = [];
 
 if save_results,
     if add_workday,
-        save('features_sleep_workdayinfo2.mat', 'feature', 'state');
+        save('features_sleep_workdayinfo.mat', 'feature', 'state', 'subject_sleep');
     else
-        save('features_sleep.mat', 'feature', 'state');
+        save('features_sleep.mat', 'feature', 'state', 'subject_sleep');
     end
 end

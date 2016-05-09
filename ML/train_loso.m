@@ -11,13 +11,13 @@ else
     if ~iscell(x)||~iscell(y),
         error('train_loso: x and y must cell arrays.')
     end
-    
+
     perf2 = [];
-    
+
     parfor k=1:length(y),
-        
+
         fprintf('%d/%d\n',k,length(y));
-        
+
         xtrain = x([1:k-1,k+1:end]);
         xtrain = combine_subjects(xtrain);
         ytrain = y([1:k-1,k+1:end]);
