@@ -32,9 +32,11 @@ load('results_global_rf');
 out2=out;
 load('results_global_rfhmm');
 out3=out;
-bar([1 2 3],[[nanmean(out1(:,1));nanmean(out2(:,1));nanmean(out3(:,1))],...
-    [nanmean(out1(:,2));nanmean(out2(:,2));nanmean(out3(:,2))],...
-    [nanmean(out1(:,3));nanmean(out2(:,3));nanmean(out3(:,3))]]);
+load('results_global_plusdemo');
+out4=out;
+bar([1 2 3 4],[[nanmean(out1(:,1));nanmean(out2(:,1));nanmean(out3(:,1));nanmean(out4(:,1))],...
+    [nanmean(out1(:,2));nanmean(out2(:,2));nanmean(out3(:,2));nanmean(out4(:,2))],...
+    [nanmean(out1(:,3));nanmean(out2(:,3));nanmean(out3(:,3));nanmean(out4(:,3))]]);
 hold on;
 % errorbar([[.777; 1.777; 2.777],[1; 2; 3],[1.222; 2.222; 3.222]],[[nanmean(out1(:,1));nanmean(out2(:,1));nanmean(out3(:,1))],...
 %     [nanmean(out1(:,2));nanmean(out2(:,2));nanmean(out3(:,2))],...
@@ -47,5 +49,5 @@ ylim([.5 1]);
 grid on;
 box off;
 legend('accuracy','precision','recall');
-set(gca, 'xtick', 1:3, 'xticklabel', {'sensor','+workday','+HMM'});
+set(gca, 'xtick', 1:4, 'xticklabel', {'sensor','+workday','+HMM','+other info'});
 title('Global model');

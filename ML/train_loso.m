@@ -12,7 +12,7 @@ else
         error('train_loso: x and y must cell arrays.')
     end
 
-    perf2 = [];
+    perf = [];
 
     parfor k=1:length(y),
 
@@ -26,11 +26,9 @@ else
         xtest = x{k};
         ytest = y{k};
         
-        perf2(k,:) = regressor(xtrain, ytrain, xtest, ytest);
+        perf(k,:) = regressor(xtrain, ytrain, xtest, ytest);
         
     end
-    
-    perf = nanmean(perf2,1);
     
 end
 

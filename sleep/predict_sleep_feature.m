@@ -49,14 +49,19 @@ clear feature_new state_new;
 %     feature{i}(:,end) = [];
 % end
 
-% personal model
+%% personal model
 % out = train_personal_random(feature, state, n_bootstrap, p_train, @rf_binaryclassifier);
 % out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
-out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
+% out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 
-% global model
+%% global model
+% adding demo features to the features vector
+for i=1:length(feature)
+    feature{i} = [feature{i}, ones(size(feature{i},1),1)*[demoage(i) demofemale(i) demoalone(i) demosleepalone(i)...
+        demoemployed(i) demonumjobs(i) demophonelocation(i)]];
+end
 % out = train_loso(feature, state, @rf_binaryclassifier);
-% out = train_loso(feature, state, @rfhmm_binaryclassifier);
+out = train_loso(feature, state, @rfhmm_binaryclassifier);
 
 fprintf('accuracy: %.3f\nprecision: %.3f\nrecall: %.3f\n', nanmean(out(:,1)),nanmean(out(:,2)),nanmean(out(:,3)));
 
