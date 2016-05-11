@@ -11,7 +11,7 @@ p_train = .85;
 k_train = 3;
 add_other_vars = true;
 
-load('features_sleep_workdayinfo.mat');
+load('features_sleepdetection.mat');
 load('../Demographics/demo_baseline');
 load('../Demographics/demo_basic');
 
@@ -51,17 +51,17 @@ clear feature_new state_new;
 
 %% personal model
 % out = train_personal_random(feature, state, n_bootstrap, p_train, @rf_binaryclassifier);
-% out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
+out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
 % out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 
 %% global model
 % adding demo features to the features vector
-for i=1:length(feature)
-    feature{i} = [feature{i}, ones(size(feature{i},1),1)*[demoage(i) demofemale(i) demoalone(i) demosleepalone(i)...
-        demoemployed(i) demonumjobs(i) demophonelocation(i)]];
-end
+% for i=1:length(feature)
+%     feature{i} = [feature{i}, ones(size(feature{i},1),1)*[demoage(i) demofemale(i) demoalone(i) demosleepalone(i)...
+%         demoemployed(i) demonumjobs(i) demophonelocation(i)]];
+% end
 % out = train_loso(feature, state, @rf_binaryclassifier);
-out = train_loso(feature, state, @rfhmm_binaryclassifier);
+% out = train_loso(feature, state, @rfhmm_binaryclassifier);
 
 fprintf('accuracy: %.3f\nprecision: %.3f\nrecall: %.3f\n', nanmean(out(:,1)),nanmean(out(:,2)),nanmean(out(:,3)));
 
