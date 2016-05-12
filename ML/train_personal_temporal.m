@@ -9,7 +9,7 @@ else
     end
     
     perf = [];
-    parfor i = 1,%:length(x),
+    for i = 2,%:length(x),
         
         if size(x{i},1)~=length(y{i})
             error('something is wrong');
@@ -19,6 +19,7 @@ else
             fprintf('skipping subject %d...\n',i);
             perf(i,:) = nan;
         else
+            fprintf('%d: ', i);
             perf2 = [];
             for k=1:k_train,
                 foldsize = floor(length(y{i})/k_train);
@@ -33,7 +34,6 @@ else
                     perf2(k,:) = regressor(feature_train, state_train, feature_test, state_test);
                 end
             end
-            perf2
             perf(i,:) = nanmean(perf2,1);
             fprintf(' %.2f',perf(i,:));
             fprintf('\n');

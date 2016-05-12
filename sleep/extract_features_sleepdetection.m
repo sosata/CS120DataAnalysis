@@ -29,25 +29,19 @@ parfor i = 1:length(subjects),
     end
     
     % loading data
-    %     empty_probe = false;
     data = [];
     for p = 1:length(probes),
         filename = [data_dir, subjects{i}, '/', probes{p}, '.csv'];
         if ~exist(filename, 'file'),
             disp(['No ', probes{p}, ' data for ', subjects{i}]);
             data.(probes{p}) = [];
-            %             empty_probe = true;
-            %             continue;
         else
             data.(probes{p}) = readtable(filename, 'delimiter', '\t', 'readvariablenames', false);
+            
             % correcting timestamps for the time zone
             data.(probes{p}).Var1 = data.(probes{p}).Var1 + time_zone*3600;
         end
     end
-    %     % skip if one of the probes is empty
-    %     if empty_probe,
-    %         continue;
-    %     end
     
     % reported sleep times are in ms
     time_bed = data.ems.Var2/1000 + time_zone*3600;
@@ -63,20 +57,13 @@ parfor i = 1:length(subjects),
     workday_new(workday=='normal') = 2;
     workday = workday_new;
     
-    % sorting second columns which will be used for feature extraction
-    %     data.fus.Var2 = sqrt((data.fus.Var2-mean(data.fus.Var2)).^2+(data.fus.Var3-mean(data.fus.Var3)).^2);
-    %     data.act.Var2 = categorical(cellfun(@(x) x(x~='_'), data.act.Var2, 'uniformoutput', false));
-    %     data.scr.Var2 = categorical(data.scr.Var2);
-    %     data.bat.Var2 = data.bat.Var3;
-    %     data.wif.Var2 = categorical(data.wif.Var2);
-    
     for j = 1:length(time_bed),
         
         data.before = [];
         data.during = [];
         data.after = [];
         for p = 1:length(probes),
-            data.before.(probes{p}) = clip_data(data.(probes{p}), time_sleep(j)-window_awake, time_bed(j));
+            data.before.(probes{p}) = clip_data(data.(probes{p}), time_sleep(j)-window_awake, time_sleep(j));
             data.during.(probes{p}) = clip_data(data.(probes{p}), time_sleep(j), time_wake(j));
             data.after.(probes{p}) = clip_data(data.(probes{p}), time_wake(j), time_wake(j)+window_awake);
         end
@@ -88,12 +75,15 @@ parfor i = 1:length(subjects),
             data_int = combine_and_window2(data.(period{k}), window_sensor);
             
             % skip if no data
+            % TODO: This skips when there's no data in a given period and
+            % causes imbalance in data - maybe give timestart and timeend
+            % as arguments to combine_and_window2 ?
             if isempty(data_int),
                 continue;
             end
             
             ft = [];
-            for w=1:length(data_int.ems),
+            for w=1:length(data_int.act),
                 ft_row = [];
                 if ~isempty(data_int.act{w}),
                     ft_row = [ft_row, (sum(~strcmp(data_int.act{w}.Var2,'STILL'))==0)||isempty(data_int.act{w}.Var1)];

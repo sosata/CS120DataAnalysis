@@ -1,6 +1,6 @@
 function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 
-n_tree = 100;
+n_tree = 1000;
 
 if isempty(xtrain)||isempty(xtest),
     out = [0 0 0];
@@ -24,38 +24,30 @@ else
     % stratification of training data
     [xtrain, ytrain] = stratify(xtrain, ytrain);
     
-    % training random forest
+    % TODO: stratify test data as well and see what happens
+    
+    % training RF
     mdl = TreeBagger(n_tree, xtrain, ytrain, 'method', 'classification');
     
-    [state_pred, ~] = predict(mdl, xtest);
+    % testing RF+HMM
+    [state_pred, pr] = predict(mdl, xtest);
     state_pred = cellfun(@str2num, state_pred);
 
-%     state_pr = pr(:,2);
-%     cnt = 1;
-%     for phq_th = 0:.05:1,
-%         state_pred = (state_pr>=phq_th);
-%         sensitivity(cnt) = sum(state_pred(ytest==1)==1)/sum(ytest==1);
-%         specificity(cnt) = sum(state_pred(ytest==0)==0)/sum(ytest==0);
-%         cnt = cnt+1;
-%     end
-%     auc = abs(trapz(1-specificity, sensitivity));
-%     state_pred = state_pr>=.5;
+%     figure;
+%     plot(1-ytest,'g');hold on;
+%     plot(pr(:,1),'.r');
+%     ylim([-1 2]);
     
-    %p_transit = sum(diff(ytrain)~=0)/length(ytrain)/2;
+    pr(:,1) = medfilt1(pr(:,1),7);
+%     pr(:,2) = medfilt1(pr(:,2),5);
+    state_pred = (pr(:,1)<.5);
+%     plot(pr(:,1),'.b');
     
-    p_transit = 1/(6*24);
-    state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99]) - 1;
+%     p_transit = 1/(6*24);
+%     state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99]) - 1;
     
-    acc = nanmean(state_pred'==ytest);
-    if (sum(ytest==1)~=0)||(sum(ytest==0)~=0),
-        precision = (nanmean(ytest(state_pred==1)==1)+nanmean(ytest(state_pred==0)==0))/2;
-        recall = (nanmean(state_pred(ytest==1)==1)+nanmean(state_pred(ytest==0)==0))/2;
-    else
-        precision = nan;
-        recall = nan;
-        fprintf('No sleep instances in test data.\n');
-    end
-    out = [acc, precision, recall];
+    [accuracy, precision, recall] = calculate_accuracy(ytest, state_pred);
+    out = [accuracy, precision, recall];
 end
 
 end

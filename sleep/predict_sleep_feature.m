@@ -9,7 +9,9 @@ plot_results = false;
 n_bootstrap = 12;
 p_train = .85;
 k_train = 3;
-add_other_vars = true;
+
+add_other_vars = false;
+add_history = true;
 
 load('features_sleepdetection.mat');
 load('../Demographics/demo_baseline');
@@ -38,21 +40,30 @@ if add_other_vars,
         end
         
     end
+    feature = feature_new;
+    state = state_new;
+    clear feature_new state_new;
+    
 end
-
-feature = feature_new;
-state = state_new;
-clear feature_new state_new;
 
 % removing work day info
 % for i=1:length(feature),
 %     feature{i}(:,end) = [];
 % end
 
+if add_history,
+    for i=1:length(feature)
+        
+        feature{i} = [feature{i}(37:end,:), feature{i}(36:end-1,:), feature{i}(31:end-6,:), feature{i}(1:end-36,:)];
+        state{i} = state{i}(37:end);
+        
+    end
+end
+
 %% personal model
 % out = train_personal_random(feature, state, n_bootstrap, p_train, @rf_binaryclassifier);
-out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
-% out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
+% out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
+out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 
 %% global model
 % adding demo features to the features vector

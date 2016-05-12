@@ -1,6 +1,6 @@
 % This function currently only works for 2 classes
 
-function [accuracy, precision, recall] = performance_accuracy(y, y_pred)
+function [accuracy, precision, recall] = calculate_accuracy(y, y_pred)
 
 if length(y)~=length(y_pred)
     error('inputs should have the same length');
