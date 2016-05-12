@@ -13,7 +13,6 @@ overlap = 0;
 
 save_results = true;
 
-% cnt = 1;
 feature = cell(length(subjects),1);
 state = cell(length(subjects),1);
 
@@ -68,80 +67,74 @@ parfor i = 1:length(subjects),
             data.after.(probes{p}) = clip_data(data.(probes{p}), time_wake(j), time_wake(j)+window_awake);
         end
         
+        data_int = [];
+        data_int.before = combine_and_window3(data.before, time_sleep(j)-window_awake, time_sleep(j), window_sensor);
+        data_int.during = combine_and_window3(data.during, time_sleep(j), time_wake(j), window_sensor);
+        data_int.after = combine_and_window3(data.after, time_wake(j), time_wake(j)+window_awake, window_sensor);
+       
         period = {'before', 'during', 'after'};
         
         for k = 1:length(period),
-            
-            data_int = combine_and_window2(data.(period{k}), window_sensor);
             
             % skip if no data
             % TODO: This skips when there's no data in a given period and
             % causes imbalance in data - maybe give timestart and timeend
             % as arguments to combine_and_window2 ?
-            if isempty(data_int),
-                continue;
-            end
+%             if isempty(data_int),
+%                 continue;
+%             end
             
             ft = [];
-            for w=1:length(data_int.act),
+            for w=1:length(data_int.(period{k}).act),
                 ft_row = [];
-                if ~isempty(data_int.act{w}),
-                    ft_row = [ft_row, (sum(~strcmp(data_int.act{w}.Var2,'STILL'))==0)||isempty(data_int.act{w}.Var1)];
+                if ~isempty(data_int.(period{k}).act{w}),
+                    ft_row = [ft_row, (sum(~strcmp(data_int.(period{k}).act{w}.Var2,'STILL'))==0)||isempty(data_int.(period{k}).act{w}.Var1)];
                 else
                     ft_row = [ft_row, nan];
                 end
-                if ~isempty(data_int.lgt{w}),
-                    ft_row = [ft_row, mean(data_int.lgt{w}.Var2), mean(range(data_int.lgt{w}.Var2))];
+                if ~isempty(data_int.(period{k}).lgt{w}),
+                    ft_row = [ft_row, mean(data_int.(period{k}).lgt{w}.Var2), mean(range(data_int.(period{k}).lgt{w}.Var2))];
                 else
                     ft_row = [ft_row, nan, nan];
                 end
-                if ~isempty(data_int.aud{w}),
-                    ft_row = [ft_row, mean(data_int.aud{w}.Var2)];
+                if ~isempty(data_int.(period{k}).aud{w}),
+                    ft_row = [ft_row, mean(data_int.(period{k}).aud{w}.Var2)];
                 else
                     ft_row = [ft_row, nan];
                 end
-                if ~isempty(data_int.scr{w}),
-                    ft_row = [ft_row, length(data_int.scr{w}.Var1)];
+                if ~isempty(data_int.(period{k}).scr{w}),
+                    ft_row = [ft_row, length(data_int.(period{k}).scr{w}.Var1)];
                 else
                     ft_row = [ft_row, nan];
                 end
-                if ~isempty(data_int.fus{w}),
-                    ft_row = [ft_row, estimate_variance(data_int.fus{w}.Var2,data_int.fus{w}.Var3)];
+                if ~isempty(data_int.(period{k}).fus{w}),
+                    ft_row = [ft_row, estimate_variance(data_int.(period{k}).fus{w}.Var2,data_int.(period{k}).fus{w}.Var3)];
                 else
                     ft_row = [ft_row, nan];
                 end
-                if ~isempty(data_int.bat{w}),
-                    ft_row = [ft_row, mode(data_int.bat{w}.Var3)>0];
+                if ~isempty(data_int.(period{k}).bat{w}),
+                    ft_row = [ft_row, mode(data_int.(period{k}).bat{w}.Var3)>0];
                 else
                     ft_row = [ft_row, nan];
                 end
-                if ~isempty(data_int.wif{w}),
-                    ft_row = [ft_row, sum(char(mode(categorical(data_int.wif{w}.Var2))))];
+                if ~isempty(data_int.(period{k}).wif{w}),
+                    ft_row = [ft_row, sum(char(mode(categorical(data_int.(period{k}).wif{w}.Var2))))];
                 else
                     ft_row = [ft_row, nan];
                 end
                 ft = [ft; ft_row];
                 
-%                 ft = [cell2mat(cellfun(@(x) (sum(~strcmp(x.Var2,'STILL'))>0)||isempty(x.Var1), data_int.act, 'uniformoutput', false))',...  %is there only still activity or no activity data?
-%                     cellfun(@(x) mean(x.Var2), data_int.lgt)', ... %average light power
-%                     cellfun(@(x) mean(range(x.Var2)), data_int.lgt)', ...  %range of light power
-%                     cellfun(@(x) mean(range(x.Var2)), data_int.aud)', ...  %range of audio power
-%                     cellfun(@(x) length(x.Var1), data_int.scr)', ...   %number of screen on/off
-%                     cellfun(@(x) estimate_variance(x.Var2,x.Var3), data_int.fus)', ... %variance of distance from mean
-%                     cellfun(@(x) mode(x.Var3)>0, data_int.bat)', ... %battery charging?
-%                     cellfun(@(x) sum(char(mode(categorical(x.Var2)))), data_int.wif)']; ... %dominant wifi name
-                    
             end
             
             % adding workday variable
-            ft = [ft, workday(j)*ones(length(data_int.ems),1)];
+            ft = [ft, workday(j)*ones(length(data_int.(period{k}).ems),1)];
             
             % adding to the main feature and state vectors
             feature{i} = [feature{i}; ft];
             if strcmp(period{k}, 'during'),
-                state{i} = [state{i}; 2*ones(size(ft,1),1)];
+                state{i} = [state{i}; ones(size(ft,1),1)];    % asleep
             else
-                state{i} = [state{i}; 1*ones(size(ft,1),1)];
+                state{i} = [state{i}; zeros(size(ft,1),1)];    % awake
             end
             
         end
@@ -167,6 +160,11 @@ end
 ind = find(cellfun(@isempty, feature));
 if sum(ind~=find(cellfun(@isempty, state)))>1,
     error('something is wrong');
+end
+if length(ind)>1,
+    fprintf('removing the following subjects with no data:\n');
+    fprintf(' %s',subjects(ind));
+    fprintf('\n');
 end
 feature(ind) = [];
 state(ind) = [];

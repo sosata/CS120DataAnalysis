@@ -9,7 +9,7 @@ else
     end
     
     perf = [];
-    for i = 2,%:length(x),
+    parfor i = 1:length(x),
         
         if size(x{i},1)~=length(y{i})
             error('something is wrong');

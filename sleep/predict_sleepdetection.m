@@ -4,13 +4,11 @@ close all;
 addpath('../functions');
 addpath('../ML');
 
-plot_results = false;
-
 n_bootstrap = 12;
 p_train = .85;
 k_train = 3;
 
-add_other_vars = false;
+add_other_vars = true;
 add_history = true;
 
 load('features_sleepdetection.mat');
@@ -54,8 +52,8 @@ end
 if add_history,
     for i=1:length(feature)
         
-        feature{i} = [feature{i}(37:end,:), feature{i}(36:end-1,:), feature{i}(31:end-6,:), feature{i}(1:end-36,:)];
-        state{i} = state{i}(37:end);
+        feature{i} = [feature{i}(5:end,:),feature{i}(4:end-1,:),feature{i}(3:end-2,:),feature{i}(2:end-3,:),feature{i}(1:end-4,:)];
+        state{i} = state{i}(5:end);
         
     end
 end
