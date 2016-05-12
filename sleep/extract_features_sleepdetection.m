@@ -88,7 +88,7 @@ parfor i = 1:length(subjects),
             for w=1:length(data_int.(period{k}).act),
                 ft_row = [];
                 if ~isempty(data_int.(period{k}).act{w}),
-                    ft_row = [ft_row, (sum(~strcmp(data_int.(period{k}).act{w}.Var2,'STILL'))==0)||isempty(data_int.(period{k}).act{w}.Var1)];
+                    ft_row = [ft_row, (sum(~strcmp(data_int.(period{k}).act{w}.Var2,'STILL'))>0)&~isempty(data_int.(period{k}).act{w}.Var1)];
                 else
                     ft_row = [ft_row, nan];
                 end
@@ -105,7 +105,7 @@ parfor i = 1:length(subjects),
                 if ~isempty(data_int.(period{k}).scr{w}),
                     ft_row = [ft_row, length(data_int.(period{k}).scr{w}.Var1)];
                 else
-                    ft_row = [ft_row, nan];
+                    ft_row = [ft_row, 0];   % for the screen feature when there is no activity, the activity should be 0
                 end
                 if ~isempty(data_int.(period{k}).fus{w}),
                     ft_row = [ft_row, estimate_variance(data_int.(period{k}).fus{w}.Var2,data_int.(period{k}).fus{w}.Var3)];

@@ -72,6 +72,10 @@ out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 % out = train_loso(feature, state, @rf_binaryclassifier);
 % out = train_loso(feature, state, @rfhmm_binaryclassifier);
 
-fprintf('accuracy: %.3f\nprecision: %.3f\nrecall: %.3f\n', nanmean(out(:,1)),nanmean(out(:,2)),nanmean(out(:,3)));
+perf = out.performance;
+
+fprintf('accuracy: %.3f (%.3f)\nprecision: %.3f (%.3f)\nrecall: %.3f (%.3f)\n', ...
+    nanmean(perf(:,1)),nanstd(perf(:,1))/sqrt(size(perf,1)),nanmean(perf(:,2)),nanstd(perf(:,2))/sqrt(size(perf,1)),...
+    nanmean(perf(:,3)),nanstd(perf(:,3))/sqrt(size(perf,1)));
 
 save('results.mat', 'out', 'demoage','demofemale','demoemployed','demoalone','demosleepalone','demonumjobs','demophonelocation');

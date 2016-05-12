@@ -1,7 +1,10 @@
-function perf = train_personal_temporal(x, y, k_train, regressor)
+function out = train_personal_temporal(x, y, k_train, regressor)
 
 if isempty(x),
-    perf = -Inf;
+    out.performance = NaN;
+    out.target = [];
+    out.prediction1 = [];
+    out.prediction2 = [];
 else
     
     if ~iscell(x)||~iscell(y),
@@ -9,6 +12,9 @@ else
     end
     
     perf = [];
+    target = cell(length(x),1);
+    prediction1 = cell(length(x),1);
+    prediction2 = cell(length(x),1);
     parfor i = 1:length(x),
         
         if size(x{i},1)~=length(y{i})
@@ -31,7 +37,12 @@ else
                     fprintf('training set did not include all classes. skipping subject %d / fold %d\n',i,k);
                     perf2(k,:) = [nan nan nan];
                 else
-                    perf2(k,:) = regressor(feature_train, state_train, feature_test, state_test);
+                    outreg = regressor(feature_train, state_train, feature_test, state_test);
+                    perf2(k,:) = outreg.performance;
+                    target{i} = [target{i}; state_test];
+                    prediction1{i} = [prediction1{i}; outreg.staterf];
+                    prediction2{i} = [prediction2{i}; outreg.statefilter];
+
                 end
             end
             perf(i,:) = nanmean(perf2,1);
@@ -39,6 +50,11 @@ else
             fprintf('\n');
         end
     end
+    
+    out.performance = perf;
+    out.prediction1 = prediction1;
+    out.prediction2 = prediction2;
+    out.target = target;
     
 end
 

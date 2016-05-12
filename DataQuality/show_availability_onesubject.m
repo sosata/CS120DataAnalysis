@@ -6,7 +6,7 @@ addpath('../functions/');
 data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
 sensors = {'act','app','aud','bat','cal','coe','emc','eml','emm','ems','fus','lgt','run','scr','tch','wif'};
 
-subject = '856513';
+subject = '1150915';
 
 h = figure;
 set(h,'position', [657   285   558   287]);
@@ -24,7 +24,7 @@ for i=1:length(sensors),
     
 end
 ylim([0 length(sensors)]);
-set_date_ticks(gca, 1);
+set_date_ticks(gca, 7);
 set(gca, 'ytick', 1:length(sensors), 'yticklabel', sensors);
 box off;
 grid on;

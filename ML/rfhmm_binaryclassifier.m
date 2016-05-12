@@ -29,25 +29,22 @@ else
     % training RF
     mdl = TreeBagger(n_tree, xtrain, ytrain, 'method', 'classification');
     
-    % testing RF+HMM
-    [state_pred, pr] = predict(mdl, xtest);
-    state_pred = cellfun(@str2num, state_pred);
+    % testing RF
+    [~, pr] = predict(mdl, xtest);
+%     state_pred = cellfun(@str2num, state_pred);
+    out.staterf = pr(:,1);
 
-%     figure;
-%     plot(1-ytest,'g');hold on;
-%     plot(pr(:,1),'.r');
-%     ylim([-1 2]);
-    
+    % median filter
     pr(:,1) = medfilt1(pr(:,1),7);
-%     pr(:,2) = medfilt1(pr(:,2),5);
     state_pred = (pr(:,1)<.5);
-%     plot(pr(:,1),'.b');
-    
+    out.statefilter = pr(:,1);
+
+    % HMM
 %     p_transit = 1/(6*24);
 %     state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99]) - 1;
     
     [accuracy, precision, recall] = calculate_accuracy(ytest, state_pred);
-    out = [accuracy, precision, recall];
+    out.performance = [accuracy, precision, recall];
 end
 
 end
