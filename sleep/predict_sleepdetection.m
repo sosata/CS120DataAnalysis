@@ -15,6 +15,11 @@ load('features_sleepdetection.mat');
 load('../Demographics/demo_baseline');
 load('../Demographics/demo_basic');
 
+% removing work day info
+for i=1:length(feature),
+    feature{i}(:,end) = [];
+end
+
 cnt = 1;
 if add_other_vars,
     for s=1:length(subject_sleep)
@@ -43,11 +48,6 @@ if add_other_vars,
     clear feature_new state_new;
     
 end
-
-% removing work day info
-% for i=1:length(feature),
-%     feature{i}(:,end) = [];
-% end
 
 if add_history,
     for i=1:length(feature)

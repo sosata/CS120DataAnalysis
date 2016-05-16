@@ -35,13 +35,14 @@ else
     out.staterf = pr(:,1);
 
     % median filter
-    pr(:,1) = medfilt1(pr(:,1),7);
-    state_pred = (pr(:,1)<.5);
+    pr(:,1) = medfilt1(pr(:,1),21);
     out.statefilter = pr(:,1);
+    
+    state_pred = (pr(:,1)<pr(:,2));
 
     % HMM
-%     p_transit = 1/(6*24);
-%     state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99]) - 1;
+    p_transit = 1/(6*24);
+    state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99])'-1;
     
     [accuracy, precision, recall] = calculate_accuracy(ytest, state_pred);
     out.performance = [accuracy, precision, recall];

@@ -56,6 +56,9 @@ parfor i = 1:length(subjects),
     workday_new(workday=='normal') = 2;
     workday = workday_new;
     
+    % removing short-period (<=30) screen data
+    data.scr = remove_short_screen(data.scr, 30);
+    
     for j = 1:length(time_bed),
         
         data.before = [];
@@ -73,22 +76,27 @@ parfor i = 1:length(subjects),
         data_int.after = combine_and_window3(data.after, time_wake(j), time_wake(j)+window_awake, window_sensor);
        
         period = {'before', 'during', 'after'};
+        % saving timestart to calculate absolute time later as a feature
+        timestart = [time_sleep(j)-window_awake, time_sleep(j),  time_wake(j)+window_awake];
         
         for k = 1:length(period),
             
-            % skip if no data
-            % TODO: This skips when there's no data in a given period and
-            % causes imbalance in data - maybe give timestart and timeend
-            % as arguments to combine_and_window2 ?
-%             if isempty(data_int),
-%                 continue;
-%             end
-            
+            % Filling in empty activity bins with last activity
+            last_activity='STILL';
+            for w=1:length(data_int.(period{k}).act),
+                if isempty(data_int.(period{k}).act{w}),
+                    data_int.(period{k}).act{w} = table(0, {last_activity}, 100);
+                else
+                    last_activity = data_int.(period{k}).act{w}.Var2{end};
+                end
+            end
+
+            % Building the feature vector
             ft = [];
             for w=1:length(data_int.(period{k}).act),
                 ft_row = [];
                 if ~isempty(data_int.(period{k}).act{w}),
-                    ft_row = [ft_row, (sum(~strcmp(data_int.(period{k}).act{w}.Var2,'STILL'))>0)&~isempty(data_int.(period{k}).act{w}.Var1)];
+                    ft_row = [ft_row, (sum(~strcmp(data_int.(period{k}).act{w}.Var2,'STILL'))>0)&~isempty(data_int.(period{k}).act{w}.Var2)];
                 else
                     ft_row = [ft_row, nan];
                 end
@@ -105,7 +113,7 @@ parfor i = 1:length(subjects),
                 if ~isempty(data_int.(period{k}).scr{w}),
                     ft_row = [ft_row, length(data_int.(period{k}).scr{w}.Var1)];
                 else
-                    ft_row = [ft_row, 0];   % for the screen feature when there is no activity, the activity should be 0
+                    ft_row = [ft_row, 0];   % for the screen feature when there is no activity, the number of events should be 0
                 end
                 if ~isempty(data_int.(period{k}).fus{w}),
                     ft_row = [ft_row, estimate_variance(data_int.(period{k}).fus{w}.Var2,data_int.(period{k}).fus{w}.Var3)];
@@ -122,11 +130,16 @@ parfor i = 1:length(subjects),
                 else
                     ft_row = [ft_row, nan];
                 end
+                %adding absolute time (midpoint in window)
+                ft_row = [ft_row, mod((timestart(k)+(w-.5)*10*60),86400)/3600];
+
+                % adding the row to the matrix
                 ft = [ft; ft_row];
                 
             end
             
-            % adding workday variable
+            % adding workday variable (this will always be the last
+            % feature)
             ft = [ft, workday(j)*ones(length(data_int.(period{k}).ems),1)];
             
             % adding to the main feature and state vectors
@@ -163,7 +176,7 @@ if sum(ind~=find(cellfun(@isempty, state)))>1,
 end
 if length(ind)>1,
     fprintf('removing the following subjects with no data:\n');
-    fprintf(' %s',subjects(ind));
+    subjects(ind)
     fprintf('\n');
 end
 feature(ind) = [];

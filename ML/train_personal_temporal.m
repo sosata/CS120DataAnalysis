@@ -15,7 +15,7 @@ else
     target = cell(length(x),1);
     prediction1 = cell(length(x),1);
     prediction2 = cell(length(x),1);
-    parfor i = 1:length(x),
+    parfor i = 1:length(x),%%%%%%%%%%%%%%%%%
         
         if size(x{i},1)~=length(y{i})
             error('something is wrong');

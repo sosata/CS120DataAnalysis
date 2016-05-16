@@ -1,10 +1,10 @@
 % leave one-subject-out
 
-function perf = train_loso(x, y, regressor)
+function out = train_loso(x, y, regressor)
 
 if isempty(x),
     
-    perf = -Inf;
+    out.performance = -Inf;
     
 else
     
@@ -13,7 +13,6 @@ else
     end
 
     perf = [];
-
     parfor k=1:length(y),
 
         fprintf('%d/%d\n',k,length(y));
@@ -26,10 +25,14 @@ else
         xtest = x{k};
         ytest = y{k};
         
-        perf(k,:) = regressor(xtrain, ytrain, xtest, ytest);
+        outreg = regressor(xtrain, ytrain, xtest, ytest);
+        perf(k,:) = outreg.performance;
         
+        fprintf(' %.2f', perf(k,:));
+        fprintf('\n');
     end
     
+    out.performance = perf;
 end
 
 end
