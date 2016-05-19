@@ -3,8 +3,13 @@ function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 n_tree = 500;
 
 if isempty(xtrain)||isempty(xtest),
-    out = [0 0 0];
+    out = [];
 else
+    
+    % removing nans from training data as RF cannot deal with it
+    ind_nan = isnan(ytrain);
+    xtrain(ind_nan,:) = [];
+    ytrain(ind_nan) = [];
     
     if length(unique(ytrain))~=2,
         error('rf_binaryclassifier: ytrain must be binary.');
@@ -32,17 +37,19 @@ else
     % testing RF
     [~, pr] = predict(mdl, xtest);
 %     state_pred = cellfun(@str2num, state_pred);
-    out.staterf = pr(:,1);
+    out.rf = pr(:,1);
 
     % median filter
     pr(:,1) = medfilt1(pr(:,1),21);
-    out.statefilter = pr(:,1);
+    out.medianfilter = pr(:,1);
     
     state_pred = (pr(:,1)<pr(:,2));
 
     % HMM
     p_transit = 1/(6*24);
     state_pred = hmmviterbi(state_pred+1, [1-p_transit p_transit; p_transit 1-p_transit], [.99 .01;.01 .99])'-1;
+    
+    out.hmm = state_pred;
     
     [accuracy, precision, recall] = calculate_accuracy(ytest, state_pred);
     out.performance = [accuracy, precision, recall];

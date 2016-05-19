@@ -2,7 +2,7 @@ clear;
 
 addpath('../Functions/');
 
-subject = '856513';
+subject = '1013558';
 
 data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
 
@@ -21,6 +21,8 @@ set_date_ticks(gca, 7);
 
 figure;
 subplot 211;
-hist((tab.Var4-tab.Var3)/1000/3600);
+histogram((tab.Var4-tab.Var3)/1000/3600,24);
+xlabel('sleep duration (hours)');
 subplot 212;
-hist((tab.Var5-tab.Var2)/1000/3600);
+histogram((tab.Var5-tab.Var2)/1000/3600,24);
+xlabel('bed duration (hours)');

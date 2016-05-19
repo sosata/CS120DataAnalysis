@@ -2,13 +2,22 @@
 
 function [accuracy, precision, recall] = calculate_accuracy(y, y_pred)
 
+% removing missing observations
+ind_nan = isnan(y);
+y(ind_nan) = [];
+y_pred(ind_nan) = [];
+
 if length(y)~=length(y_pred)
-    error('inputs should have the same length');
+    error('calculate_accuracy: inputs should have the same length');
 end
 
 y_uniq = unique(y);
 if length(y_uniq)~=2,
-    error('this function only works for 2 classes.');
+    fprintf('instance skipped since there weren''t two classes in the ground truth.\n');
+    accuracy = nan;
+    precision = nan;
+    recall = nan;
+    return;
 end
 y1 = y_uniq(1);
 y2 = y_uniq(2);
