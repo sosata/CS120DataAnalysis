@@ -61,7 +61,7 @@ parfor i = 1:length(subjects),
     data.scr = remove_short_screen(data.scr, 30);
     
     % windowing and combining all data
-    data_win = combine_and_window3(data, time_sleep(1), time_wake(end), window_size);
+    data_win = combine_and_window_tc_speed(data, time_sleep(1), time_wake(end), window_size);
     
     
     for w=1:length(data_win.act),
