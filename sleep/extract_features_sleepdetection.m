@@ -5,23 +5,22 @@ addpath('../functions');
 addpath('../features');
 load('../settings.mat');
 
-calculate_features = false;
+calculate_features = true; % if false, only caluclates states and pulls features from previously saved file
 save_results = true;
 
-probes = {'ems','fus','lgt','aud','act','scr','bat','wif'};
-
-% window_awake = 6*3600;  % time window before sleep and after wake to be considered as awake
 window_size = 10*60;
 overlap = 0;
 
+% initializing feature and state vectors
 if calculate_features,
+    probes = {'ems','fus','lgt','aud','act','scr','bat','wif'};
     feature = cell(length(subjects),1);
-    state = cell(length(subjects),1);
 else
+    probes = {'ems'};
     load('features_sleepdetection');
-    state = cell(length(subjects),1);
     clear subject_sleep;
 end
+state = cell(length(subjects),1);
 
 parfor i = 1:length(subjects),
     
@@ -60,20 +59,25 @@ parfor i = 1:length(subjects),
     [time_bed, time_sleep, time_wake, time_up] = correct_reported_times(time_bed, time_sleep, time_wake, time_up);
     
     % extracting workday info
-    workday = categorical(data.ems.Var7);
-    workday_new = zeros(length(workday),1);
-    workday_new(workday=='off') = 0;
-    workday_new(workday=='partial') = 1;
-    workday_new(workday=='normal') = 2;
-    workday = workday_new;
+%     workday = categorical(data.ems.Var7);
+%     workday_new = zeros(length(workday),1);
+%     workday_new(workday=='off') = 0;
+%     workday_new(workday=='partial') = 1;
+%     workday_new(workday=='normal') = 2;
+%     workday = workday_new;
     
-    % removing short-period (<=30) screen data
-    data.scr = remove_short_screen(data.scr, 30);
+    if calculate_features,
+        % removing short-period (<=30) screen data
+        data.scr = remove_short_screen(data.scr, 30);
+        
+        % windowing and combining all data
+        data_win = combine_and_window_tc_speed(data, time_sleep(1), time_wake(end), window_size);
+        n_samples = length(data_win.act);
+    else
+        n_samples = length(feature{i});
+    end
     
-    % windowing and combining all data
-    data_win = combine_and_window_tc_speed(data, time_sleep(1), time_wake(end), window_size);
-    
-    for w=1:length(data_win.act),
+    for w=1:n_samples,
         
         time_win = time_sleep(1)+(w-.5)*10*60;
         
@@ -170,20 +174,23 @@ parfor i = 1:length(subjects),
     
 end
 
-% removing empty subjects
-ind = find(cellfun(@isempty, feature));
-if sum(ind~=find(cellfun(@isempty, state)))>1,
-    error('something is wrong');
-end
-% if length(ind)>1,
-%     fprintf('removing the following subjects with no data:\n');
-%     subjects(ind)
-%     fprintf('\n');
-% end
-% feature(ind) = [];
-% state(ind) = [];
 subject_sleep = subjects;
-% subject_sleep(ind) = [];
+
+if calculate_features,
+    %removing empty subjects
+%     ind = find(cellfun(@isempty, feature));
+%     if sum(ind~=find(cellfun(@isempty, state)))>1,
+%         error('something is wrong');
+%     end
+%     if length(ind)>1,
+%         fprintf('removing the following subjects with no data:\n');
+%         subjects(ind)
+%         fprintf('\n');
+%     end
+%     feature(ind) = [];
+%     state(ind) = [];
+%     subject_sleep(ind) = [];
+end
 
 if save_results,
     save('features_sleepdetection.mat', 'feature', 'state', 'subject_sleep');
