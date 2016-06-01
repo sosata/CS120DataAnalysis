@@ -3,11 +3,11 @@ close all;
 
 addpath('../functions');
 
-load('../Assessment/psqi.mat');
+load('../Assessment/phq9.mat');
 load('../FeatureExtraction/features_biweekly_all');
 
-assessment = psqi.w6;
-subject_assessment = subject_psqi.w6;
+assessment = phq.w0;
+subject_assessment = subject_phq.w0;
 
 prc_low = prctile(assessment, 27);
 prc_high = prctile(assessment, 73);
@@ -52,11 +52,12 @@ for w = 2,%:num_weeks,
     ft = myzscore(ft);
     
     h=figure;
+    set(h,'position',[4         130        1672         818]);
     hold on;
     for i=1:length(groups),
         plot([0 .01],[0 0],'color', colors(i,:),'linewidth',2);
     end
-    legend('negative','positive','location','southeast');
+    legend('bottom 27%','top 27%','location','southeast');
     set(gca,'xtick',[]);
     h_max = -Inf*ones(size(ft,2),1);
     for i=1:length(groups),

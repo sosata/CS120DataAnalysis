@@ -2,8 +2,10 @@ clear;
 close all;
 
 addpath('../Functions/');
-load('results_personal_onlytime.mat');
+load('results_personal_notime.mat');
 load('features_sleepdetection.mat');
+
+return;
 
 subject = 5;
 

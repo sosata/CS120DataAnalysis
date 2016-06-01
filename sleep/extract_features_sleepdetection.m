@@ -49,6 +49,9 @@ parfor i = 1:length(subjects),
     time_wake = data.ems.Var4/1000 + time_zone*3600;
     time_up = data.ems.Var5/1000 + time_zone*3600;
     
+    % correct possibly wrong reports
+    [time_bed, time_sleep, time_wake, time_up] = correct_reported_times(time_bed, time_sleep, time_wake, time_up);
+    
     % extracting workday info
     workday = categorical(data.ems.Var7);
     workday_new = zeros(length(workday),1);
@@ -104,7 +107,7 @@ parfor i = 1:length(subjects),
         else
             ft_row = [ft_row, nan];
         end
-        %adding absolute time (midpoint in window)
+        %adding time of day (midpoint in window)
         ft_row = [ft_row, mod(time_win,86400)/3600];
     
         %adding workday info

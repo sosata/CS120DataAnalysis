@@ -4,11 +4,11 @@ close all;
 addpath('../functions');
 addpath('../ML');
 
-n_bootstrap = 12;
-p_train = .85;
-k_train = 3;
+% n_bootstrap = 12;
+% p_train = .85;
+k_train = 3;    % for personal classifiers
 
-add_other_vars = true;
+add_other_vars = false;
 add_history = true;
 
 load('features_sleepdetection.mat');
@@ -83,4 +83,8 @@ fprintf('accuracy: %.3f (%.3f)\nprecision: %.3f (%.3f)\nrecall: %.3f (%.3f)\n', 
     nanmean(perf(:,1)),nanstd(perf(:,1))/sqrt(size(perf,1)),nanmean(perf(:,2)),nanstd(perf(:,2))/sqrt(size(perf,1)),...
     nanmean(perf(:,3)),nanstd(perf(:,3))/sqrt(size(perf,1)));
 
-save('results.mat', 'out', 'demoage','demofemale','demoemployed','demoalone','demosleepalone','demonumjobs','demophonelocation');
+if add_other_vars,
+    save('results.mat', 'out', 'demoage','demofemale','demoemployed','demoalone','demosleepalone','demonumjobs','demophonelocation');
+else
+    save('results.mat', 'out');
+end
