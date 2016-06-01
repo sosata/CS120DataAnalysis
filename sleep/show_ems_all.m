@@ -13,7 +13,7 @@ for i=1:length(subject_sleep),
     tab = readtable([data_dir, '\', subject_sleep{i}, '\ems.csv'],'readvariablenames',false,'delimiter','\t');
     
     sleep_duration_all = [sleep_duration_all; (tab.Var4-tab.Var3)/1000/3600];
-    sleep_time_all = [sleep_time_all; mod(tab.Var4/1000+time_zone*3600,24*3600)/3600];
+    sleep_time_all = [sleep_time_all; mod(tab.Var3/1000+time_zone*3600,24*3600)/3600];
     
     sleep_dur{i} = (tab.Var4-tab.Var3)/1000/3600;
     time{i} = tab.Var1;
@@ -22,9 +22,17 @@ end
 % figure;
 % histogram(sleep_duration_all);
 
+% figure;
+% histogram(sleep_time_all,24);
+% xlim([0 24]);
+
 figure;
-histogram(sleep_time_all,24);
+scatter(sleep_time_all, sleep_duration_all);
 xlim([0 24]);
+xlabel('sleep time (hour)');
+ylabel('sleep duration (hours)');
+
+return;
 
 h = figure;
 set(h,'position',[124         167        1049         420]);
