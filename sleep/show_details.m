@@ -2,12 +2,10 @@ clear;
 close all;
 
 addpath('../Functions/');
-load('results_personal_notime.mat');
+load('results.mat');
 load('features_sleepdetection.mat');
 
-return;
-
-subject = 5;
+subject = 185;
 
 feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
 
@@ -17,13 +15,13 @@ set(h,'position',[3          69        1668         866]);
 ax(1) = subplot(2,1,1);
 hold on;
 set(gca,'position',[0.07 0.5 .92 .45]);
-plot(out.target{subject},'color',[.5 .8 .5],'linewidth',2);
+plot(out.target{subject},'color',[.6 .9 .6],'linewidth',4);
 plot(1-out.prediction1{subject},'r','color',[1 .7 .7]);
-plot(1-out.prediction1{subject},'.r','markersize',10);
+plot(1-out.prediction1{subject},'.r','markersize',8);
 plot(1-out.prediction2{subject},'color',[.7 .7 1]);
-plot(1-out.prediction2{subject},'.b','markersize',10);
+plot(1-out.prediction2{subject},'.b','markersize',8);
 plot(out.prediction3{subject},'color',[.7 .7 .7]);
-plot(out.prediction3{subject},'.k','markersize',10);
+plot(out.prediction3{subject},'.k','markersize',8);
 box off;
 axis tight;
 set(gca,'ytick',[0 .5 1],'yticklabel',{'awake',[],'asleep'},'fontsize',16);

@@ -5,7 +5,7 @@ addpath('../functions');
 addpath('../features');
 load('../settings.mat');
 
-calculate_features = true; % if false, only caluclates states and pulls features from previously saved file
+calculate_features = false; % if false, only caluclates states and pulls features from previously saved file
 save_results = true;
 
 window_size = 10*60;
@@ -56,7 +56,7 @@ parfor i = 1:length(subjects),
     time_up = data.ems.Var5/1000 + time_zone*3600;
     
     % correct possibly wrong reports
-    [time_bed, time_sleep, time_wake, time_up] = correct_reported_times(time_bed, time_sleep, time_wake, time_up);
+    [timestamp, time_bed, time_sleep, time_wake, time_up] = correct_reported_times(timestamp, time_bed, time_sleep, time_wake, time_up);
     
     % extracting workday info
 %     workday = categorical(data.ems.Var7);
@@ -136,7 +136,7 @@ parfor i = 1:length(subjects),
         ind_wake_after = find(time_wake>time_win, 1, 'first');
         
         if time_sleep(ind_sleep_before)>time_wake(ind_wake_before), % if they have gone to sleep
-            % only call it asleep if report of wake up the same as report of sleep
+            % only call it asleep if report of wake up is on the same as report of sleep
             if floor(timestamp(ind_wake_after)/86400)==floor(timestamp(ind_sleep_before)/86400),
                 state{i} = [state{i}; 1];
             else

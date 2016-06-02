@@ -16,15 +16,15 @@ load('../Demographics/demo_baseline');
 load('../Demographics/demo_basic');
 
 % removing empty subjects from analysis
-ind_empty = find(cellfun(@isempty, feature));
-feature(ind_empty) = [];
-state(ind_empty) = [];
-subject_sleep(ind_empty) = [];
+% ind_empty = find(cellfun(@isempty, feature));
+% feature(ind_empty) = [];
+% state(ind_empty) = [];
+% subject_sleep(ind_empty) = [];
 
 % including only time
-for i=1:length(feature),
-    feature{i} = feature{i}(:,end);
-end
+% for i=1:length(feature),
+%     feature{i} = feature{i}(:,end);
+% end
 
 % removing time
 % for i=1:length(feature),
