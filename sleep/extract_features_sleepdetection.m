@@ -6,6 +6,7 @@ addpath('../features');
 load('../settings.mat');
 
 calculate_features = true; % if false, only caluclates states and pulls features from previously saved file
+correct_sleep_times = true;
 save_results = true;
 
 window_size = 10*60;
@@ -56,7 +57,9 @@ parfor i = 1:length(subjects),
     time_up = data.ems.Var5/1000 + time_zone*3600;
     
     % correct possibly wrong reports
-    [timestamp, time_bed, time_sleep, time_wake, time_up] = correct_reported_times(timestamp, time_bed, time_sleep, time_wake, time_up);
+    if correct_sleep_times,
+        [timestamp, time_bed, time_sleep, time_wake, time_up] = correct_reported_times(timestamp, time_bed, time_sleep, time_wake, time_up);
+    end
     
     % extracting workday info
 %     workday = categorical(data.ems.Var7);
@@ -84,7 +87,8 @@ parfor i = 1:length(subjects),
         if calculate_features,
             ft_row = [];
             if ~isempty(data_win.act{w}),
-                ft_row = [ft_row, (sum(~strcmp(data_win.act{w}.Var2,'STILL'))>0)&~isempty(data_win.act{w}.Var2)];
+                %ft_row = [ft_row, (sum(~strcmp(data_win.act{w}.Var2,'STILL'))>0)&~isempty(data_win.act{w}.Var2)];
+                ft_row = [ft_row, sum(strcmp(data_win.act{w}.Var2,'STILL'))/length(data_win.act{w}.Var2)];
             else
                 ft_row = [ft_row, nan];
             end
