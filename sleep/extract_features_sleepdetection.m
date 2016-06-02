@@ -5,7 +5,7 @@ addpath('../functions');
 addpath('../features');
 load('../settings.mat');
 
-calculate_features = false; % if false, only caluclates states and pulls features from previously saved file
+calculate_features = true; % if false, only caluclates states and pulls features from previously saved file
 save_results = true;
 
 window_size = 10*60;
