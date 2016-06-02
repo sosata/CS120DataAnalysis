@@ -8,6 +8,7 @@ addpath('../ML');
 % p_train = .85;
 k_train = 3;    % for personal classifiers
 
+time_only = false;
 add_other_vars = false;
 add_history = true;
 
@@ -15,16 +16,14 @@ load('features_sleepdetection.mat');
 load('../Demographics/demo_baseline');
 load('../Demographics/demo_basic');
 
-% removing empty subjects from analysis
-% ind_empty = find(cellfun(@isempty, feature));
-% feature(ind_empty) = [];
-% state(ind_empty) = [];
-% subject_sleep(ind_empty) = [];
-
 % including only time
-% for i=1:length(feature),
-%     feature{i} = feature{i}(:,end);
-% end
+if time_only,
+    for i=1:length(feature),
+        if ~isempty(feature{i}),
+            feature{i} = feature{i}(:,end);
+        end
+    end
+end
 
 % removing time
 % for i=1:length(feature),

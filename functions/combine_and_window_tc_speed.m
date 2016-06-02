@@ -3,7 +3,7 @@
 % input data can be cell or table
 % output data is cell
 
-function data_out = combine_and_window2(data_in, t_start, t_end, window_size)
+function data_out = combine_and_window_tc_speed(data_in, t_start, t_end, window_size)
 
 % skip if input data vector is empty
 if isempty(data_in),
