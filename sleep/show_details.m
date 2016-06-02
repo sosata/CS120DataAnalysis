@@ -2,7 +2,7 @@ clear;
 close all;
 
 addpath('../Functions/');
-load('results.mat');
+load('results_personal_notime.mat');
 load('features_sleepdetection.mat');
 
 subject = 185;
@@ -10,11 +10,11 @@ subject = 185;
 feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
 
 h = figure;
-set(h,'position',[3          69        1668         866]);
+% set(h,'position',[3          69        1668         866]);
 
 ax(1) = subplot(2,1,1);
 hold on;
-set(gca,'position',[0.07 0.5 .92 .45]);
+% set(gca,'position',[0.07 0.5 .92 .45]);
 plot(out.target{subject},'color',[.6 .9 .6],'linewidth',4);
 plot(1-out.prediction1{subject},'r','color',[1 .7 .7]);
 plot(1-out.prediction1{subject},'.r','markersize',8);
@@ -45,7 +45,8 @@ set(h, 'fontsize',16);
 
 ax(2) = subplot(2,1,2);
 hold on;
-set(gca,'position',[0.07 0.05 .92 .4]);
+% set(gca,'position',[0.07 0.05 .92 .4]);
+plot(out.target{subject}*10 + 50)
 for i=1:size(feature{subject},2),
     plot((i-1)*5+myzscore(feature{subject}(:,i)));%,'.','markersize',10);
 end
@@ -57,7 +58,7 @@ set(gca,'fontsize',16);
 linkaxes(ax,'x');
 
 h = figure;
-set(h, 'position',[256         196        1144         752]);
+% set(h, 'position',[256         196        1144         752]);
 for i=1:size(feature{subject},2),
     subplot(floor(sqrt(size(feature{subject},2))),ceil(sqrt(size(feature{subject},2))),i);
     hold on;

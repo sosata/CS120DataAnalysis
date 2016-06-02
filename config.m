@@ -17,8 +17,9 @@ gap_max_wifi = 10*3600;
 
 % data_dir = 'C:\Data\CS120\';
 % data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
-data_dir = '~/Dropbox/Data/CS120/';
+% data_dir = '~/Dropbox/Data/CS120/';
 % data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
+data_dir = 'D:/CS120_data/pt_data/';
 
 addpath('functions');
 
