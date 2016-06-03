@@ -5,9 +5,9 @@ addpath('../Functions/');
 load('results.mat');
 load('features_sleepdetection.mat');
 
-subject = 27;
+subject = 66;
 
-feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
+% feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
 
 h = figure;
 set(h,'position',[3          69        1668         866]);
