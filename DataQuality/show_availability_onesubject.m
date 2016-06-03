@@ -6,7 +6,7 @@ addpath('../functions/');
 data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
 sensors = {'act','app','aud','bat','cal','coe','emc','eml','emm','ems','fus','lgt','run','scr','tch','wif'};
 
-subject = '1150915';
+subject = '1299151';
 
 h = figure;
 set(h,'position', [657   285   558   287]);

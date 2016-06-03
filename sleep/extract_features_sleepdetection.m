@@ -56,7 +56,7 @@ parfor i = 1:length(subjects),
     time_wake = data.ems.Var4/1000 + time_zone*3600;
     time_up = data.ems.Var5/1000 + time_zone*3600;
     
-    % correct possibly wrong reports
+    % correct potentially wrong reports
     if correct_sleep_times,
         [timestamp, time_bed, time_sleep, time_wake, time_up] = correct_reported_times(timestamp, time_bed, time_sleep, time_wake, time_up);
     end
@@ -86,43 +86,63 @@ parfor i = 1:length(subjects),
         
         if calculate_features,
             ft_row = [];
+            % stillness
             if ~isempty(data_win.act{w}),
                 %ft_row = [ft_row, (sum(~strcmp(data_win.act{w}.Var2,'STILL'))>0)&~isempty(data_win.act{w}.Var2)];
                 ft_row = [ft_row, sum(strcmp(data_win.act{w}.Var2,'STILL'))/length(data_win.act{w}.Var2)];
             else
                 ft_row = [ft_row, nan];
             end
+            % light
             if ~isempty(data_win.lgt{w}),
-                ft_row = [ft_row, mean(data_win.lgt{w}.Var2), mean(range(data_win.lgt{w}.Var2))];
+                ft_row = [ft_row, mean(data_win.lgt{w}.Var2), mean(range(data_win.lgt{w}.Var2)), kurtosis(data_win.lgt{w}.Var2)];
+                if length(data_win.lgt{w}.Var2)>=2,
+                    ft_row = [ft_row, mean(((data_win.lgt{w}.Var2(2:end)-data_win.lgt{w}.Var2(1:end-1)).^2)./(data_win.lgt{w}.Var2(1:end-1).^2))];
+                else
+                    ft_row = [ft_row, nan];
+                end
+            else
+                ft_row = [ft_row, nan, nan, nan, nan];
+            end
+            % audio
+            if ~isempty(data_win.aud{w}),
+                ft_row = [ft_row, mean(data_win.aud{w}.Var2), mean(data_win.aud{w}.Var3)];
             else
                 ft_row = [ft_row, nan, nan];
             end
-            if ~isempty(data_win.aud{w}),
-                ft_row = [ft_row, mean(data_win.aud{w}.Var2)];
-            else
-                ft_row = [ft_row, nan];
-            end
+            % screen
             if ~isempty(data_win.scr{w}),
                 ft_row = [ft_row, length(data_win.scr{w}.Var1)];
             else
                 ft_row = [ft_row, 0];   % for the screen feature when there is no activity, the number of events should be 0
             end
+            % location
             if ~isempty(data_win.fus{w}),
                 ft_row = [ft_row, estimate_variance(data_win.fus{w}.Var2,data_win.fus{w}.Var3)];
+                if length(data_win.fus{w}.Var2)>=2,
+                    change_lat = mean(((data_win.fus{w}.Var2(2:end)-data_win.fus{w}.Var2(1:end-1)).^2)./(data_win.fus{w}.Var2(1:end-1).^2));
+                    change_lng = mean(((data_win.fus{w}.Var3(2:end)-data_win.fus{w}.Var3(1:end-1)).^2)./(data_win.fus{w}.Var3(1:end-1).^2));
+                    ft_row = [ft_row, mean([change_lat change_lng])];
+                else
+                    ft_row = [ft_row, nan];
+                end
             else
-                ft_row = [ft_row, nan];
+                ft_row = [ft_row, nan, nan];
             end
+            % battery charging
             if ~isempty(data_win.bat{w}),
                 ft_row = [ft_row, mode(data_win.bat{w}.Var3)>0];
             else
                 ft_row = [ft_row, nan];
             end
+            % wifi
             if ~isempty(data_win.wif{w}),
                 ft_row = [ft_row, sum(char(mode(categorical(data_win.wif{w}.Var2))))];
             else
                 ft_row = [ft_row, nan];
             end
-            %adding time of day (midpoint in window)
+            
+            %time of day (midpoint in window)
             ft_row = [ft_row, mod(time_win,86400)/3600];
             
             %adding workday info
@@ -196,6 +216,9 @@ if calculate_features,
 %     subject_sleep(ind) = [];
 end
 
+feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq','screen','loc var','loc change',...
+    'charging','wifi','time'};
+
 if save_results,
-    save('features_sleepdetection.mat', 'feature', 'state', 'subject_sleep');
+    save('features_sleepdetection.mat', 'feature', 'feature_label', 'state', 'subject_sleep');
 end
