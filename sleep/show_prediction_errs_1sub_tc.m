@@ -2,8 +2,9 @@ clear;
 close all;
 
 addpath('../Functions/');
-load('results_personal_notime.mat');
+load('results_newfeatures.mat');
 load('features_sleepdetection.mat');
+load('../settings.mat');
 
 %% Find Bad Subjects
 
@@ -16,16 +17,60 @@ subplot(3,1,3)
 histogram(out.performance(:,3))
 
 figure(112)
-h = plot(demoage, out.performance(:,1), '.');
-xlabel('Age')
+h = plot(rand(length(out.performance(:,1)),1), out.performance(:,1), '.');
+xlabel('Jitter')
 ylabel('Accuracy (?)')
 customDataCursor(h, ...
     cellfun(@num2str, num2cell(1:size(out.performance, 1)), ...
             'UniformOutput', false));
+        
+figure(1122)
+clf
+hold on
+plot(out.target{subject})
+plot(diff(out.target{subject}))
+hold off
+
+%% Load sleep start/end
+
+for subject = 1:length(subject_sleep)
+    filename = [data_dir, subject_sleep{i}, '/ems.csv'];
+    if ~exist(filename, 'file'),
+        disp(['No sleep data for ', subjects{i}]);
+        continue;
+    end
+    
+    % loading data
+    data = [];
+    for p = 1:length(probes),
+        filename = [data_dir, subject_sleep{i}, '/', probes{p}, '.csv'];
+        if ~exist(filename, 'file'),
+            disp(['No ', probes{p}, ' data for ', subjects{i}]);
+            data.(probes{p}) = [];
+        else
+            data.(probes{p}) = readtable(filename, 'delimiter', '\t', 'readvariablenames', false);
+            
+            % correcting timestamps for the time zone
+            data.(probes{p}).Var1 = data.(probes{p}).Var1 + time_zone*3600;
+        end
+    end
+    
+    % reported sleep times are in ms
+    timestamp = data.ems.Var1 + time_zone*3600;
+    time_bed = data.ems.Var2/1000 + time_zone*3600;
+    time_sleep = data.ems.Var3/1000 + time_zone*3600;
+    time_wake = data.ems.Var4/1000 + time_zone*3600;
+    time_up = data.ems.Var5/1000 + time_zone*3600;
+    
+    % correct potentially wrong reports
+    if correct_sleep_times,
+        [timestamp, time_bed, time_sleep, time_wake, time_up] = correct_reported_times(timestamp, time_bed, time_sleep, time_wake, time_up);
+    end
+end
 
 %% Look at individual subjects
 
-subject = 101;
+subject = 38;
 
 figure(113)
 clf
@@ -38,6 +83,13 @@ for i = 1:size(feature{subject}, 2)
     plot(mat2gray(f))
     title(feature_label{i})
 end
+
+figure(114)
+clf
+hold on
+plot(mat2gray(feature{subject}(:,end)))
+plot(out.target{subject})
+hold off
 
 
 %% Individual feature plots
