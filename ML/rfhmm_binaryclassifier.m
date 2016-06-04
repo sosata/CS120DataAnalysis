@@ -1,6 +1,6 @@
 function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 
-n_tree = 25;
+n_tree = 500;
 
 if isempty(xtrain)||isempty(xtest),
     out = [];

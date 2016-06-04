@@ -14,7 +14,7 @@ overlap = 0;
 
 % initializing feature and state vectors
 if calculate_features,
-    probes = {'ems','fus','lgt','aud','act','scr','bat','wif'};
+    probes = {'ems','fus','lgt','aud','act','scr','bat','wif','coe'};
     feature = cell(length(subjects),1);
 else
     probes = {'ems'};
@@ -141,6 +141,16 @@ parfor i = 1:length(subjects),
             else
                 ft_row = [ft_row, nan];
             end
+            % communication
+            if ~isempty(data_win.coe{w}),
+                ft_row = [ft_row, sum(data_win.coe{w}.Var2{end}), sum(data_win.coe{w}.Var3{end}), ...
+                    sum(strcmp(data_win.coe{w}.Var4,'PHONE')),sum(strcmp(data_win.coe{w}.Var4,'SMS')), ...
+                    sum(strcmp(data_win.coe{w}.Var4,'PHONE')&strcmp(data_win.coe{w}.Var5,'OUTGOING')), ...
+                    sum(strcmp(data_win.coe{w}.Var4,'SMS')&strcmp(data_win.coe{w}.Var5,'OUTGOING'))];
+            else
+                ft_row = [ft_row, nan, nan, 0, 0, 0, 0];
+            end
+            
             
             %time of day (midpoint in window)
             ft_row = [ft_row, mod(time_win,86400)/3600];
@@ -217,7 +227,7 @@ if calculate_features,
 end
 
 feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq','screen','loc var','loc change',...
-    'charging','wifi','time'};
+    'charging','wifi','last name','last number','call','sms','out call','out sms','time'};
 
 if save_results,
     save('features_sleepdetection.mat', 'feature', 'feature_label', 'state', 'subject_sleep');
