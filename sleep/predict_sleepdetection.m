@@ -62,7 +62,8 @@ end
 if add_history,
     for i=1:length(feature)
         
-        feature{i} = [feature{i}(5:end,:),feature{i}(4:end-1,:),feature{i}(3:end-2,:),feature{i}(2:end-3,:),feature{i}(1:end-4,:)];
+        feature{i} = [feature{i}(5:end,:),feature{i}(4:end-1,:),feature{i}(3:end-2,:),feature{i}(2:end-3,:),...
+            feature{i}(1:end-4,:)];
         state{i} = state{i}(5:end);
         
     end

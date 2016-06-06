@@ -106,9 +106,9 @@ parfor i = 1:length(subjects),
             end
             % audio
             if ~isempty(data_win.aud{w}),
-                ft_row = [ft_row, mean(data_win.aud{w}.Var2), mean(data_win.aud{w}.Var3)];
+                ft_row = [ft_row, mean(data_win.aud{w}.Var2), min(data_win.aud{w}.Var3), max(data_win.aud{w}.Var3)];
             else
-                ft_row = [ft_row, nan, nan];
+                ft_row = [ft_row, nan, nan, nan];
             end
             % screen
             if ~isempty(data_win.scr{w}),
@@ -226,7 +226,7 @@ if calculate_features,
 %     subject_sleep(ind) = [];
 end
 
-feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq','screen','loc var','loc change',...
+feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq min','audio frq max','screen','loc var','loc change',...
     'charging','wifi','last name','last number','call','sms','out call','out sms','time'};
 
 if save_results,
