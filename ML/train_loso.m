@@ -24,7 +24,10 @@ else
     
     parfor k=1:length(y),
 
-        fprintf('%d/%d\n',k,length(y));
+        if isempty(y{k}),
+            fprintf('no data for subject %d - skipping\n',k);
+            continue;
+        end
 
         xtrain = x([1:k-1,k+1:end]);
         xtrain = combine_subjects(xtrain);
@@ -41,6 +44,7 @@ else
         prediction2{k} = [prediction2{k}; outreg.medianfilter];
         prediction3{k} = [prediction3{k}; outreg.hmm];
         
+        fprintf('%d ',k);
         fprintf(' %.2f', perf(k,:));
         fprintf('\n');
     end

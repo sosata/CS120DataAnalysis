@@ -131,9 +131,10 @@ parfor i = 1:length(subjects),
             end
             % battery charging
             if ~isempty(data_win.bat{w}),
-                ft_row = [ft_row, mode(data_win.bat{w}.Var3)>0];
+                ft_row = [ft_row, mean(data_win.bat{w}.Var2)];
+                ft_row = [ft_row, mode(data_win.bat{w}.Var3)>0, mode(data_win.bat{w}.Var3)==2];
             else
-                ft_row = [ft_row, nan];
+                ft_row = [ft_row, nan, nan, nan];
             end
             % wifi
             if ~isempty(data_win.wif{w}),
@@ -226,8 +227,9 @@ if calculate_features,
 %     subject_sleep(ind) = [];
 end
 
-feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq min','audio frq max','screen','loc var','loc change',...
-    'charging','wifi','last name','last number','call','sms','out call','out sms','time'};
+feature_label = {'stillness','lgt mean','lgt range','lgt kurtosis','lgt change','audio pwr','audio frq min','audio frq max',...
+    'screen','loc var','loc change','bat level','charging','charging usb','wifi','last name','last number','call',...
+    'sms','out call','out sms','time'};
 
 if save_results,
     save('features_sleepdetection.mat', 'feature', 'feature_label', 'state', 'subject_sleep');

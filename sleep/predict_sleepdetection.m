@@ -72,7 +72,7 @@ end
 %% personal model
 % out = train_personal_random(feature, state, n_bootstrap, p_train, @rf_binaryclassifier);
 % out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
-out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
+% out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 
 %% global model
 % adding demo features to the features vector
@@ -80,8 +80,7 @@ out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 %     feature{i} = [feature{i}, ones(size(feature{i},1),1)*[demoage(i) demofemale(i) demoalone(i) demosleepalone(i)...
 %         demoemployed(i) demonumjobs(i) demophonelocation(i)]];
 % end
-% out = train_loso(feature, state, @rf_binaryclassifier);
-% out = train_loso(feature, state, @rfhmm_binaryclassifier);
+out = train_loso(feature, state, @rfhmm_binaryclassifier);
 
 perf = out.performance;
 
