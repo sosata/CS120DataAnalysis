@@ -3,7 +3,7 @@ function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 n_tree = 25;
 
 if isempty(xtrain)||isempty(xtest),
-    out = [];
+    out = [nan nan nan];
 else
     
     % removing nans from training data as RF cannot deal with it

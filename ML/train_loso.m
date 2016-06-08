@@ -15,7 +15,7 @@ else
     if ~iscell(x)||~iscell(y),
         error('train_loso: x and y must cell arrays.')
     end
-
+    
     perf = [];
     target = cell(length(y),1);
     prediction1 = cell(length(y),1);
@@ -24,10 +24,11 @@ else
     
     parfor k=1:length(y),
 
-        if isempty(y{k}),
-            fprintf('no data for subject %d - skipping\n',k);
-            continue;
-        end
+%         if isempty(y{k}),
+%             fprintf('no data for subject %d - skipping\n',k);
+%             perf(k,:) = [nan, nan, nan];
+%             continue;
+%         end
 
         xtrain = x([1:k-1,k+1:end]);
         xtrain = combine_subjects(xtrain);
