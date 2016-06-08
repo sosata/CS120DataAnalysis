@@ -13,7 +13,7 @@ close all;
 
 addpath('../Functions/');
 load('features_sleepdetection');
-load('results_newfeatures');
+load('results_personal_correctedtimes');
 load('../settings.mat');
 
 %% For all subjects
@@ -39,9 +39,15 @@ for i = 1:n_subjects
 
         avg_target_dur(i) = nanmean(target_sleep_mean);
         avg_pred_dur(i) = nanmean(pred_sleep_mean);
+
+        target_sleep_dur = (target_times(:,2) - target_times(:,1)) * time_mod;
+        pred_sleep_dur = (pred_times(:,2) - pred_times(:,1)) * time_mod;
+        rmsd(i) = sqrt(nanmean((pred_sleep_mean-target_sleep_mean).^2));
+        
     else
         avg_target_dur(i) = NaN;
         avg_pred_dur(i) = NaN;
+        rmsd(i) = nan;
     end
 end
 
@@ -50,7 +56,8 @@ end
 figure(11)
 plot(avg_target_dur - avg_pred_dur)
 
-rmsd = sqrt(nanmean((avg_target_dur - avg_pred_dur).^2))
+% rmsd = sqrt(nanmean((avg_target_dur - avg_pred_dur).^2))
+fprintf('duration rmsd: %.1f (%.2f)\n', nanmean(rmsd), nanstd(rmsd)/sqrt(length(rmsd)))
 
 %% Do with aligned trials
 
@@ -71,6 +78,7 @@ for i = 1:n_subjects
         start_error{i} = aln_preds{i}(:,1) - aln_targs{i}(:,1);
         end_error{i} = aln_preds{i}(:,2) - aln_targs{i}(:,2);
         
+        
         % <TODO>
         % There might be a fencepost error here.
         % End times (:,2) are the index of the last sleep-positive bin
@@ -83,6 +91,11 @@ for i = 1:n_subjects
         dur_error{i} = aln_pred_dur{i} - aln_targ_dur{i};
     end
 end
+
+rmsd_start = cellfun(@(x) sqrt(nanmean(x.^2)), start_error);
+rmsd_end = cellfun(@(x) sqrt(nanmean(x.^2)), end_error);
+fprintf('start rmsd: %.1f (%.2f)\n', nanmean(rmsd_start), nanstd(rmsd_start)/sqrt(length(rmsd_start)))
+fprintf('end rmsd: %.1f (%.2f)\n', nanmean(rmsd_end), nanstd(rmsd_end)/sqrt(length(rmsd_end)))
 
 %% Visualize aligned data for example subject
 
