@@ -1,7 +1,7 @@
 clear;
 close all;
 
-load_results = false;
+load_results = true;
 
 addpath('../functions');
 
@@ -28,10 +28,6 @@ else
         
         % estimating sensor times
         for j=1:length(sensor),
-            % due to a problem with this subject's app csv file
-%             if strcmp(subject, '4667dacb7f27afd0933bc46dbc07405e')&&j==2,
-%                 continue;
-%             end
             filename = [data_dir, subject, '/', sensor{j}, '.csv'];
             if exist(filename,'file'),
                 tab = readtable(filename, 'delimiter','\t','readvariablenames',false);
@@ -58,10 +54,18 @@ else
             end
         end
         
+        % estimating sleep report times
+        filename = [data_dir, subject, '/ems.csv'];
+        if exist(filename,'file'),
+            tab = readtable(filename, 'delimiter','\t','readvariablenames',false);
+            time_ems{i} = tab.Var1;
+        else
+            time_ems{i} = [];
+        end
         
     end
     
-    save('data_availability.mat', 'time_start_sensor', 'time_end_sensor', 'time_start_ema', 'time_end_ema');
+    save('data_availability.mat', 'time_start_sensor', 'time_end_sensor', 'time_start_ema', 'time_end_ema', 'time_ems');
     
 end
 
@@ -70,23 +74,44 @@ end
 % time_start_ema(isinf(time_start_ema)) = NaN;
 % time_end_ema(isinf(time_end_ema)) = NaN;
 
+[~, ind_sort] = sort(time_start_sensor);
 subplot(1,5,[1 4]);
-plot([time_start_sensor, time_end_sensor]',ones(2,1)*(1:length(folders)),'k');
+plot([time_start_sensor(ind_sort), time_end_sensor(ind_sort)]',ones(2,1)*(1:length(time_start_sensor)),'k');
 ylabel('subjects');
-set_date_ticks(gca, 7);
+set_date_ticks(gca, 30);
 box off;
 subplot(1,5,5);
-barh(ceil((time_end_sensor-time_start_sensor)/86400));
+barh(ceil((time_end_sensor(ind_sort)-time_start_sensor(ind_sort))/86400));
 xlabel('days');
 box off;
 
 figure;
-subplot(1,5,[1 4]);
-plot([time_start_ema, time_end_ema]',ones(2,1)*(1:length(folders)),'k');
-ylabel('subjects');
+[~, ind_sort] = sort(time_start_ema);
+plot([time_start_ema(ind_sort), time_end_ema(ind_sort)]',ones(2,1)*(1:length(time_start_ema)),'k');
+ylabel('Subjects');
 box off;
-set_date_ticks(gca, 7);
-subplot(1,5,5);
-barh(ceil((time_end_ema-time_start_ema)/86400));
-xlabel('days');
+set_date_ticks(gca, 30);
+axis tight;
+
+figure;
+numdays = ceil((time_end_ema(ind_sort)-time_start_ema(ind_sort))/86400);
+histogram(numdays, 42);
+xlabel('Number of Days in Study');
+ylabel('Number of Subjects');
+box off
+
+h = figure;
+set(h,'position',[360   192   670   426]);
+hold on;
+ind_empty = find(cellfun(@isempty, time_ems));
+time_ems(ind_empty) = [];
+[~,ind_sort] = sort(cellfun(@(x) x(1), time_ems));
+time_ems = time_ems(ind_sort);
+for i=1:length(time_ems)
+    plot(time_ems{i}, i*ones(length(time_ems{i}),1),'.k');
+end
+axis tight;
+set_date_ticks(gca, 14);
+xlabel('Date');
+ylabel('Subjects');
 box off;

@@ -6,7 +6,7 @@ addpath('../features');
 load('../settings.mat');
 
 calculate_features = true; % if false, only caluclates states and pulls features from previously saved file
-correct_sleep_times = true;
+correct_sleep_times = false;
 save_results = true;
 
 window_size = 10*60;

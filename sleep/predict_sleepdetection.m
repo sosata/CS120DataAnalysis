@@ -12,7 +12,7 @@ time_only = false;
 add_other_vars = false;
 add_history = true;
 
-load('features_sleepdetection.mat');
+load('features_sleepdetection_corrected');
 load('../Demographics/demo_baseline');
 load('../Demographics/demo_basic');
 
@@ -26,9 +26,11 @@ if time_only,
 end
 
 % removing time
-% for i=1:length(feature),
-%     feature{i}(:,end) = [];
-% end
+for i=1:length(feature),
+    if ~isempty(feature{i}),
+        feature{i}(:,end) = [];
+    end
+end
 
 cnt = 1;
 if add_other_vars,
@@ -72,7 +74,7 @@ end
 %% personal model
 % out = train_personal_random(feature, state, n_bootstrap, p_train, @rf_binaryclassifier);
 % out = train_personal_temporal(feature, state, k_train, @rf_binaryclassifier);
-% out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
+out = train_personal_temporal(feature, state, k_train, @rfhmm_binaryclassifier);
 
 %% global model
 % adding demo features to the features vector
@@ -80,7 +82,7 @@ end
 %     feature{i} = [feature{i}, ones(size(feature{i},1),1)*[demoage(i) demofemale(i) demoalone(i) demosleepalone(i)...
 %         demoemployed(i) demonumjobs(i) demophonelocation(i)]];
 % end
-out = train_loso(feature, state, @rfhmm_binaryclassifier);
+% out = train_loso(feature, state, @rfhmm_binaryclassifier);
 
 perf = out.performance;
 

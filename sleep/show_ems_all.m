@@ -9,28 +9,51 @@ data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
 
 sleep_duration_all = [];
 sleep_time_all = [];
+wake_time_all = [];
+
 for i=1:length(subject_sleep),
-    tab = readtable([data_dir, '\', subject_sleep{i}, '\ems.csv'],'readvariablenames',false,'delimiter','\t');
     
-    sleep_duration_all = [sleep_duration_all; (tab.Var4-tab.Var3)/1000/3600];
-    sleep_time_all = [sleep_time_all; mod(tab.Var3/1000+time_zone*3600,24*3600)/3600];
+    filename = [data_dir, '\', subject_sleep{i}, '\ems.csv'];
     
-    sleep_dur{i} = (tab.Var4-tab.Var3)/1000/3600;
-    time{i} = tab.Var1;
+    if exist(filename,'file'),
+        tab = readtable(filename,'readvariablenames',false,'delimiter','\t');
+        
+        sleep_duration_all = [sleep_duration_all; (tab.Var4-tab.Var3)/1000/3600];
+        sleep_time_all = [sleep_time_all; mod(tab.Var3/1000+time_zone*3600,24*3600)/3600];
+        wake_time_all = [wake_time_all; mod(tab.Var4/1000+time_zone*3600,24*3600)/3600];
+        
+        sleep_dur{i} = (tab.Var4-tab.Var3)/1000/3600;
+        time{i} = tab.Var1;
+    else
+        sleep_dur{i} = [];
+        time{i} = [];
+    end
 end
 
 % figure;
 % histogram(sleep_duration_all);
 
-% figure;
-% histogram(sleep_time_all,24);
-% xlim([0 24]);
+figure;
+[y, x] = hist(wake_time_all,24*2);
+y = medfilt1(y,3);
+plot(x,y,'linewidth',1,'color',[1 .7 .4]);
+hold on
+[y, x] = hist(sleep_time_all,24*2);
+y = medfilt1(y,3);
+plot(x,y,'linewidth',1, 'color',[.4 .7 1]);
+xlim([0 24]);
+% ylim([-100 1200]);
+box off
+ylabel('Number of Samples')
+xlabel('Time of Day (hours)')
+legend('Wake-up Time','Sleep Time')
 
 figure;
-scatter(sleep_time_all, sleep_duration_all);
+plot(sleep_time_all, sleep_duration_all,'.','markersize',10);
 xlim([0 24]);
-xlabel('sleep time (hour)');
-ylabel('sleep duration (hours)');
+xlabel('Sleep Time (hours)');
+ylabel('Sleep Duration (hours)');
+box off;
 
 return;
 

@@ -13,7 +13,7 @@ close all;
 
 addpath('../Functions/');
 load('features_sleepdetection');
-load('results_personal_correctedtimes');
+load('results_personal_gentleboost100');
 load('../settings.mat');
 
 %% For all subjects
@@ -87,13 +87,20 @@ for i = 1:n_subjects
     end
 end
 
-rmsd_dur = cellfun(@(x) sqrt(nanmean(x.^2)), dur_error);
-rmsd_start = cellfun(@(x) sqrt(nanmean(x.^2)), start_error);
-rmsd_end = cellfun(@(x) sqrt(nanmean(x.^2)), end_error);
+rmsd_dur = cellfun(@(x) sqrt(nanmean(x.^2)), dur_error)*time_mod;
+rmsd_start = cellfun(@(x) sqrt(nanmean(x.^2)), start_error)*time_mod;
+rmsd_end = cellfun(@(x) sqrt(nanmean(x.^2)), end_error)*time_mod;
+med_dur = cellfun(@(x) nanmedian(abs(x)), dur_error)*time_mod;
+med_start = cellfun(@(x) nanmedian(abs(x)), start_error)*time_mod;
+med_end = cellfun(@(x) nanmedian(abs(x)), end_error)*time_mod;
 fprintf('duration rmsd: %.1f (%.2f)\n', nanmean(rmsd_dur), nanstd(rmsd_dur)/sqrt(length(rmsd_dur)))
 fprintf('start rmsd: %.1f (%.2f)\n', nanmean(rmsd_start), nanstd(rmsd_start)/sqrt(length(rmsd_start)))
 fprintf('end rmsd: %.1f (%.2f)\n', nanmean(rmsd_end), nanstd(rmsd_end)/sqrt(length(rmsd_end)))
+fprintf('duration error median: %.1f (%.2f)\n', nanmean(med_dur), nanstd(med_dur)/sqrt(length(med_dur)))
+fprintf('start error median: %.1f (%.2f)\n', nanmean(med_start), nanstd(med_start)/sqrt(length(med_start)))
+fprintf('end error median: %.1f (%.2f)\n', nanmean(med_end), nanstd(med_end)/sqrt(length(med_end)))
 
+return;
 
 %% Visualize aligned data for example subject
 
@@ -151,10 +158,15 @@ plot([zeros(length(aln_pred_dur{example_subj}), 1), ...
 hold off
 
 figure(24)
-histogram(dur_error{1})
+histogram(dur_error{example_subj},10)
 
 %% Visualize data for all subjects
 
 figure(31)
-rmsd_dur_error = cellfun(@(x) sqrt(mean(x.^2)), dur_error) * 10 / 60
+rmsd_dur_error = cellfun(@(x) sqrt(mean(x.^2)), dur_error) * 10 / 60;
 histogram(rmsd_dur_error)
+
+figure(32)
+plot(cellfun(@(x) nanmean(x), dur_error) * 10 / 60, cellfun(@(x) nanstd(x), dur_error) * 10 / 60, '.','markersize',10)
+xlabel('duration error mean')
+ylabel('duration error std')

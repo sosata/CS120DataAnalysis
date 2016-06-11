@@ -1,6 +1,6 @@
 function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 
-n_tree = 25;
+n_tree = 50;
 
 if isempty(xtrain)||isempty(xtest),
     out = [nan nan nan];
@@ -33,6 +33,8 @@ else
     
     % training RF
     mdl = TreeBagger(n_tree, xtrain, ytrain, 'method', 'classification');
+    % mdl = fitensemble(xtrain,ytrain,'Subspace',n_tree,'Tree', 'type', 'classification');
+    % mdl = fitensemble(xtrain,ytrain,'GentleBoost',n_tree,'Tree', 'type', 'classification');
     
     % testing RF
     [~, pr] = predict(mdl, xtest);
