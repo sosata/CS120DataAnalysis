@@ -13,7 +13,7 @@ close all;
 
 addpath('../Functions/');
 load('features_sleepdetection');
-load('results_personal_gentleboost100');
+load('results_personal_correctedtimes');
 load('../settings.mat');
 
 %% For all subjects
@@ -93,6 +93,7 @@ rmsd_end = cellfun(@(x) sqrt(nanmean(x.^2)), end_error)*time_mod;
 med_dur = cellfun(@(x) nanmedian(abs(x)), dur_error)*time_mod;
 med_start = cellfun(@(x) nanmedian(abs(x)), start_error)*time_mod;
 med_end = cellfun(@(x) nanmedian(abs(x)), end_error)*time_mod;
+
 fprintf('duration rmsd: %.1f (%.2f)\n', nanmean(rmsd_dur), nanstd(rmsd_dur)/sqrt(length(rmsd_dur)))
 fprintf('start rmsd: %.1f (%.2f)\n', nanmean(rmsd_start), nanstd(rmsd_start)/sqrt(length(rmsd_start)))
 fprintf('end rmsd: %.1f (%.2f)\n', nanmean(rmsd_end), nanstd(rmsd_end)/sqrt(length(rmsd_end)))
@@ -165,8 +166,158 @@ histogram(dur_error{example_subj},10)
 figure(31)
 rmsd_dur_error = cellfun(@(x) sqrt(mean(x.^2)), dur_error) * 10 / 60;
 histogram(rmsd_dur_error)
+xlabel('RMSD in Duration (h)')
+ylabel('# of participants')
 
 figure(32)
 plot(cellfun(@(x) nanmean(x), dur_error) * 10 / 60, cellfun(@(x) nanstd(x), dur_error) * 10 / 60, '.','markersize',10)
 xlabel('duration error mean')
 ylabel('duration error std')
+
+figure(33)
+clf
+abox_1 = [0,250,0,100];
+bins = 0:20:250;
+
+subplot(2,2,1)
+hold on
+data = med_start;
+histogram(data, bins)
+center_val = nanmean(data);
+plot(center_val*[1,1], abox_1(3:4), 'k--')
+text(center_val+5, 0.75*abox_1(end), ...
+    sprintf('mean: %0.0f min', center_val));
+hold off
+axis(abox_1)
+title('start onset error')
+xlabel('MAD of sleep onset time (m)')
+ylabel('# of participants')
+
+subplot(2,2,2)
+hold on
+data = med_end;
+histogram(data, bins)
+center_val = nanmean(data);
+plot(center_val*[1,1], abox_1(3:4), 'k--')
+text(center_val+5, 0.75*abox_1(end), ...
+    sprintf('mean: %0.0f min', center_val));
+hold off
+axis(abox_1)
+title('wake time error')
+xlabel('MAD of wake time (m)')
+ylabel('# of participants')
+
+subplot(2,1,2)
+hold on
+data = med_dur;
+histogram(data, bins)
+center_val = nanmean(data);
+plot(center_val*[1,1], abox_1(3:4), 'k--')
+text(center_val+5, 0.75*abox_1(end), ...
+    sprintf('mean: %0.0f min', center_val));
+hold off
+axis(abox_1)
+title('sleep duration error')
+xlabel('MAD of duration (m)')
+ylabel('# of participants')
+
+figure(34)
+scatter(cellfun(@nanmean, aln_targ_dur) * time_mod, ...
+    cellfun(@nanmean, dur_error) * time_mod)
+
+%% Does duration dictate prediction error?
+
+figure(41)
+clf
+xval = cellfun(@nanmean, aln_targ_dur) * time_mod;
+yval = med_dur;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.7*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('Avg. Subject Sleep Duration (m)')
+ylabel('Subject Duration Prediction MAD (m)')
+
+
+figure(42)
+clf
+xval = cellfun(@nanmean, aln_targ_dur) * time_mod;
+yval = cellfun(@nanmean, aln_pred_dur) * time_mod;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.25*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('Avg. Subject Sleep Duration (m)')
+ylabel('Avg. Predicted Subject Sleep Duration (m)')
+
+
+figure(43)
+clf
+xval = cellfun(@nanmean, aln_targ_dur) * time_mod;
+yval = cellfun(@nanmean, dur_error) * time_mod;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.7*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('Avg. Subject Sleep Duration (m)')
+ylabel('Avg. Error in Subject Sleep Duration (m)')
+
+
+figure(44)
+clf
+bins2 = -150:20:150;
+abox_2 = [-150,150,0,70];
+hold on
+data = cellfun(@nanmean, dur_error) * time_mod;
+histogram(data, bins2)
+center_val = nanmean(data);
+plot(center_val*[1,1], abox_2(3:4), 'k--')
+text(center_val+5, 0.75*abox_2(end), ...
+    sprintf('mean: %0.0f min', center_val));
+hold off
+axis(abox_2)
