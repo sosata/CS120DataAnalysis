@@ -25,14 +25,15 @@ for i = 1:length(names)
         fprintf('%s:\n', names{i})
         uniques = unique(field);
         for j = 1:length(uniques)
-            if isnan(uniques(j))
+            key = uniques(j);
+            if isnan(key)
                 fprintf('\t%s: %f (%i/%i)\n', num2str(uniques(j)), ...
                     length(find(isnan(field(subj_idx)))) / total, ...
                     length(find(isnan(field(subj_idx)))), total)
             else
                 fprintf('\t%s: %f (%i/%i)\n', num2str(uniques(j)), ...
-                    length(find(field(subj_idx) == j)) / total, ...
-                    length(find(field(subj_idx) == j)), total)
+                    length(find(field(subj_idx) == key)) / total, ...
+                    length(find(field(subj_idx) == key)), total)
             end
         end
     end
