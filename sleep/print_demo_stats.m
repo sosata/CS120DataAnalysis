@@ -24,9 +24,16 @@ for i = 1:length(names)
         total = length(field(subj_idx));
         fprintf('%s:\n', names{i})
         uniques = unique(field);
-        for j = 1:length(unique(field))
-            fprintf('\t%s: %f\n', num2str(uniques(j)), ...
-                length(find(field(subj_idx) == j)) / total)
+        for j = 1:length(uniques)
+            if isnan(uniques(j))
+                fprintf('\t%s: %f (%i/%i)\n', num2str(uniques(j)), ...
+                    length(find(isnan(field(subj_idx)))) / total, ...
+                    length(find(isnan(field(subj_idx)))), total)
+            else
+                fprintf('\t%s: %f (%i/%i)\n', num2str(uniques(j)), ...
+                    length(find(field(subj_idx) == j)) / total, ...
+                    length(find(field(subj_idx) == j)), total)
+            end
         end
     end
 end
