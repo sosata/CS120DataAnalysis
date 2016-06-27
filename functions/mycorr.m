@@ -8,6 +8,9 @@ if strcmp(type, 'pearson'),
 %     y = y - nanmean(y);
 %     r = nanmean(x.*y)/nanstd(x)/nanstd(y);
 
+    x = x(:);
+    y = y(:);
+    
     indnanx = find(isnan(x));
     indnany = find(isnan(y));
     
@@ -17,6 +20,9 @@ if strcmp(type, 'pearson'),
     [r,p] = corr(x,y,'type','pearson');
 
 elseif strcmp(type, 'spearman'),
+    
+    x = x(:);
+    y = y(:);
     
     indnanx = find(isnan(x));
     indnany = find(isnan(y));

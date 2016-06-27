@@ -1,16 +1,33 @@
-function R2 = rf_regressor(xtrain, ytrain, xtest, ytest)
+function out = rf_regressor(xtrain, ytrain, xtest, ytest)
 
 n_tree = 1000;
 
 if isempty(xtrain)||isempty(xtest),
-    R2 = -Inf;
+    out = [];
 else
+
+    mdl = TreeBagger(n_tree, xtrain, ytrain, 'Method', 'regression');
     
-    mdl = TreeBagger(n_tree, xtrain, ytrain, 'Method', 'regression','UseParallel',true);
-    out = predict(mdl, xtest);
-    
-    R2 = 1-mean((out-ytest).^2)/mean((mean(ytrain)-ytest).^2);
-    
+    if ~iscell(xtest),
+        y_pred = predict(mdl, xtest);
+        
+        out.rf = nan;
+        out.medianfilter = nan;
+        out.hmm = nan;
+        
+        out.performance = 1-nanmean((y_pred-ytest).^2)/nanmean((nanmean(ytrain)-ytest).^2);
+    else
+        for i=1:length(xtest)
+            y_pred = predict(mdl, xtest{i});
+            out.rf{i} = nan;
+            out.medianfilter{i} = nan;
+            out.hmm{i} = nan;
+            
+            out.performance(i,:) = 1-nanmean((y_pred-ytest{i}).^2)/nanmean((nanmean(ytrain)-ytest{i}).^2);
+            
+        end
+        
+    end
 end
 
 end

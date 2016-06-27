@@ -3,14 +3,20 @@ close all;
 
 addpath('../Functions/');
 
-save_bad_subjects = true;
+save_bad_subjects = false;
 
-load('results_personal.mat');
 load('features_sleepdetection.mat');
 
+load('results_personal.mat');
+acc_personal = out.performance(:,1);
+load('results_global.mat');
+acc_global = out.performance(:,1);
+
+% only analyze features for which missing makes sense
 features_to_analyze = [2 3 4 5 6 7 8 10 11 12 13 14 15];
 features_to_analyze_labels = feature_label(features_to_analyze);
 
+%% finding proportion of missing sensor features
 for i=1:length(feature),
     if ~isempty(feature{i})
         p_nan(i) = sum(sum(isnan(feature{i}(:,features_to_analyze))))/(size(feature{i},1)*length(features_to_analyze));
@@ -18,46 +24,60 @@ for i=1:length(feature),
         p_nan(i) = nan;
     end
 end
-acc = out.performance(:,1);
 
 ind_bad = find(p_nan>.5);
 
-figure;
-plot(p_nan, acc,'.','markersize',12); hold on;
-mdl = fitlm(p_nan, acc);
-plot([min(p_nan) max(p_nan)], mdl.Coefficients.Estimate(2)*[min(p_nan) max(p_nan)]+mdl.Coefficients.Estimate(1),'--k');
+%% global model accuracy vs missing sensor data
+figure
+plot(p_nan, acc_global,'.','markersize',8); hold on;
+mdl = fitlm(p_nan, acc_global);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
 text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan',acc,'pearson')),'fontweight','bold','fontsize',12);
+    sprintf('r = %.3f', mycorr(p_nan,acc_global,'pearson')),'fontweight','normal','fontsize',14);
 box off;
+ylim([.55 1]);
+title('Global Model');
+set(gca, 'fontsize',14);
 
-fprintf('accuracy (missing <50%% - n=%d): %.3f (%.3f)\n',sum(p_nan<=.5),mean(acc(p_nan<=.5)),std(acc(p_nan<=.5))/sqrt(sum(p_nan<=.5)));
-fprintf('accuracy (missing <10%% - n=%d): %.3f (%.3f)\n',sum(p_nan<=.1),mean(acc(p_nan<=.1)),std(acc(p_nan<=.1))/sqrt(sum(p_nan<=.1)));
-
-for i=1:length(feature)
-    cnt = 0;
-    if ~isempty(feature{i}),
-        for j=features_to_analyze,
-            cnt = cnt+1;
-            p_feature_nan(i,cnt) = sum(isnan(feature{i}(:,j)))/size(feature{i},1);
-        end
-    else
-        p_feature_nan = nan*ones(1,length(features_to_analyze));
-    end
-end
-
+%% personal model accuracy vs missing sensor data
 figure;
-for i=1:size(p_feature_nan,2),
-    subplot(ceil(sqrt(size(p_feature_nan,2))),ceil(sqrt(size(p_feature_nan,2))),i);
-    plot(p_feature_nan(:,i), acc,'.','markersize',12);
-    xlabel('proportion of missing data');
-    ylabel('accuracy');
-    title(sprintf('%s (r=%.3f)',features_to_analyze_labels{i},mycorr(p_feature_nan(:,i),acc,'pearson')));
-    box off;
-end
+plot(p_nan, acc_personal,'.','markersize',8); hold on;
+mdl = fitlm(p_nan, acc_personal);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+xlabel('Proportion of Missing Sensor Data');
+ylabel('Classification Accuracy');
+text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
+    sprintf('r = %.3f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','normal','fontsize',14);
+box off;
+ylim([.55 1]);
+title('Personal Model');
+set(gca, 'fontsize',14);
 
-% finding missing data in EMA
+% for i=1:length(feature)
+%     cnt = 0;
+%     if ~isempty(feature{i}),
+%         for j=features_to_analyze,
+%             cnt = cnt+1;
+%             p_feature_nan(i,cnt) = sum(isnan(feature{i}(:,j)))/size(feature{i},1);
+%         end
+%     else
+%         p_feature_nan = nan*ones(1,length(features_to_analyze));
+%     end
+% end
+% 
+% figure;
+% for i=1:size(p_feature_nan,2),
+%     subplot(ceil(sqrt(size(p_feature_nan,2))),ceil(sqrt(size(p_feature_nan,2))),i);
+%     plot(p_feature_nan(:,i), acc,'.','markersize',12);
+%     xlabel('proportion of missing data');
+%     ylabel('accuracy');
+%     title(sprintf('%s (r=%.3f)',features_to_analyze_labels{i},mycorr(p_feature_nan(:,i),acc,'pearson')));
+%     box off;
+% end
+
+%% finding missing data in EMA
 p_nan = [];
 for i=1:length(state),
     if ~isempty(state{i})
@@ -66,15 +86,35 @@ for i=1:length(state),
         p_nan(i) = nan;
     end
 end
+
+%% global model accuracy vs missing data in EMA
 figure;
-plot(p_nan, acc,'.','markersize',12); hold on;
-mdl = fitlm(p_nan, acc);
-plot([min(p_nan) max(p_nan)], mdl.Coefficients.Estimate(2)*[min(p_nan) max(p_nan)]+mdl.Coefficients.Estimate(1),'--k');
+plot(p_nan, acc_global,'.','markersize',8); hold on;
+mdl = fitlm(p_nan, acc_global);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
 text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan',acc,'pearson')),'fontweight','bold','fontsize',12);
+    sprintf('r = %.3f', mycorr(p_nan,acc_global,'pearson')),'fontweight','normal','fontsize',14);
 box off;
+ylim([.55 1]);
+title('Global Model');
+set(gca, 'fontsize',14);
+
+%% personal model accuracy vs missing data in EMA
+figure;
+plot(p_nan, acc_personal,'.','markersize',8); hold on;
+mdl = fitlm(p_nan, acc_personal);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+xlabel('Proportion of Missing EMA Data');
+ylabel('Classification Accuracy');
+text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
+    sprintf('r = %.3f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','normal','fontsize',14);
+box off;
+ylim([.55 1]);
+title('Personal Model');
+set(gca, 'fontsize',14);
+
 
 if save_bad_subjects
     save('bad_subjects','ind_bad');

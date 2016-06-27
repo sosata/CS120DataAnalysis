@@ -11,18 +11,21 @@ if length(y)~=length(y_pred)
     error('calculate_accuracy: inputs should have the same length');
 end
 
+if length(y)>1,
+    accuracy = nanmean(y(1)==y_pred(1));
+else
+    accuracy = nanmean(y==y_pred);
+end
+
 y_uniq = unique(y);
 if length(y_uniq)~=2,
-    fprintf('instance skipped since there weren''t two classes in the ground truth.\n');
-    accuracy = nan;
+%     fprintf('calculation of precision and recall was skipped since there weren''t two classes in the ground truth.\n');
     precision = nan;
     recall = nan;
     return;
 end
 y1 = y_uniq(1);
 y2 = y_uniq(2);
-
-accuracy = nanmean(y==y_pred);
 
 precision_y1 = nanmean(y(y_pred==y1)==y1);
 precision_y2 = nanmean(y(y_pred==y2)==y2);

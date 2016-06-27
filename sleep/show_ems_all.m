@@ -6,6 +6,7 @@ load('features_sleepdetection');
 load('../settings.mat');
 
 data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
+timezones = readtable('../general/timezones.csv', 'readvariablenames',false,'delimiter','\t');
 
 sleep_duration_all = [];
 sleep_time_all = [];
@@ -17,6 +18,9 @@ for i=1:length(subject_sleep),
     
     if exist(filename,'file'),
         tab = readtable(filename,'readvariablenames',false,'delimiter','\t');
+        
+        ind = find(strcmp(timezones.Var1, subject_sleep{i}));
+        time_zone = timezones.Var2(ind);
         
         sleep_duration_all = [sleep_duration_all; (tab.Var4-tab.Var3)/1000/3600];
         sleep_time_all = [sleep_time_all; mod(tab.Var3/1000+time_zone*3600,24*3600)/3600];
@@ -34,28 +38,27 @@ end
 % histogram(sleep_duration_all);
 
 figure;
-[y, x] = hist(wake_time_all,24*2);
-y = medfilt1(y,3);
-plot(x,y,'linewidth',1,'color',[1 .7 .4]);
-hold on
-[y, x] = hist(sleep_time_all,24*2);
-y = medfilt1(y,3);
-plot(x,y,'linewidth',1, 'color',[.4 .7 1]);
+hs = histogram(wake_time_all, 0:.25:24);
+% y = medfilt1(y,3);
+% plot(x,y,'linewidth',2,'color',[1 .7 .4]);
+% hold on
+
+figure;
+hs = histogram(sleep_time_all, 0:1:24);
+% y = medfilt1(y,3);
+% plot(x,y,'linewidth',2, 'color',[.4 .7 1]);
 xlim([0 24]);
-% ylim([-100 1200]);
 box off
 ylabel('Number of Samples')
 xlabel('Time of Day (hours)')
 legend('Wake-up Time','Sleep Time')
 
 figure;
-plot(sleep_time_all, sleep_duration_all,'.','markersize',10);
+plot(sleep_time_all, sleep_duration_all,'.','markersize',8);
 xlim([0 24]);
 xlabel('Sleep Time (hours)');
 ylabel('Sleep Duration (hours)');
 box off;
-
-return;
 
 h = figure;
 set(h,'position',[124         167        1049         420]);
