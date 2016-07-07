@@ -3,7 +3,7 @@
 
 function out = rfhmm_binaryclassifier(xtrain, ytrain, xtest, ytest)
 
-n_tree = 50;
+n_tree = 400;
 
 if isempty(xtrain)||isempty(xtest),
     out = [];

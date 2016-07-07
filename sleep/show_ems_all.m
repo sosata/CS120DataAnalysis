@@ -34,24 +34,21 @@ for i=1:length(subject_sleep),
     end
 end
 
-% figure;
-% histogram(sleep_duration_all);
-
 figure;
-hs = histogram(wake_time_all, 0:.25:24);
-% y = medfilt1(y,3);
-% plot(x,y,'linewidth',2,'color',[1 .7 .4]);
-% hold on
-
-figure;
-hs = histogram(sleep_time_all, 0:1:24);
-% y = medfilt1(y,3);
-% plot(x,y,'linewidth',2, 'color',[.4 .7 1]);
+histogram(wake_time_all, 0:.1:24);
 xlim([0 24]);
 box off
 ylabel('Number of Samples')
 xlabel('Time of Day (hours)')
-legend('Wake-up Time','Sleep Time')
+set(gca,'xtick',1:24);
+
+figure;
+histogram(sleep_time_all, 0:.1:24);
+xlim([0 24]);
+box off
+ylabel('Number of Samples')
+xlabel('Time of Day (hours)')
+set(gca,'xtick',1:24);
 
 figure;
 plot(sleep_time_all, sleep_duration_all,'.','markersize',8);
@@ -59,6 +56,10 @@ xlim([0 24]);
 xlabel('Sleep Time (hours)');
 ylabel('Sleep Duration (hours)');
 box off;
+set(gca,'xtick',0:24);
+grid on
+
+return;
 
 h = figure;
 set(h,'position',[124         167        1049         420]);

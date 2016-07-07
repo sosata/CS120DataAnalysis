@@ -11,11 +11,12 @@ if length(y)~=length(y_pred)
     error('calculate_accuracy: inputs should have the same length');
 end
 
-if length(y)>1,
-    accuracy = nanmean(y(1)==y_pred(1));
-else
+% what was this???????
+% if length(y)>1,
+%     accuracy = nanmean(y(1)==y_pred(1));
+% else
     accuracy = nanmean(y==y_pred);
-end
+% end
 
 y_uniq = unique(y);
 if length(y_uniq)~=2,

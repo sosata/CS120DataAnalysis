@@ -35,6 +35,14 @@ time_wake(ind_double) = [];
 time_up(ind_double) = [];
 timestamp(ind_double) = [];
 
+% removing the sample if its bed time is before previous sample's up time
+
+ind_double = find((time_bed(2:end)-time_up(1:end-1))<=0) + 1;
+time_bed(ind_double) = [];
+time_sleep(ind_double) = [];
+time_wake(ind_double) = [];
+time_up(ind_double) = [];
+timestamp(ind_double) = [];
 
 
 end

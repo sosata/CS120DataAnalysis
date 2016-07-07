@@ -12,6 +12,8 @@ cs120_key = 'cs120'
 pr_key = 'pr'
 
 write_percentage = 0
+write_times_pr = 1
+write_times_cs120 = 0
 
 with open('all.json') as f:
 	mapping = json.load(f)
@@ -55,21 +57,24 @@ for subj in subjects:
 				if data_row:
 					if (data_row[1] in num_pr) or (data_row[2] in num_pr):
 						pr_exist.append(1)
-						pr_exist_t_row = [data_row[0], 1]
+						pr_exist_t_row = [data_row[0], 1, data_row[3]]
+						#print data_row[3]+' found'
 					else:
 						pr_exist.append(0)
-						pr_exist_t_row = [data_row[0], 0]
+						pr_exist_t_row = [data_row[0], 0, data_row[3]]
+						#print data_row[3]+' not found'
 					pr_exist_t.append(list(pr_exist_t_row))
 		file_in.close()
 		pr_perc.append(sum(pr_exist) / float(len(pr_exist)))
 	
 		#writing temporal information to individual files for each subject
-		with open('availability_temporal/pr_'+subj+'.csv', 'w') as file_out:
-			spamwriter = csv.writer(file_out, delimiter='\t',quotechar='|',quoting=csv.QUOTE_MINIMAL)
-			for j in range(len(pr_exist_t)):
-				data_out_row = pr_exist_t[j]
-				spamwriter.writerow(data_out_row)
-		file_out.close()
+		if write_times_pr:
+			with open('availability_temporal/pr_'+subj+'.csv', 'w') as file_out:
+				spamwriter = csv.writer(file_out, delimiter='\t',quotechar='|',quoting=csv.QUOTE_MINIMAL)
+				for j in range(len(pr_exist_t)):
+					data_out_row = pr_exist_t[j]
+					spamwriter.writerow(data_out_row)
+			file_out.close()
 
 	else:
 		pr_perc.append(float('nan'))
@@ -94,12 +99,13 @@ for subj in subjects:
 		cs120_perc.append(sum(cs120_exist) / float(len(cs120_exist)))
 		
 		#writing temporal information to individual files for each subject
-		with open('availability_temporal/cs120_'+subj+'.csv', 'w') as file_out:
-			spamwriter = csv.writer(file_out, delimiter='\t',quotechar='|',quoting=csv.QUOTE_MINIMAL)
-			for j in range(len(cs120_exist_t)):
-				data_out_row = cs120_exist_t[j]
-				spamwriter.writerow(data_out_row)
-		file_out.close()
+		if write_times_cs120:
+			with open('availability_temporal/cs120_'+subj+'.csv', 'w') as file_out:
+				spamwriter = csv.writer(file_out, delimiter='\t',quotechar='|',quoting=csv.QUOTE_MINIMAL)
+				for j in range(len(cs120_exist_t)):
+					data_out_row = cs120_exist_t[j]
+					spamwriter.writerow(data_out_row)
+			file_out.close()
 
 	else:
 		cs120_perc.append(float('nan'))
