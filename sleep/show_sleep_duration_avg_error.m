@@ -17,7 +17,7 @@ load('results_personal_correctedtimes');
 load('../settings.mat');
 load('bad_subjects.mat');
 
-ind_good = ones(size(med_dur));
+ind_good = ones(size(feature));
 ind_good(ind_bad) = 0;
 ind_good(183) = 0;
 ind_good = find(ind_good);
@@ -332,7 +332,7 @@ text(center_val+5, 0.75*abox_2(end), ...
 hold off
 axis(abox_2)
 
-%%
+%% Is this a bias in start or end times?
 
 figure(53)
 clf
@@ -387,7 +387,7 @@ hold off
 xlabel('Avg. Subject Sleep Duration (m)')
 ylabel('Avg. Error in Subject Sleep Start Time (pred. - true.) (m)')
 
-%%
+%% Do start and end times show the same relation to early or late sleepers?
 
 figure(63)
 clf
@@ -441,3 +441,70 @@ hold off
 
 xlabel('Avg. Subject Sleep End Time (m)')
 ylabel('Avg. Error in Subject Sleep End Time (pred. - true.) (m)')
+
+%% How do we do on predicting sleep outliers?
+
+% for i = 1:n_subjects
+%     figure(2000)
+%     histogram(aln_targ_dur{i}/6,0:19)
+%     axis([0,18,0,20])
+%     pause;
+% end
+
+% Is there something odd about sleep distributions?
+
+targ_skew = cellfun(@skewness, aln_targ_dur);
+targ_kurt = cellfun(@kurtosis, aln_targ_dur);
+
+figure(2001)
+clf
+xval = med_dur * time_mod;
+yval = targ_skew;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.7*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('median sleep duration (m)')
+ylabel('skew in sleep duration')
+
+figure(2002)
+clf
+xval = cellfun(@mean, aln_targ_dur);
+yval = targ_kurt;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.7*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('average sleep duration (m)')
+ylabel('skew in sleep duration')
+
