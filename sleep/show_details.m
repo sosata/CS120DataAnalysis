@@ -2,10 +2,10 @@ clear;
 close all;
 
 addpath('../Functions/');
-load('results.mat');
+load('results_personal_correctedtimes.mat');
 load('features_sleepdetection.mat');
 
-subject = 66;
+subject = find(cellfun(@(s) strcmp(s, '1054952'), subject_sleep));
 
 % feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
 
@@ -59,7 +59,7 @@ linkaxes(ax,'x');
 h = figure;
 set(h, 'position',[256         196        1144         752]);
 for i=1:size(feature{subject},2),
-    subplot(floor(sqrt(size(feature{subject},2))),ceil(sqrt(size(feature{subject},2))),i);
+    subplot(ceil(sqrt(size(feature{subject},2))),ceil(sqrt(size(feature{subject},2))),i);
     hold on;
     if sum(i==[1 7 10]), % still,charging,workday
         scatter(-.1+.2*rand(sum(out.target{subject}==0),1), -.1+.2*rand(sum(out.target{subject}==0),1)+feature{subject}(out.target{subject}==0,i),'filled');

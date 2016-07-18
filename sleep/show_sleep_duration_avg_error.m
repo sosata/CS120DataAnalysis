@@ -508,3 +508,43 @@ hold off
 xlabel('average sleep duration (m)')
 ylabel('skew in sleep duration')
 
+figure(2003)
+clf
+xval = cellfun(@std, aln_targ_dur) * time_mod;
+yval = med_dur;
+
+% Remove nans
+nonan_idx = (~isnan(xval)&~isnan(yval));
+xval = xval(nonan_idx);
+yval = yval(nonan_idx);
+
+coeffs = polyfit(xval, yval, 1);
+fitx = linspace(min(xval), max(xval), 200);
+fity = polyval(coeffs, fitx);
+r = corrcoef(xval, yval, 'rows', 'complete');
+
+hold on
+scatter(xval, yval, '.')
+plot(fitx, fity, 'k--')
+text(0.7*(max(xval)-min(xval)) + min(xval), ...
+    0.7*(max(yval)-min(yval)) + min(yval), ...
+    sprintf('r=%0.2f', r(1,2)))
+hold off
+
+xlabel('std. deviation of sleep duration (m)')
+ylabel('MAD of predictions')
+
+%%
+
+for i = 1:n_subjects
+    figure(2000)
+    clf
+    hold on
+    histogram(aln_targ_dur{i}/6,0:19)
+    histogram(aln_pred_dur{i}/6,0:19)
+    hold off
+    title(subject_sleep{i})
+    legend('True', 'Predicted')
+    axis([0,18,0,20])
+    pause;
+end
