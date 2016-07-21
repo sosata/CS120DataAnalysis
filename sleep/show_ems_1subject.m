@@ -4,7 +4,7 @@ close all;
 addpath('../Functions/');
 load('../settings.mat');
 
-subject = '1299151';
+subject = '1294671';
 
 data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
 

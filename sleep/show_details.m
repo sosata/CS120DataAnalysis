@@ -5,7 +5,7 @@ addpath('../Functions/');
 load('results.mat');
 load('features_sleepdetection.mat');
 
-subject = 66;
+subject = 65;
 
 % feature_label = {'still','lgt pwr','lgt rng','aud pwr','screen','loc var','charging','wifi name','time'};
 

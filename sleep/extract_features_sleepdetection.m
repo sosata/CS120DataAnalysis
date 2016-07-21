@@ -97,9 +97,9 @@ parfor i = 1:length(subjects),
             end
             % light
             if ~isempty(data_win.lgt{w}),
-                ft_row = [ft_row, mean(data_win.lgt{w}.Var2), mean(range(data_win.lgt{w}.Var2)), kurtosis(data_win.lgt{w}.Var2)];
+                ft_row = [ft_row, nanmean(data_win.lgt{w}.Var2), nanmean(range(data_win.lgt{w}.Var2)), kurtosis(data_win.lgt{w}.Var2)];
                 if length(data_win.lgt{w}.Var2)>=2,
-                    ft_row = [ft_row, mean(((data_win.lgt{w}.Var2(2:end)-data_win.lgt{w}.Var2(1:end-1)).^2)./(data_win.lgt{w}.Var2(1:end-1).^2))];
+                    ft_row = [ft_row, nanmean(((data_win.lgt{w}.Var2(2:end)-data_win.lgt{w}.Var2(1:end-1)).^2)./(data_win.lgt{w}.Var2(1:end-1).^2))];
                 else
                     ft_row = [ft_row, nan];
                 end
@@ -110,7 +110,7 @@ parfor i = 1:length(subjects),
             end
             % audio
             if ~isempty(data_win.aud{w}),
-                ft_row = [ft_row, mean(data_win.aud{w}.Var2), min(data_win.aud{w}.Var3), max(data_win.aud{w}.Var3)];
+                ft_row = [ft_row, nanmean(data_win.aud{w}.Var2), nanmin(data_win.aud{w}.Var3), nanmax(data_win.aud{w}.Var3)];
                 missing_audio = 0;
             else
                 ft_row = [ft_row, nan, nan, nan];
@@ -126,9 +126,9 @@ parfor i = 1:length(subjects),
             if ~isempty(data_win.fus{w}),
                 ft_row = [ft_row, estimate_variance(data_win.fus{w}.Var2,data_win.fus{w}.Var3)];
                 if length(data_win.fus{w}.Var2)>=2,
-                    change_lat = mean(((data_win.fus{w}.Var2(2:end)-data_win.fus{w}.Var2(1:end-1)).^2)./(data_win.fus{w}.Var2(1:end-1).^2));
-                    change_lng = mean(((data_win.fus{w}.Var3(2:end)-data_win.fus{w}.Var3(1:end-1)).^2)./(data_win.fus{w}.Var3(1:end-1).^2));
-                    ft_row = [ft_row, mean([change_lat change_lng])];
+                    change_lat = nanmean(((data_win.fus{w}.Var2(2:end)-data_win.fus{w}.Var2(1:end-1)).^2)./(data_win.fus{w}.Var2(1:end-1).^2));
+                    change_lng = nanmean(((data_win.fus{w}.Var3(2:end)-data_win.fus{w}.Var3(1:end-1)).^2)./(data_win.fus{w}.Var3(1:end-1).^2));
+                    ft_row = [ft_row, nanmean([change_lat change_lng])];
                 else
                     ft_row = [ft_row, nan];
                 end
@@ -139,7 +139,7 @@ parfor i = 1:length(subjects),
             end
             % battery charging
             if ~isempty(data_win.bat{w}),
-                ft_row = [ft_row, mean(data_win.bat{w}.Var2)];
+                ft_row = [ft_row, nanmean(data_win.bat{w}.Var2)];
                 ft_row = [ft_row, mode(data_win.bat{w}.Var3)>0, mode(data_win.bat{w}.Var3)==2];
                 missing_bat = 0;
             else
