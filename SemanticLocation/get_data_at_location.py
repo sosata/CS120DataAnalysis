@@ -13,13 +13,14 @@ def get_data_at_location(path, time_now, time_prev, lat_report, lng_report, sens
         with open(filename) as file_in:
             data = csv.reader(file_in, delimiter='\t')
             for data_row in data:
-                t.append(float(data_row[0]))
-                lat.append(float(data_row[1]))
-                lng.append(float(data_row[2]))
+                if data_row:
+                    t.append(float(data_row[0]))
+                    lat.append(float(data_row[1]))
+                    lng.append(float(data_row[2]))
         file_in.close()
     else:
         print 'error: location file not found'
-        return []
+        return np.array([])
 
     # filtering gps data based on time
     dif = [abs(x-time_prev) for x in t]
@@ -39,7 +40,7 @@ def get_data_at_location(path, time_now, time_prev, lat_report, lng_report, sens
 
     if not t:
         print 'no data - instance skipped'
-        return []
+        return np.array([])
 
     # finding isolated t's
     inds = [i for i in range(len(t)-1) if t[i+1]-t[i]>600]
@@ -49,15 +50,15 @@ def get_data_at_location(path, time_now, time_prev, lat_report, lng_report, sens
         t_end.append(t[inds[i]])
         t_start.append(t[inds[i]+1])
     t_end.append(t[len(t)-1])
-    print t_start
-    print t_end
+    #print t_start
+    #print t_end
 
     #print 't0: ' + str(t[0])
     #print 'tend: ' + str(t[len(t)-1])
     
     if not t:
         print 'no data - instance skipped'
-        return []
+        return np.array([])
         
     filename = path + '/' + sensor_name + '.csv'
     if os.path.isfile(filename):
@@ -65,14 +66,14 @@ def get_data_at_location(path, time_now, time_prev, lat_report, lng_report, sens
             data = csv.reader(file_in, delimiter='\t')
             data_value = []
             for data_row in data:
-                #print data_row[0]
-                for i in range(len(t_start)):
-                    if (float(data_row[0])>=t_start[i])and(float(data_row[0])<=t_end[i]):
-                        #print 'data added'
-                        data_value.append(data_row)
+                if data_row:
+                    for i in range(len(t_start)):
+                        if (float(data_row[0])>=t_start[i])and(float(data_row[0])<=t_end[i]):
+                            #print 'data added'
+                            data_value.append(data_row)
         file_in.close()
     else:
         print 'warning: sensor '+sensor_name+' not found.'
-        return []
+        return np.array([])
 
     return np.array(data_value)
