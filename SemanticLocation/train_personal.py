@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[5]:
+# In[15]:
 
 import os
 import pickle
@@ -11,18 +11,24 @@ from calculate_confusion_matrix import calculate_confusion_matrix
 from sklearn import preprocessing
 from split_balanced import split_balanced
 
-n_min = 5 # minimum number of samples for each class to be kept
+n_min = 3 # minimum number of samples for each class to be kept
 
 ft_dir = 'features/'
 
 files = os.listdir(ft_dir)
-files= [files[40]]
+#files= [files[40]]
+
+confs = []
+aucs = []
+labels = []
 
 for filename in files:
     with open(ft_dir+filename) as f:  
         
+        print filename
         # skipping this subject as it doesn't have enough data
-        if filename=='features_1401811.dat':
+        if filename in ['features_1401811.dat','features_1230637.dat','features_1299151.dat','features_1294671.dat']:
+            print 'subject skipped because of lack of data'
             continue
         
         feature, state = pickle.load(f)
@@ -58,10 +64,18 @@ for filename in files:
         predictions = gbm.predict(x_test)
 
         conf, roc_auc = calculate_confusion_matrix(predictions, y_test)
-        print filename
         print np.unique(state)
         print roc_auc
         print '------------------'
+    
+        labels.append(np.unique(np.append(y_test, predictions)))
+        confs.append(conf)
+        aucs.append(roc_auc)
+
+# saving the results
+with open('accuracy_personal.dat','w') as f:
+    pickle.dump([aucs, confs, labels], f)
+f.close()
 
 
 # In[35]:
@@ -85,12 +99,7 @@ axes = plt.gca()
 axes.set_ylim([-1, len(state_uniq)])
 
 
-# In[5]:
+# In[17]:
 
-print np.unique(state)
-print state
-le = preprocessing.LabelEncoder()
-le.fit(state)
-state_code = le.transform(state)
-print state_code
+print x_train.shape
 

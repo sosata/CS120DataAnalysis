@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[23]:
+# In[26]:
 
 import os
 import pickle
@@ -70,7 +70,7 @@ for i in range(len(feature_all)):
                 y_test = np.append(y_test, state_all[i][j])
 
     #train
-    gbm = xgboost.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05).fit(x_train, y_train)
+    gbm = xgboost.XGBClassifier(max_depth=3, n_estimators=600, learning_rate=0.05).fit(x_train, y_train)
 
     #test
     predictions = gbm.predict(x_test)
@@ -82,13 +82,9 @@ for i in range(len(feature_all)):
     labels.append(np.unique(np.append(y_test, predictions)))
     confs.append(conf)
     aucs.append(roc_auc)
-
-
-# In[25]:
-
-# save the results
-with open('accuracy.dat','w') as f:
+    
+# saving the results
+with open('accuracy600.dat','w') as f:
     pickle.dump([aucs, confs, labels], f)
 f.close()
-    
 
