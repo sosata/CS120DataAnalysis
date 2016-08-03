@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[22]:
+# In[15]:
 
 import pickle
 import numpy as np
@@ -30,7 +30,7 @@ for (i, a) in enumerate(auc):
     auc_ci = np.append(auc_ci, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[58]:
+# In[16]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
@@ -39,6 +39,8 @@ plt.barh(range(len(auc_mean)), auc_mean, xerr=auc_ci, align='center', color=(.3,
 plt.xlabel('AUC',fontsize=15,color=(0,0,0))
 axes = plt.gca()
 axes.set_ylim([-1, len(auc_mean)])
+axes.set_xlim([0, 1])
 plt.yticks(range(len(auc_mean)), state_top10, fontsize=15, color=(0,0,0));
 plt.plot([.5, .5], [-1, len(auc_mean)],color=(0,0,0))
+print auc_mean
 
