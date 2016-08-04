@@ -534,7 +534,7 @@ hold off
 xlabel('std. deviation of sleep duration (m)')
 ylabel('MAD of predictions')
 
-%%
+%% FOR DEBUGGING ONLY. WILL PLOT SOMETHING FOR EACH SUBJECT.
 
 for i = 1:n_subjects
     figure(2000)
@@ -546,5 +546,18 @@ for i = 1:n_subjects
     title(subject_sleep{i})
     legend('True', 'Predicted')
     axis([0,18,0,20])
+    pause;
+end
+
+%% Get outliers for each subject, See if our errors are substantially worse?
+
+% example_subj = 6;
+h_per_d = 144;
+
+for i = 1:n_subjects  
+    figure(2001)
+    histogram(mod(aln_targs{i}(:,1), h_per_d)/6, 100)
+    axis([0,24,0,10])
+    title([subject_sleep{i}, ' (', num2str(i), ')'])
     pause;
 end
