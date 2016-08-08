@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 def count_transitions(x, state1, state2):
 
 	cnt = 0

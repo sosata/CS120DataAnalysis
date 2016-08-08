@@ -1,12 +1,13 @@
 
 # coding: utf-8
 
-# In[37]:
+# In[98]:
 
 import pickle
 import numpy as np
 
-files = ['accuracy.dat','accuracy_new300.dat','accuracy_new300_2.dat']
+#files = ['accuracy.dat','accuracy_new300.dat','accuracy_new300_2.dat','accuracy_new300_3.dat','accuracy_new300_3_stratified.dat']
+files = ['accuracy_new300_2.dat','accuracy_new300_3.dat','accuracy_new100_3_depth6.dat']
 
 with open('top10.dat') as f:
     state_top10 = pickle.load(f)
@@ -43,15 +44,15 @@ print state_top10
 print conf_top10[3][3].size
 
 
-# In[63]:
+# In[99]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
-plt.figure(figsize=(12,5))
+plt.figure(figsize=(12,10))
 w = 1/(float(len(auc_mean))+1)
 for (i, aucm) in enumerate(auc_mean):
-    plt.barh(np.arange(i/(float(len(auc_mean)+1)),10+i/(1+float(len(auc_mean))),1), aucm, w, xerr=auc_ci[i], align='center',              color=(i/float(len(auc_mean)),.5,1), alpha=0.9, ecolor=(0,0,0))
-plt.legend(['feature set 1','feature set 2','feature set 3'], loc=2)
+    plt.barh(np.arange(i/(float(len(auc_mean)+1)),10+i/(1+float(len(auc_mean))),1), aucm, w, xerr=auc_ci[i], align='center',              color=(i/float(len(auc_mean)),1-i/float(len(auc_mean)),1), alpha=0.9, ecolor=(0,0,0))
+plt.legend(files, loc=2)
 plt.xlabel('AUC',fontsize=15,color=(0,0,0))
 axes = plt.gca()
 axes.set_ylim([-1, len(state_top10)])
@@ -81,7 +82,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion matrix', cmap=plt.cm.Blue
     plt.xlabel('Predicted label')
 
 
-# In[66]:
+# In[100]:
 
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10):
@@ -89,4 +90,5 @@ for (i,c_row) in enumerate(conf_top10):
         conf[i,j] = np.sum(conf_top10[i][j])
 cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
 plot_confusion_matrix(cm_normalized, state_top10)
+print conf
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[113]:
+# In[ ]:
 
 import csv
 import os
@@ -25,14 +25,15 @@ feature_label = np.array(['lgt mean','lgt std','aud mean','aud std','frq mean','
 subjects = os.listdir(data_dir)
 #subjects = [subjects[0]]
 
-for subj in subjects:
+for (cnt,subj) in enumerate(subjects):
     subject_dir = data_dir + subj + '/'
     samples = os.listdir(subject_dir)
-    #print samples
-    #samples = [samples[0]]
+    print str(cnt) + ' ' + subj
     loc = []
+    loc_fsq = []
     feature = np.array([])
     state = np.array([])
+    state_fsq = np.array([])
     for (i,samp) in enumerate(samples):
         sensor_dir = subject_dir + samp + '/'
         sensors = os.listdir(sensor_dir)
@@ -44,24 +45,32 @@ for subj in subjects:
             data_eml = pd.read_csv(filename, delimiter='\t', header=None)
             loc_string = data_eml[6][0]
             loc_string = loc_string[1:len(loc_string)-1]
+            loc_string = loc_string.replace('"','')
             loc.append(loc_string)
-            
+        
+        if 'fsq.csv' in sensors:
+            data_fsq = pd.read_csv(sensor_dir+'fsq.csv', delimiter='\t', header=None)
+            loc_string = data_fsq.loc[10,1]
+            loc_fsq.append(loc_string)
+        else:
+            loc_fsq.append('Unknown')
+        
         ft_row = np.array([])
         
         # light
         if 'lgt.csv' in sensors:
             data = pd.read_csv(sensor_dir+'lgt.csv', delimiter='\t', header=None)
             lgt = data[:][1]
-            ft_row = np.append(ft_row, [np.nanmean(lgt), np.nanstd(lgt), np.sum(lgt==0)/float(lgt.size),                                        np.sum(np.diff(np.sign(lgt-np.nanmean(lgt))))/float(lgt.size)]) # prop. zero-crossings
+            ft_row = np.append(ft_row, [np.nanmean(lgt), np.nanstd(lgt), np.sum(lgt==0)/float(lgt.size),                                        np.sum(np.diff(np.sign(lgt-np.nanmean(lgt))))/float(lgt.size),                                       stats.skew(lgt), stats.kurtosis(lgt)]) # prop. zero-crossings
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan])
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
 
         # audio
         if 'aud.csv' in sensors:
             data = pd.read_csv(sensor_dir+'aud.csv', delimiter='\t', header=None)
-            ft_row = np.append(ft_row, [np.nanmean(data[:][1]), np.nanstd(data[:][1]), np.nanmean(data[:][2]), np.nanstd(data[:][2])])
+            ft_row = np.append(ft_row, [np.nanmean(data[:][1]), np.nanstd(data[:][1]),                                         stats.skew(data[:][1]), stats.kurtosis(data[:][1]),                                        np.nanmean(data[:][2]), np.nanstd(data[:][2]),                                        stats.skew(data[:][2]), stats.kurtosis(data[:][2])])
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan])
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
 
         # screen
         if 'scr.csv' in sensors:
@@ -69,13 +78,19 @@ for subj in subjects:
             if data[:][0].size>=2:
                 deltat = data[0][data[0][:].size-1] - data[0][0]
                 if deltat!=0:
-                    ft_row = np.append(ft_row, data[0][:].size/float(deltat))
+                    scr_dur = np.array([])
+                    scr_frq = 0
+                    for j in range(data[1][:].size-1):
+                        if data[1][j]=='True' and data[1][j+1]=='False':
+                            scr_dur = np.append(scr_dur, data[0][j+1]-data[0][j])
+                            scr_frq += 1
+                    ft_row = np.append(ft_row, [scr_frq/float(deltat), np.mean(scr_dur), np.std(scr_dur)])
                 else:
-                    ft_row = np.append(ft_row, np.nan)
+                    ft_row = np.append(ft_row, [np.nan,np.nan,np.nan])
             else:
-                ft_row = np.append(ft_row, 0)
+                ft_row = np.append(ft_row, [0,0,0])
         else:
-            ft_row = np.append(ft_row, 0)
+            ft_row = np.append(ft_row, [0,0,0])
         
         # activity
         if 'act.csv' in sensors:
@@ -87,47 +102,30 @@ for subj in subjects:
             per_unknown = np.sum(data[1][:]=='UNKNOWN')/n
             n_trans1 = count_transitions(data[1][:],'STILL','ONFOOT')/n
             n_trans2 = count_transitions(data[1][:],'STILL','TILTING')/n
-            ft_row = np.append(ft_row, [per_still, per_tilt, per_onfoot, per_unknown, n_trans1, n_trans2])
+            n_trans3 = count_transitions(data[1][:],'STILL','UNKNOWN')/n
+            n_trans4 = count_transitions(data[1][:],'ONFOOT','UNKNOWN')/n
+            ft_row = np.append(ft_row, [per_still, per_tilt, per_onfoot, per_unknown, n_trans1, n_trans2,                                       n_trans3, n_trans4])
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         
         # apps
         if 'app.csv' in sensors:
             data = pd.read_csv(sensor_dir+'app.csv', delimiter='\t', header=None)
-            n_messaging = np.sum(data[2][:]=='Messaging')
-            n_facebook = np.sum(data[2][:]=='Facebook')
-            n_chrome = np.sum(data[2][:]=='Chrome')
-            n_mobilyze = np.sum(data[2][:]=='Mobilyze')
-            n_phone = np.sum(data[2][:]=='Phone')
-            n_gmail = np.sum(data[2][:]=='Gmail')
-            n_contacts = np.sum(data[2][:]=='Contacts')
-            n_internet = np.sum(data[2][:]=='Internet')
-            n_gallery = np.sum(data[2][:]=='Gallery')
-            n_email = np.sum(data[2][:]=='Email')
-            n_settings = np.sum(data[2][:]=='Settings')
-            n_messenger = np.sum(data[2][:]=='Messenger')
-            n_camera = np.sum(data[2][:]=='Camera')
-            n_clock = np.sum(data[2][:]=='Clock')
-            n_maps = np.sum(data[2][:]=='Maps')
-            n_calendar = np.sum(data[2][:]=='Calendar')
-            n_youtube = np.sum(data[2][:]=='Youtube')
-            n_calculator = np.sum(data[2][:]=='Calculator')
-            n_purplerobot = np.sum(data[2][:]=='Purple Robot')
-            n_systemui = np.sum(data[2][:]=='System UI')
-            ft_row = np.append(ft_row, [n_messaging, n_facebook, n_chrome, n_mobilyze, n_phone, n_gmail, n_contacts, n_internet,                                        n_gallery, n_email, n_settings, n_messenger, n_camera, n_clock, n_maps, n_calendar, n_youtube,                                        n_calculator, n_purplerobot, n_systemui])
-                                        
+            ft_row = np.append(ft_row, [np.sum(data[2][:]=='Messaging'),                                        np.sum(data[2][:]=='Facebook'),                                        np.sum(data[2][:]=='Chrome'),                                        np.sum(data[2][:]=='Mobilyze'),                                        np.sum(data[2][:]=='Phone'),                                        np.sum(data[2][:]=='Gmail'),                                        np.sum(data[2][:]=='Contacts'),                                        np.sum(data[2][:]=='Internet'),                                        np.sum(data[2][:]=='Gallery'),                                        np.sum(data[2][:]=='Email'),                                        np.sum(data[2][:]=='Settings'),                                        np.sum(data[2][:]=='Messenger'),                                        np.sum(data[2][:]=='Camera'),                                        np.sum(data[2][:]=='Clock'),                                        np.sum(data[2][:]=='Maps'),                                        np.sum(data[2][:]=='Calendar'),                                        np.sum(data[2][:]=='Youtube'),                                        np.sum(data[2][:]=='Calculator'),                                        np.sum(data[2][:]=='Purple Robot'),                                        np.sum(data[2][:]=='System UI')])
         else:
-            ft_row = np.append(ft_row, zeros([1,20]))
+            ft_row = np.append(ft_row, np.zeros([1,20]))
             
         # communication
         if 'coe.csv' in sensors:
             data = pd.read_csv(sensor_dir+'coe.csv', delimiter='\t', header=None)
-            n_call = np.sum(data[3][:]=='PHONE')
-            n_sms = np.sum(data[3][:]=='SMS')
+            n_call_in = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='INCOMING'))
+            n_call_out = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='OUTGOING'))
+            n_sms_in = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='INCOMING'))
+            n_sms_out = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='OUTGOING'))
             n_missedcall = np.sum(data[4][:]=='MISSED')
-            ft_row = np.append(ft_row, [n_call, n_sms, n_missedcall])
+            ft_row = np.append(ft_row, [n_call_in,n_call_out,n_sms_in,n_sms_out,n_missedcall])
         else:
-            ft_row = np.append(ft_row, [0, 0, 0])
+            ft_row = np.append(ft_row, [0, 0, 0, 0, 0])
         
         # wifi
         if 'wif.csv' in sensors:
@@ -152,7 +150,7 @@ for subj in subjects:
             data = pd.read_csv(sensor_dir+'wtr.csv', delimiter='\t', header=None)
             ft_row = np.append(ft_row, [np.mean(data[1][:]), np.mean(data[3][:]), stats.mode(data[9][:])[0][0]])
         else:
-            ft_row = np.append(ft_row, np.nan, np.nan, np.nan)
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan])
         
         # time
         dow_start = datetime.datetime.fromtimestamp(t_start).weekday()
@@ -163,22 +161,24 @@ for subj in subjects:
         if i==0:
             feature = np.array([ft_row])
             state = np.array(loc[i])
+            state_fsq = np.array(loc_fsq[i])
         else:
             feature = np.append(feature, [ft_row], axis=0)
             state = np.append(state, loc[i])
+            state_fsq = np.append(state_fsq, loc_fsq[i])
         
     if save_results:
         with open('features_new/features_'+subj+'.dat', 'w') as file_out:
-            pickle.dump([feature, state, feature_label], file_out)
+            pickle.dump([feature, state, state_fsq, feature_label], file_out)
         file_out.close()
 
 exit
 
 
-# In[39]:
+# In[31]:
 
-import datetime
-a = datetime.datetime.fromtimestamp(1000).weekday()
+print len(state_fsq)
+print len(state)
 
 
 # In[43]:

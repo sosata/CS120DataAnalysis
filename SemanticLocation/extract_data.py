@@ -11,11 +11,11 @@ from get_time_from_gps import get_time_from_gps
 from sys import exit
 import shutil
 
-#probes = ['act','app','aud','bat','cal','coe','fus','lgt','run','scr','tch','wif','wtr']
-probes = ['wtr']
+probes = ['act','app','aud','bat','cal','coe','fus','lgt','run','scr','tch','wif','wtr']
 
 data_dir = '/home/sohrob/Dropbox/Data/CS120/'
 weather_data_dir = '/home/sohrob/Dropbox/Data/CS120Weather/'
+fsq_data_dir = '/home/sohrob/Dropbox/Data/CS120FourSquare/'
 out_dir = 'data/'
 
 subjects = os.listdir(data_dir)
@@ -27,7 +27,7 @@ subjects[52] = ''
 #subjects = subjects[148:]
 
 for subj in subjects:
-    filename = data_dir + subj + '/eml.csv'
+    filename = fsq_data_dir + subj + '/fsq.csv'
     if os.path.exists(filename):
         print filename
         loc = []
@@ -55,9 +55,10 @@ for subj in subjects:
                     
         file_in.close()
     else:
-        print 'skipping subject '+subj+' without location report data.'
+        print 'skipping subject '+subj+' without location report/foursquare data.'
         continue
-                       
+        
+                      
     # looking into data between current and previous report
     filename = data_dir + subj + '/fus.csv'
     if os.path.exists(filename):
