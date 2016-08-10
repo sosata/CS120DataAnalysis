@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
 
 def stratify(x, y):
     
@@ -27,7 +27,7 @@ def stratify(x, y):
         
 
 
-# In[29]:
+# In[4]:
 
 import os
 import pickle
@@ -35,7 +35,9 @@ import numpy as np
 import xgboost
 from calculate_confusion_matrix import calculate_confusion_matrix
 import time
+from copy import deepcopy
 
+save_results = True
 do_stratify = False
 
 fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',          'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',          'Professional & Other Places':'Professional or Medical Office',          'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
@@ -55,15 +57,16 @@ for (i,s) in enumerate(state_top10):
 
 feature_all = []
 state_all = []
+state_fsq_all = []
 for filename in files:
     with open(ft_dir+filename) as f:  
-        feature, state, feature_label = pickle.load(f)
+        feature, state, state_fsq, feature_label = pickle.load(f)
 
         for (i,s) in enumerate(state):
             state[i] = state[i].replace('"','')
             state[i] = state[i].replace('[','')
             state[i] = state[i].replace(']','')
-        
+            
         # only keeping top 10 states
         ind = np.array([], int)
         for (i,st) in enumerate(state):
@@ -71,21 +74,45 @@ for filename in files:
                 ind = np.append(ind, i)
         feature = feature[ind,:]
         state = state[ind]
+        state_fsq = state_fsq[ind]
+        
+        # converting foursquare names to 
+        state_fsq = list(state_fsq)
+        for (i,s) in enumerate(state_fsq):
+            if s in fsq_map:
+                state_fsq[i] = fsq_map[s]
+            else:
+                state_fsq[i] = 'Unknown'
+        state_fsq = np.array(state_fsq)
         
         # This is a temporary solution, to turn sky conditions into numbers
         # The original feature extraction file needs to change to solve this problem
         # (XGBoost does not accept string input)
+        feature_new = np.array([[]])
         for (i,ft_row) in enumerate(feature):
             if isinstance(feature[i,56], basestring):
                 feature[i,56] = sum(ord(c) for c in feature[i,56])
+            # adding foursquare locations as additional features
+            # also converting it to float first
+            sum_fsq = sum(ord(c) for c in state_fsq[i])
+            if feature_new.size>0:
+                feature_new = np.append(feature_new, [np.append(feature[i,:], sum_fsq)], axis=0)
+            else:
+                feature_new = np.array([np.append(feature[i,:], sum_fsq)])
+        feature  = feature_new
+        
         feature_all.append(feature)
         state_all.append(state)
+        state_fsq_all.append(state_fsq)
     f.close()
 
-    
+exit
+
 confs = []
 aucs = []
 labels = []
+confs_fsq = []
+aucs_fsq = []
 
 for i in range(len(feature_all)):
     
@@ -120,21 +147,31 @@ for i in range(len(feature_all)):
     conf, roc_auc = calculate_confusion_matrix(predictions, y_test)
     t4 = time.time()
     
-    print t1-t0, t2-t1, t3-t2, t4-t3
-    print np.unique(np.append(y_test, predictions))
+    # confusion matrix, AUC for foursquare
+    conf_fsq, roc_auc_fsq = calculate_confusion_matrix(state_fsq_all[i], y_test)
+    
+    #print t1-t0, t2-t1, t3-t2, t4-t3
+    print np.unique(y_test)
     #print conf
+    print 'model:'
     print roc_auc
-    labels.append(np.unique(np.append(y_test, predictions)))
+    print 'foursquare:'
+    print roc_auc_fsq
+    #labels.append(np.unique(np.append(y_test, predictions)))
+    labels.append(np.unique(y_test))
     confs.append(conf)
     aucs.append(roc_auc)
+    confs_fsq.append(conf_fsq)
+    aucs_fsq.append(roc_auc_fsq)
     
 # saving the results
-with open('accuracy_new100_3_depth6.dat','w') as f:
-    pickle.dump([aucs, confs, labels], f)
-f.close()
+if save_results:
+    with open('accuracy_new100_3_depth6_fsq.dat','w') as f:
+        pickle.dump([aucs, confs, labels, aucs_fsq, confs_fsq], f)
+    f.close()
 
 
-# In[32]:
+# In[1]:
 
 print state_top10
 

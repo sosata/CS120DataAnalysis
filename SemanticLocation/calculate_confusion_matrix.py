@@ -7,40 +7,56 @@ from sklearn.preprocessing import OneHotEncoder
 
 def calculate_confusion_matrix(y, y_t):
 
-	if len(y)!=len(y_t):
-		print 'error: vectors must have the same length'
-		return []
+    if len(y)!=len(y_t):
+        print 'error: vectors must have the same length'
+        return []
 
-	# convert strings to codes
-	# defining codes based on the target
-	le = preprocessing.LabelEncoder()
-	le.fit(np.append(y,y_t))
-	y_t = le.transform(y_t)
-	y = le.transform(y)
+    # convert strings to codes
+    # defining codes based on the target
+    le = preprocessing.LabelEncoder()
+    le.fit(np.unique(np.append(y,y_t)))
+    y_t_new = le.transform(y_t)
+    y_new = le.transform(y)
+    y_t = y_t_new
+    y = y_new
 
-	y_uniq = np.unique(np.append(y,y_t))
-	n_class = y_uniq.size
+    y_uniq = np.unique(y)
+    y_t_uniq = np.unique(y_t)
+    y_union = np.unique(np.append(y,y_t))
+    n_class = y_union.size
+    
+    # classes to be removed
+    # (which are not in the target)
+    ind_out = np.array([])
+    for (i,y_u) in enumerate(y_union):
+        if not y_u in y_t_uniq:
+            ind_out = np.append(ind_out, i)
 
-	# confusion matrix
-	conf = np.zeros((n_class, n_class))
-	for (i,s) in enumerate(y_t):
-		conf[s, y[i]] += 1
+    # confusion matrix
+    conf = np.zeros((n_class, n_class))
+    for (i,s) in enumerate(y_t):
+        conf[s, y[i]] += 1
 
-	# ROC curve
-	#y_bin = label_binarize(y, classes=range(n_class))
-	#y_t_bin = label_binarize(y_t, classes=range(n_class))
-	enc = OneHotEncoder()
-	y_union = np.array(np.append(y,y_t))
-	enc.fit(y_union.reshape(-1, 1))
-	y_bin = enc.transform(y.reshape(-1,1)).toarray()
-	y_t_bin = enc.transform(y_t.reshape(-1,1)).toarray()
+    # ROC curve
+    enc = OneHotEncoder()
+    enc.fit(y_union.reshape(-1, 1))
+    y_bin = enc.transform(y.reshape(-1,1)).toarray()
+    y_t_bin = enc.transform(y_t.reshape(-1,1)).toarray()
+    
+    roc_auc = np.zeros(n_class)
+    for i in range(n_class):
+        fpr, tpr, _ = roc_curve(y_bin[:, i], y_t_bin[:, i])
+        if fpr.size>=2:
+            roc_auc[i] = auc(fpr, tpr)
+        else:
+            roc_auc[i] = np.nan
+            print 'ROC AUC set to nan due to lack of data'
 
-	#print y_bin
-	#print y_t_bin
+    # removing classes that are not in the target
+    roc_auc = np.delete(roc_auc, ind_out)
+    conf = np.delete(conf, ind_out, axis=0)
+    conf = np.delete(conf, ind_out, axis=1)
+    
+    #print str(roc_auc.size)+' '+str(conf.shape)
 
-	roc_auc = np.zeros(n_class)
-	for i in range(n_class):
-		fpr, tpr, _ = roc_curve(y_bin[:, i], y_t_bin[:, i])
-		roc_auc[i] = auc(fpr, tpr)
-
-	return conf, roc_auc
+    return conf, roc_auc
