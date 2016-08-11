@@ -7,15 +7,15 @@ import os
 import math
 
 data_dir = '/home/sohrob/Dropbox/Data/CS120/'
-write_to = 'coverage.csv'
+write_to = 'coverage2.csv'
 cs120_key = 'cs120'
 pr_key = 'pr'
 
-write_percentage = 0
-write_times_pr = 1
+write_percentage = 1
+write_times_pr = 0
 write_times_cs120 = 0
 
-with open('all.json') as f:
+with open('all-2.json') as f:
 	mapping = json.load(f)
 f.close()
 

@@ -48,12 +48,14 @@ for (cnt,subj) in enumerate(subjects):
             loc_string = loc_string.replace('"','')
             loc.append(loc_string)
         
-        if 'fsq.csv' in sensors:
-            data_fsq = pd.read_csv(sensor_dir+'fsq.csv', delimiter='\t', header=None)
+        if 'fsq2.csv' in sensors:
+            data_fsq = pd.read_csv(sensor_dir+'fsq2.csv', delimiter='\t', header=None)
             loc_string = data_fsq.loc[10,1]
+            distance_fsq = data_fsq.loc[11,1]
             loc_fsq.append(loc_string)
         else:
             loc_fsq.append('Unknown')
+            distance_fsq = np.nan
         
         ft_row = np.array([])
         
@@ -156,6 +158,9 @@ for (cnt,subj) in enumerate(subjects):
         dow_start = datetime.datetime.fromtimestamp(t_start).weekday()
         dow_end = datetime.datetime.fromtimestamp(t_end).weekday()
         ft_row = np.append(ft_row, [t_end-t_start, ((t_end+t_start)/2.0)%86400, dow_start, dow_end])
+        
+        # adding distance to closest foursquare location (m)
+        ft_row = np.append(ft_row, distance_fsq)
 
         # adding to feature matrix
         if i==0:

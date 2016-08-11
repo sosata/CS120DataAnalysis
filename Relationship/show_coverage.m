@@ -1,15 +1,15 @@
 clear
 close all
 
-tab = readtable('coverage.csv', 'delimiter', '\t', 'readvariablenames', false);
+tab = readtable('coverage2.csv', 'delimiter', '\t', 'readvariablenames', false);
 
 h = figure
 set(h, 'position', [352   288   783   420]);
 histogram(tab.Var2, 20)
 pr_mean = nanmean(tab.Var2);
 hold on
-plot([pr_mean pr_mean], [0 40], '--k'); 
-text(pr_mean, 35, sprintf('mean: %.3f', pr_mean))
+plot([pr_mean pr_mean], [0 180], '--k'); 
+text(pr_mean, 180, sprintf('mean: %.3f', pr_mean))
 xlabel('% Purple Robot (communication events) contacts found in mapping')
 ylabel('N subjects');
 

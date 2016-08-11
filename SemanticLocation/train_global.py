@@ -27,7 +27,7 @@ def stratify(x, y):
         
 
 
-# In[4]:
+# In[ ]:
 
 import os
 import pickle
@@ -36,6 +36,9 @@ import xgboost
 from calculate_confusion_matrix import calculate_confusion_matrix
 import time
 from copy import deepcopy
+from sklearn.preprocessing import OneHotEncoder
+from sklearn import preprocessing
+
 
 save_results = True
 do_stratify = False
@@ -44,6 +47,15 @@ fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation
 
 ft_dir = 'features_new/'
 
+# building one hot encoder for foursquare locations (as extra features)
+state7 = np.array(fsq_map.values()+['Unknown'])
+le = preprocessing.LabelEncoder()
+le.fit(state7)
+state7_code = le.transform(state7)
+enc = OneHotEncoder()
+enc.fit(state7_code.reshape(-1, 1))
+
+# list feature files
 files = os.listdir(ft_dir)
 #files = [files[0]]
 
@@ -94,19 +106,19 @@ for filename in files:
                 feature[i,56] = sum(ord(c) for c in feature[i,56])
             # adding foursquare locations as additional features
             # also converting it to float first
-            sum_fsq = sum(ord(c) for c in state_fsq[i])
+            #sum_fsq = sum(ord(c) for c in state_fsq[i])
+            state_fsq_code = le.transform(state_fsq[i])
+            state_fsq_bin = enc.transform(state_fsq_code.reshape(-1,1)).toarray()            
             if feature_new.size>0:
-                feature_new = np.append(feature_new, [np.append(feature[i,:], sum_fsq)], axis=0)
+                feature_new = np.append(feature_new, [np.append(feature[i,:], state_fsq_bin[0])], axis=0)
             else:
-                feature_new = np.array([np.append(feature[i,:], sum_fsq)])
+                feature_new = np.array([np.append(feature[i,:], state_fsq_bin[0])])
         feature  = feature_new
         
         feature_all.append(feature)
         state_all.append(state)
         state_fsq_all.append(state_fsq)
     f.close()
-
-exit
 
 confs = []
 aucs = []
@@ -166,12 +178,28 @@ for i in range(len(feature_all)):
     
 # saving the results
 if save_results:
-    with open('accuracy_new100_3_depth6_fsq.dat','w') as f:
+    with open('accuracy_new100_3_depth6_fsq2_distance.dat','w') as f:
         pickle.dump([aucs, confs, labels, aucs_fsq, confs_fsq], f)
     f.close()
 
+os._exit(0)
 
-# In[1]:
 
-print state_top10
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+state7 = np.array(fsq_map.values()+['Unknown'])
+print state7
+le = preprocessing.LabelEncoder()
+le.fit(state7)
+enc = OneHotEncoder()
+enc.fit(state7_code.reshape(-1, 1))
+
+state_code = le.transform(np.array(['Unknown']))
+state_bin =  enc.transform(state_code.reshape(-1,1)).toarray()
+print state_bin[0]
 

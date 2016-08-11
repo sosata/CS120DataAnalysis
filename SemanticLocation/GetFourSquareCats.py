@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[11]:
+# In[2]:
 
 # This program will add an extra column to eml.csv containing the Foursquare
 # highest-level category for the locations subjects have entered
@@ -16,11 +16,14 @@ data_root_dir = '/home/sohrob/Dropbox/Data/CS120/'
 data_write_dir = '/home/sohrob/Dropbox/Data/CS120FourSquare/'
 
 subjects = os.listdir(data_root_dir)
-subjects = subjects[169:]
+subjects = subjects[53:]
+# subject 1367477 (52) should be skipped as it doesn't have lat/long values for location reports
 
 client = foursquare.Foursquare(client_id='Z114Q224KB4ZFVHALYCFVTQIDEJZON30R3CY1UUABGI3SFA5', client_secret='4YZNN4DVQKW1IMY3SIZ1GBUGHKYRMNIGDDGHI3LJG0UGWAOU', version='20160108')
 
 cat_map = client.venues.categories()
+
+n_cat = 10 # no. fousquare categories
 
 for (i,subject) in enumerate(subjects):
     #subject = subjects_row[0]
@@ -34,14 +37,20 @@ for (i,subject) in enumerate(subjects):
                 if data_row:
                     #text = client.venues.search(params={'query':data_row[5], 'll':str(data_row[2])+','+str(data_row[3]), 'limit':'1'})
                     #print data_row
+                    #t0 = time.time()
                     text = client.venues.search(params={'ll':str(data_row[2])+','+str(data_row[3]), 'limit':'1'})
+                    #t1 = time.time()
                     time.sleep(1)
+                    #t2 = time.time()
                     categ_high = 'Unknown'
+                    distance = float('NaN')
                     if text['venues']:
+                        if text['venues'][0]['location']:
+                            distance = text['venues'][0]['location']['distance']
                         if text['venues'][0]['categories']:
                             categ_low = text['venues'][0]['categories'][0]['name']
                             #print categ_low
-                            for j in range(10):
+                            for j in range(n_cat):
                                 has_it = False
                                 for t in cat_map['categories'][j]['categories']:
                                     # if there are level 3 categories
@@ -59,13 +68,18 @@ for (i,subject) in enumerate(subjects):
                                     categ_high = cat_map['categories'][j]['name']
                                     break
                             #print categ_high
+                    else:
+                        print 'warning: query response was empty'
+                    #t3 = time.time()
+                    #print t3-t2, t2-t1, t1-t0
                     data_out_row = data_row
                     data_out_row.append(categ_high)
+                    data_out_row.append(distance)
                     data_out.append(deepcopy(data_out_row))
         file_in.close()
         if not os.path.exists(data_write_dir+subject):
             os.makedirs(data_write_dir+subject)
-        with open(data_write_dir + subject + '/fsq.csv', 'w') as file_out:
+        with open(data_write_dir + subject + '/fsq2.csv', 'w') as file_out:
             spamwriter = csv.writer(file_out, delimiter='\t',quotechar='|',quoting=csv.QUOTE_MINIMAL)
             for data_out_row in data_out:
                 spamwriter.writerow(data_out_row)
@@ -74,12 +88,10 @@ for (i,subject) in enumerate(subjects):
         print 'subject skipped due to no eml.csv'
 
 
-# In[9]:
+# In[4]:
 
-#print [text['categories'][i]['name'] for i in range(10) if 
-# print [1 for t in cat_map['categories'][4]['categories'] if t['name'] == 'Conference Room']
-# print [cat_map['categories'][i]['name'] for i in range(10)]
-# cat_map['categories'][6]['categories'][22]['categories']
-print text['venues']
-print data_row
+import os
+data_root_dir = '/home/sohrob/Dropbox/Data/CS120/'
+subjects = os.listdir(data_root_dir)
+print subjects
 

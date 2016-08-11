@@ -1,7 +1,10 @@
 
 # coding: utf-8
 
-# In[99]:
+# In[1]:
+
+# This code adds extract the foursquare entries from the source data (/Data/CS120FourSquare) and puts them in separate files
+# in ./data for later feature extraction
 
 import pandas as pd
 import os
@@ -17,7 +20,7 @@ for (i,subject) in enumerate(subjects):
     print str(i)+' '+subject
     
     # load foursquare data
-    filename = fsq_data_dir+subject+'/fsq.csv'
+    filename = fsq_data_dir+subject+'/fsq2.csv'
     data_fsq = pd.read_csv(filename, delimiter='\t', header=None)
     
     #print data_fsq[:][2]
@@ -36,7 +39,7 @@ for (i,subject) in enumerate(subjects):
         if len(ind)>0:
             ind = ind[0]
             data_to_write = data_fsq.loc[ind,:]
-            filename = data_dir+subject+'/'+subdir+'/fsq.csv'
+            filename = data_dir+subject+'/'+subdir+'/fsq2.csv'
             data_to_write.to_csv(filename, sep='\t', header=None)
         else:
             print 'subject '+subject+' subdir '+str(subdir)+' not found in foursquare data'

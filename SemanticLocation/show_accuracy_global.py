@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[36]:
 
 import pickle
 import numpy as np
 
 #files = ['accuracy.dat','accuracy_new300.dat','accuracy_new300_2.dat','accuracy_new300_3.dat','accuracy_new300_3_stratified.dat']
-files = ['accuracy_new100_3_depth6.dat','accuracy_new100_3_depth6_fsq.dat']
+files = ['accuracy_new100_3_depth6.dat','accuracy_new100_3_depth6_fsq2.dat']
 
 with open('top10.dat') as f:
     state_top10 = pickle.load(f)
@@ -19,7 +19,7 @@ auc_mean = []
 auc_ci = []
 for (i,file) in enumerate(files):
     with open(file) as f:
-        if file=='accuracy_new100_3_depth6_fsq.dat' or file=='accuracy_new100_3_depth6.dat':
+        if file=='accuracy_new100_3_depth6_fsq2.dat' or file=='accuracy_new100_3_depth6.dat':
             aucs, confs, labels, aucs_fsq, confs_fsq = pickle.load(f)
         else:
             aucs, confs, labels = pickle.load(f)
@@ -39,13 +39,13 @@ for (i,file) in enumerate(files):
             if state in lab:
                 ind = np.where(lab==state)[0]
                 auc_top10[j] = np.append(auc_top10[j], aucs[k][ind])
-                if file=='accuracy_new100_3_depth6_fsq.dat':
+                if file=='accuracy_new100_3_depth6_fsq2.dat':
                     auc_top10_fsq[j] = np.append(auc_top10_fsq[j], aucs_fsq[k][ind])
                 for (j2,state2) in enumerate(state_top10):
                     if state2 in lab:
                         ind2 = np.where(lab==state2)[0]
                         conf_top10[j][j2] = np.append(conf_top10[j][j2], confs[k][ind,ind2])
-                        if file=='accuracy_new100_3_depth6_fsq.dat':
+                        if file=='accuracy_new100_3_depth6_fsq2.dat':
                             conf_top10_fsq[j][j2] = np.append(conf_top10_fsq[j][j2], confs_fsq[k][ind,ind2])
 
     auc_mean.append(np.array([]))
@@ -68,7 +68,7 @@ print confs_fsq[0]
 print labels[0]
 
 
-# In[30]:
+# In[37]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
@@ -106,7 +106,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion matrix', cmap=plt.cm.Blue
     plt.xlabel('Predicted label')
 
 
-# In[26]:
+# In[34]:
 
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10):
@@ -116,7 +116,7 @@ cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
 plot_confusion_matrix(cm_normalized, state_top10, title='confusion matrix - sensor+fousquare')
 
 
-# In[27]:
+# In[35]:
 
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10_fsq):
