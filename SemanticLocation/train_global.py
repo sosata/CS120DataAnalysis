@@ -36,24 +36,27 @@ import xgboost
 from calculate_confusion_matrix import calculate_confusion_matrix
 import time
 from copy import deepcopy
-from sklearn.preprocessing import OneHotEncoder
-from sklearn import preprocessing
+# from sklearn.preprocessing import OneHotEncoder
+# from sklearn import preprocessing
 
 
 save_results = True
 do_stratify = False
 
-fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',          'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',          'Professional & Other Places':'Professional or Medical Office',          'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
+# fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',\
+#           'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',\
+#           'Professional & Other Places':'Professional or Medical Office',\
+#           'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
 
 ft_dir = 'features_new/'
 
 # building one hot encoder for foursquare locations (as extra features)
-state7 = np.array(fsq_map.values()+['Unknown'])
-le = preprocessing.LabelEncoder()
-le.fit(state7)
-state7_code = le.transform(state7)
-enc = OneHotEncoder()
-enc.fit(state7_code.reshape(-1, 1))
+# state7 = np.array(fsq_map.values()+['Unknown'])
+# le = preprocessing.LabelEncoder()
+# le.fit(state7)
+# state7_code = le.transform(state7)
+# enc = OneHotEncoder()
+# enc.fit(state7_code.reshape(-1, 1))
 
 # list feature files
 files = os.listdir(ft_dir)
@@ -74,10 +77,10 @@ for filename in files:
     with open(ft_dir+filename) as f:  
         feature, state, state_fsq, feature_label = pickle.load(f)
 
-        for (i,s) in enumerate(state):
-            state[i] = state[i].replace('"','')
-            state[i] = state[i].replace('[','')
-            state[i] = state[i].replace(']','')
+#         for (i,s) in enumerate(state):
+#             state[i] = state[i].replace('"','')
+#             state[i] = state[i].replace('[','')
+#             state[i] = state[i].replace(']','')
             
         # only keeping top 10 states
         ind = np.array([], int)
@@ -88,32 +91,32 @@ for filename in files:
         state = state[ind]
         state_fsq = state_fsq[ind]
         
-        # converting foursquare names to 
-        state_fsq = list(state_fsq)
-        for (i,s) in enumerate(state_fsq):
-            if s in fsq_map:
-                state_fsq[i] = fsq_map[s]
-            else:
-                state_fsq[i] = 'Unknown'
-        state_fsq = np.array(state_fsq)
+        # converting foursquare names to standard names
+#         state_fsq = list(state_fsq)
+#         for (i,s) in enumerate(state_fsq):
+#             if s in fsq_map:
+#                 state_fsq[i] = fsq_map[s]
+#             else:
+#                 state_fsq[i] = 'Unknown'
+#         state_fsq = np.array(state_fsq)
         
         # This is a temporary solution, to turn sky conditions into numbers
         # The original feature extraction file needs to change to solve this problem
         # (XGBoost does not accept string input)
-        feature_new = np.array([[]])
+#         feature_new = np.array([[]])
         for (i,ft_row) in enumerate(feature):
             if isinstance(feature[i,56], basestring):
                 feature[i,56] = sum(ord(c) for c in feature[i,56])
             # adding foursquare locations as additional features
             # also converting it to float first
             #sum_fsq = sum(ord(c) for c in state_fsq[i])
-            state_fsq_code = le.transform(state_fsq[i])
-            state_fsq_bin = enc.transform(state_fsq_code.reshape(-1,1)).toarray()            
-            if feature_new.size>0:
-                feature_new = np.append(feature_new, [np.append(feature[i,:], state_fsq_bin[0])], axis=0)
-            else:
-                feature_new = np.array([np.append(feature[i,:], state_fsq_bin[0])])
-        feature  = feature_new
+#             state_fsq_code = le.transform(state_fsq[i])
+#             state_fsq_bin = enc.transform(state_fsq_code.reshape(-1,1)).toarray()            
+#             if feature_new.size>0:
+#                 feature_new = np.append(feature_new, [np.append(feature[i,:], state_fsq_bin[0])], axis=0)
+#             else:
+#                 feature_new = np.array([np.append(feature[i,:], state_fsq_bin[0])])
+#         feature  = feature_new
         
         feature_all.append(feature)
         state_all.append(state)
@@ -151,7 +154,7 @@ for i in range(len(feature_all)):
     t2 = time.time()
     
     # train and test
-    gbm = xgboost.XGBClassifier(max_depth=6, n_estimators=100, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
+    gbm = xgboost.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
     predictions = gbm.predict(x_test)
     t3 = time.time()
 
@@ -178,16 +181,18 @@ for i in range(len(feature_all)):
     
 # saving the results
 if save_results:
-    with open('accuracy_new100_3_depth6_fsq2_distance.dat','w') as f:
+    with open('accuracy_new300_3_depth6_fsq2_distance2.dat','w') as f:
         pickle.dump([aucs, confs, labels, aucs_fsq, confs_fsq], f)
     f.close()
 
 os._exit(0)
 
 
-# In[ ]:
+# In[4]:
 
-
+import os
+files = os.listdir('features_new/')
+print files[31]
 
 
 # In[ ]:

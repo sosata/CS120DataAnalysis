@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[34]:
+# In[2]:
 
 import csv
 import os
@@ -10,17 +10,28 @@ from get_data_at_location import get_data_at_location
 from calculate_confusion_matrix import calculate_confusion_matrix
 import math
 import pickle
-from sys import exit
 import pandas as pd
 import datetime
 from scipy import stats
 from count_transitions import count_transitions
+from sklearn.preprocessing import OneHotEncoder
+from sklearn import preprocessing
 
 save_results = True
 
 data_dir = 'data/'
 
 feature_label = np.array(['lgt mean','lgt std','aud mean','aud std','frq mean','frq std','screen','still','tilt','foot','unknown',                         'still_onfoot','still_tilting','mobilyze','phone','contacts','messaging','chrome','facebook','messenger','twitter',                         'video','camera','n call','n sms','n missed','n wifi','lat','lng','loc var','temp','dew point','condition',                          'delta_t','mid hour','dow start','dow end'])
+
+fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',          'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',          'Professional & Other Places':'Professional or Medical Office',          'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
+
+# building one hot encoder for foursquare locations (as extra features)
+state7 = np.array(fsq_map.values()+['Unknown'])
+le = preprocessing.LabelEncoder()
+le.fit(state7)
+state7_code = le.transform(state7)
+enc = OneHotEncoder()
+enc.fit(state7_code.reshape(-1, 1))
 
 subjects = os.listdir(data_dir)
 #subjects = [subjects[0]]
@@ -29,8 +40,6 @@ for (cnt,subj) in enumerate(subjects):
     subject_dir = data_dir + subj + '/'
     samples = os.listdir(subject_dir)
     print str(cnt) + ' ' + subj
-    loc = []
-    loc_fsq = []
     feature = np.array([])
     state = np.array([])
     state_fsq = np.array([])
@@ -43,18 +52,23 @@ for (cnt,subj) in enumerate(subjects):
         else:
             filename = sensor_dir+'eml.csv'
             data_eml = pd.read_csv(filename, delimiter='\t', header=None)
-            loc_string = data_eml[6][0]
-            loc_string = loc_string[1:len(loc_string)-1]
-            loc_string = loc_string.replace('"','')
-            loc.append(loc_string)
+            loc = data_eml[6][0]
+            loc = loc[1:len(loc)-1]
+            loc = loc.replace('"','')
         
         if 'fsq2.csv' in sensors:
             data_fsq = pd.read_csv(sensor_dir+'fsq2.csv', delimiter='\t', header=None)
-            loc_string = data_fsq.loc[10,1]
+            loc_fsq = data_fsq.loc[10,1]
             distance_fsq = data_fsq.loc[11,1]
-            loc_fsq.append(loc_string)
+            
+            # converting foursquare category name to standard name
+            if loc_fsq in fsq_map:
+                loc_fsq = fsq_map[loc_fsq]
+            else:
+                loc_fsq = 'Unknown'
+                
         else:
-            loc_fsq.append('Unknown')
+            loc_fsq = 'Unknown'
             distance_fsq = np.nan
         
         ft_row = np.array([])
@@ -159,31 +173,36 @@ for (cnt,subj) in enumerate(subjects):
         dow_end = datetime.datetime.fromtimestamp(t_end).weekday()
         ft_row = np.append(ft_row, [t_end-t_start, ((t_end+t_start)/2.0)%86400, dow_start, dow_end])
         
+        # adding foursquare location
+        loc_fsq_code = le.transform(loc_fsq)
+        loc_fsq_bin = enc.transform(loc_fsq_code.reshape(-1,1)).toarray()            
+        ft_row = np.append(ft_row, loc_fsq_bin[0])
+        
         # adding distance to closest foursquare location (m)
         ft_row = np.append(ft_row, distance_fsq)
 
         # adding to feature matrix
         if i==0:
             feature = np.array([ft_row])
-            state = np.array(loc[i])
-            state_fsq = np.array(loc_fsq[i])
+            state = np.array(loc)
+            state_fsq = np.array(loc_fsq)
         else:
             feature = np.append(feature, [ft_row], axis=0)
-            state = np.append(state, loc[i])
-            state_fsq = np.append(state_fsq, loc_fsq[i])
+            state = np.append(state, loc)
+            state_fsq = np.append(state_fsq, loc_fsq)
         
     if save_results:
         with open('features_new/features_'+subj+'.dat', 'w') as file_out:
             pickle.dump([feature, state, state_fsq, feature_label], file_out)
         file_out.close()
 
-exit
+os._exit(0)
 
 
-# In[31]:
+# In[8]:
 
-print len(state_fsq)
-print len(state)
+print state_fsq[0:9]
+print feature[0:9,:]
 
 
 # In[43]:
