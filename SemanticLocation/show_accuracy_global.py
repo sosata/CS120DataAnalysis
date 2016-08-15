@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[48]:
+# In[1]:
 
 # read top 10 states
 
@@ -15,7 +15,7 @@ for (i,s) in enumerate(state_top10):
     state_top10[i] = s.replace('"','')
 
 
-# In[49]:
+# In[2]:
 
 # reading model trained on sensor only
 
@@ -38,10 +38,6 @@ for (k,lab) in enumerate(labels):
         if state in lab:
             ind = np.where(lab==state)[0]
             auc_top10[j] = np.append(auc_top10[j], aucs[k][ind])
-#             for (j2,state2) in enumerate(state_top10):
-#                 if state2 in lab:
-#                     ind2 = np.where(lab==state2)[0]
-#                     conf_top10[j][j2] = np.append(conf_top10[j][j2], confs[k][ind,ind2])
 
 auc_mean_sensor = np.array([])
 auc_ci_sensor = np.array([])
@@ -50,11 +46,11 @@ for (j, a) in enumerate(auc_top10):
     auc_ci_sensor = np.append(auc_ci_sensor, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[51]:
+# In[3]:
 
 # reading model trained on both sensor and foursquare data
 
-file = 'accuracy_new300_3_depth6_fsq2_distance2.dat'
+file = 'accuracy_new600_3_depth6_fsq2_distance2_longterm.dat'
 
 with open(file) as f:
     aucs, confs, labels, aucs_fsq, confs_fsq = pickle.load(f)
@@ -92,12 +88,7 @@ for (i,a) in enumerate(auc_top10_fsq):
     auc_ci_fsq = np.append(auc_ci_fsq, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[ ]:
-
-print conf_top10[9][9]
-
-
-# In[56]:
+# In[4]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
@@ -119,7 +110,7 @@ print np.nanmean(auc_mean_fsq)
 print np.mean(auc_mean_all)
 
 
-# In[52]:
+# In[ ]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
@@ -137,7 +128,7 @@ def plot_confusion_matrix(cm, labels, title='Confusion matrix', cmap=plt.cm.Blue
     plt.xlabel('Predicted label')
 
 
-# In[53]:
+# In[ ]:
 
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10):
@@ -147,7 +138,7 @@ cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
 plot_confusion_matrix(cm_normalized, state_top10, title='confusion matrix - sensor+fousquare')
 
 
-# In[54]:
+# In[ ]:
 
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10_fsq):
@@ -160,5 +151,5 @@ print cm_normalized[3,:]
 
 # In[ ]:
 
-np.isnan(np.nan)
+np.random.random(10)
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[2]:
 
 import csv
 import os
@@ -59,7 +59,7 @@ for (cnt,subj) in enumerate(subjects):
         if 'fsq2.csv' in sensors:
             data_fsq = pd.read_csv(sensor_dir+'fsq2.csv', delimiter='\t', header=None)
             loc_fsq = data_fsq.loc[10,1]
-            distance_fsq = float(data_fsq.loc[11,1])
+            distance_fsq = data_fsq.loc[11,1]
             
             # converting foursquare category name to standard name
             if loc_fsq in fsq_map:
@@ -164,10 +164,7 @@ for (cnt,subj) in enumerate(subjects):
         # weather
         if 'wtr.csv' in sensors:
             data = pd.read_csv(sensor_dir+'wtr.csv', delimiter='\t', header=None)
-            wtr_cond = stats.mode(data[9][:])[0][0]
-            if not isinstance(wtr_cond, basestring):
-                wtr_cond = str(wtr_cond)
-            ft_row = np.append(ft_row, [np.mean(data[1][:]), np.mean(data[3][:]), sum(ord(c) for c in wtr_cond)])
+            ft_row = np.append(ft_row, [np.mean(data[1][:]), np.mean(data[3][:]), stats.mode(data[9][:])[0][0]])
         else:
             ft_row = np.append(ft_row, [np.nan, np.nan, np.nan])
         
@@ -202,12 +199,13 @@ for (cnt,subj) in enumerate(subjects):
 os._exit(0)
 
 
-# In[ ]:
+# In[8]:
 
-print feature
+print state_fsq[0:9]
+print feature[0:9,:]
 
 
-# In[ ]:
+# In[43]:
 
 # spatial visualization
 import matplotlib.pyplot as plt
@@ -223,7 +221,7 @@ plt.legend(['gps']+loc_uniq, frameon=False, loc='center left', bbox_to_anchor=(0
 plt.box()
 
 
-# In[ ]:
+# In[83]:
 
 # temporal visualization
 from sklearn import preprocessing
@@ -240,7 +238,7 @@ axes.set_ylim([-1, len(loc_uniq)])
 print t_report
 
 
-# In[ ]:
+# In[13]:
 
 # temporal visualization
 plt.figure(figsize=(12,6))
@@ -252,7 +250,7 @@ axes.set_ylim([-1, len(loc_uniq)])
 print loc_uniq
 
 
-# In[ ]:
+# In[18]:
 
 # distribution of features across locations
 ft = 0
@@ -263,7 +261,7 @@ axes.set_xlim([-.5, len(loc_uniq)-.5])
 plt.xticks(range(len(loc_uniq)), loc_uniq)
 
 
-# In[ ]:
+# In[14]:
 
 
 
