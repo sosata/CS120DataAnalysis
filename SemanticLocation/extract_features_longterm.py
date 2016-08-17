@@ -41,6 +41,7 @@ for filename in files:
     f.close()
     
     if save_results:
+        feature_label = np.append(feature_label, ['LT frequency','LT interval mean'])
         with open(feature_out+filename, 'w') as f:
             pickle.dump([feature, state, state_fsq, feature_label], f)
         f.close()

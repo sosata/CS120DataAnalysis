@@ -34,30 +34,39 @@ for i=1:length(subject_sleep),
     end
 end
 
-figure;
-histogram(wake_time_all, 0:.1:24);
+h = figure;
+set(h,'position',[560   528   893   420])
+res = 1;
+hist_edges = 0:res:24;
+hist_centers = (hist_edges(1)+res/2):res:(hist_edges(end)-res/2);
+[n, ~] = histcounts(wake_time_all, hist_edges);
+plot(hist_centers, n, 'linewidth',3,'color',[1 .6 .6])
 xlim([0 24]);
+hold on
+[n, ~] = histcounts(sleep_time_all, hist_edges);
+plot(hist_centers, n, 'linewidth',3,'color',[.6 .6 1])
 box off
-ylabel('Number of Samples')
-xlabel('Time of Day (hours)')
+set(gca,'fontsize',12)
+ylabel('Samples','fontsize',14)
+xlabel('Time of Day (hours)','fontsize',14)
 set(gca,'xtick',1:24);
+l = legend('Sleep End Time','Sleep Start Time','location','north');
+set(l,'fontsize',14)
+set(gca,'xgrid','on')
 
-figure;
-histogram(sleep_time_all, 0:.1:24);
+h = figure;
+set(h,'position',[560   377   893   571])
+% plot([12 12],[0 25],'linewidth',1,'color',[.5 .5 .5])
+% hold on
+scatter(sleep_time_all, sleep_duration_all,25,'o','filled','markerfacecolor',[0 .3 .5]);
+alpha .25;
 xlim([0 24]);
-box off
-ylabel('Number of Samples')
-xlabel('Time of Day (hours)')
-set(gca,'xtick',1:24);
-
-figure;
-plot(sleep_time_all, sleep_duration_all,'.','markersize',8);
-xlim([0 24]);
-xlabel('Sleep Time (hours)');
-ylabel('Sleep Duration (hours)');
+set(gca,'fontsize',12)
+xlabel('Sleep Time (hours)','fontsize',14);
+ylabel('Sleep Duration (hours)','fontsize',14);
 box off;
 set(gca,'xtick',0:24);
-grid on
+set(gca,'xgrid','on')
 
 return;
 

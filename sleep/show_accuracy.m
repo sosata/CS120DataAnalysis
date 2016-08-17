@@ -21,44 +21,55 @@ acc_global_sensor = out.performance(:,1);
 
 figure(1)
 n = sqrt(length(acc_personal_all))/1.98;
-bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[.5 .8 1])
+b = bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none');
+% ed = get(b, 'edgecolor');
+% set(ed, 'edgestyle', 'none');
 hold on
-bar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.1 .4 .7])
+bar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.6 .6 1],'edgecolor','none')
 errorbar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],[nanstd(acc_global_sensor)/n,nanstd(acc_global_time)/n,nanstd(acc_global_all)/n],'.k',...
-    'linewidth',1);
+    'linewidth',2);
 errorbar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],[nanstd(acc_personal_sensor)/n,nanstd(acc_personal_time)/n,nanstd(acc_personal_all)/n],'.k',...
-    'linewidth',1);
+    'linewidth',2);
 xlim([0 4])
-% ylim([0 .5])
+ylim([.5 1])
 set(gca, 'xtick',[1 2 3],'xticklabel',{'Sensor','Time','Time+Sensors'});
 set(gca, 'ygrid', 'on')
+set(gca, 'fontsize', 12)
 box off
-ylabel('Classification Accuracy')
-legend('Global Models','Personal Models');
+ylabel('Classification Accuracy','fontsize',14)
+l = legend('Global Models','Personal Models','location','northwest');
+set(l, 'fontsize', 12);
 
 figure(2)
-[y,x] = hist(acc_personal_all,[.5:.025:1]);
-plot(x,y,'color',[.1 .4 .7],'linewidth',2);
-hold on;
 [y,x] = hist(acc_global_all,[.5:.025:1]);
-plot(x,y,'color',[.5 .8 1],'linewidth',2);
-xlabel('Classification Accuracy')
-ylabel('Number of Subjects')
+plot(x,y,'color',[1 .6 .6],'linestyle','-','linewidth',2);
+hold on
+[y,x] = hist(acc_personal_all,[.5:.025:1]);
+plot(x,y,'color',[.6 .6 1],'linestyle','-','linewidth',2);
+xlabel('Classification Accuracy','fontsize',14)
+ylabel('Number of Subjects','fontsize',14)
 box off
-legend('Personal Models','Global Models','location','northwest');
+l = legend('Global Models','Personal Models','location','northwest');
+set(l, 'fontsize', 12);
 
 %% global vs personal models
 h = figure(3);
-set(h,'position',[520   649   460   400])
-plot(acc_global_all, acc_personal_all, '.','markersize',8)
+% set(h,'position',[520   649   460   400])
+plot([.5 1],[.5 1],'linewidth',3,'color',[.5 .5 .5])
 hold on
-plot([.5 1],[.5 1])
+plot(acc_global_all, acc_personal_all, '.','markersize',8,'color',[.2 .2 .7])
 % axis([.25 1 .25 1])
-ylabel('Personal Models Accuracy')
-xlabel('Global Models Accuracy')
-text(.55,.58,'y = x','rotation',45,'fontweight','bold','fontsize',12,'color',[.7 .3 0])
+ylabel('Personal Models Accuracy', 'fontsize', 14)
+xlabel('Global Models Accuracy',  'fontsize', 14)
+text(.55,.58,'y = x','rotation',45,'fontweight','bold','fontsize',12,'color',[.5 .5 .5])
 box off
 mycorr(acc_global_all,acc_personal_all,'pearson')
+axis square
+set(gca, 'xtick',.5:.1:1)
+set(gca, 'ytick',.5:.1:1)
+set(gca, 'Ticklength', [0 0])
+
+return;
 % mdl = fitlm(acc_global_all, acc_personal_all);
 % [coefs, ~, latent] = pca([acc_global_all, acc_personal_all]);
 % slope = coefs(2,1)/coefs(1,1);
@@ -68,7 +79,6 @@ mycorr(acc_global_all,acc_personal_all,'pearson')
 % plot(x, slope*(x-x1)+y1, '--k', 'linewidth', 1);
 % text(min(acc_global_all), slope*(min(acc_global_all)-x1)+y1+.02,'PCA1','rotation',atan(slope)*180/pi,...
 %     'fontweight','bold','fontsize',12,'color',[0 0 0])
-
 
 
 % sensor+time versus time-only
@@ -115,25 +125,27 @@ acc_persnal_corrected_sensor_good = acc_persnal_corrected_sensor;
 acc_persnal_corrected_sensor_good(ind_bad) = [];
 
 figure(4)
-bar([.9 1.9 2.9],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor',[.7 .7 .7])
+bar([.9 1.9 2.9],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor','none')
 hold on
-bar([1.1 2.1 3.1],[nanmean(acc_persnal_corrected_sensor),nanmean(acc_personal_corrected_time),nanmean(acc_personal_corrected_all)],'barwidth',.2,'facecolor',[.4 .7 1])
-bar([1.3 2.3 3.3],[nanmean(acc_persnal_corrected_sensor_good),nanmean(acc_personal_corrected_time_good),nanmean(acc_personal_corrected_all_good)],'barwidth',.2,'facecolor',[.4 1 .7])
+bar([1.1 2.1 3.1],[nanmean(acc_persnal_corrected_sensor),nanmean(acc_personal_corrected_time),nanmean(acc_personal_corrected_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none')
+bar([1.3 2.3 3.3],[nanmean(acc_persnal_corrected_sensor_good),nanmean(acc_personal_corrected_time_good),nanmean(acc_personal_corrected_all_good)],'barwidth',.2,'facecolor',[.6 .6 1],'edgecolor','none')
 errorbar([.9 1.9 2.9],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],[nanstd(acc_personal_sensor)/n,nanstd(acc_personal_time)/n,nanstd(acc_personal_all)/n],'.k',...
-    'linewidth',3,'color',[.7 .7 .7]);
+    'linewidth',2,'color',[.7 .7 .7]);
 
 errorbar([1.1 2.1 3.1],[nanmean(acc_persnal_corrected_sensor),nanmean(acc_personal_corrected_time),nanmean(acc_personal_corrected_all)],[nanstd(acc_persnal_corrected_sensor)/n,nanstd(acc_personal_corrected_time)/n,nanstd(acc_personal_corrected_all)/n],'.k',...
-    'linewidth',3);
+    'linewidth',2);
 errorbar([1.3 2.3 3.3],[nanmean(acc_persnal_corrected_sensor_good),nanmean(acc_personal_corrected_time_good),nanmean(acc_personal_corrected_all_good)],[nanstd(acc_persnal_corrected_sensor)/n,nanstd(acc_personal_corrected_time)/n,nanstd(acc_personal_corrected_all)/n],'.k',...
-    'linewidth',3);
+    'linewidth',2);
 xlim([0 4])
-ylim([.75 .95])
+ylim([.75 1])
 set(gca, 'xtick',[1 2 3],'xticklabel',{'Sensor','Time','Time+Sensors'});
 set(gca, 'ygrid', 'on')
 box off
-ylabel('Classification Accuracy')
-legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest')
-title('Personal Models');
+set(gca, 'fontsize',12)
+ylabel('Classification Accuracy','fontsize',14)
+l = legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest');
+set(l,'fontsize',12)
+title('Personal Models','fontsize',14);
 
 %% final accuracies of global models
 load('results_global_corrected')
@@ -151,22 +163,24 @@ acc_global_corrected_sensor_good = acc_global_corrected_sensor;
 acc_global_corrected_sensor_good(ind_bad) = [];
 
 figure(5)
-bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor',[.7 .7 .7])
+bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor','none')
 hold on
-bar([1.1 2.1 3.1],[nanmean(acc_global_corrected_sensor),nanmean(acc_global_corrected_time),nanmean(acc_global_corrected_all)],'barwidth',.2,'facecolor',[.4 .7 1])
-bar([1.3 2.3 3.3],[nanmean(acc_global_corrected_sensor_good),nanmean(acc_global_corrected_time_good),nanmean(acc_global_corrected_all_good)],'barwidth',.2,'facecolor',[.4 1 .7])
+bar([1.1 2.1 3.1],[nanmean(acc_global_corrected_sensor),nanmean(acc_global_corrected_time),nanmean(acc_global_corrected_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none')
+bar([1.3 2.3 3.3],[nanmean(acc_global_corrected_sensor_good),nanmean(acc_global_corrected_time_good),nanmean(acc_global_corrected_all_good)],'barwidth',.2,'facecolor',[.6 .6 1],'edgecolor','none')
 errorbar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],[nanstd(acc_global_sensor)/n,nanstd(acc_global_time)/n,nanstd(acc_global_all)/n],'.k',...
-    'linewidth',3,'color',[.7 .7 .7]);
+    'linewidth',2,'color',[.7 .7 .7]);
 
 errorbar([1.1 2.1 3.1],[nanmean(acc_global_corrected_sensor),nanmean(acc_global_corrected_time),nanmean(acc_global_corrected_all)],[nanstd(acc_global_corrected_sensor)/n,nanstd(acc_global_corrected_time)/n,nanstd(acc_global_corrected_all)/n],'.k',...
-    'linewidth',3);
+    'linewidth',2);
 errorbar([1.3 2.3 3.3],[nanmean(acc_global_corrected_sensor_good),nanmean(acc_global_corrected_time_good),nanmean(acc_global_corrected_all_good)],[nanstd(acc_global_corrected_sensor)/n,nanstd(acc_global_corrected_time)/n,nanstd(acc_global_corrected_all)/n],'.k',...
-    'linewidth',3);
+    'linewidth',2);
 xlim([0 4])
-ylim([.75 .95])
+ylim([.75 1])
 set(gca, 'xtick',[1 2 3],'xticklabel',{'Sensor','Time','Time+Sensors'});
 set(gca, 'ygrid', 'on')
+set(gca,'fontsize',12)
 box off
-ylabel('Classification Accuracy')
-legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest')
-title('Global Models');
+ylabel('Classification Accuracy','fontsize',14)
+l = legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest');
+set(l,'fontsize',12)
+title('Global Models','fontsize',14);

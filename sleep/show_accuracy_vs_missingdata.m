@@ -28,10 +28,11 @@ end
 ind_bad = find(p_nan>.5);
 
 %% global model accuracy vs missing sensor data
-figure
-plot(p_nan, acc_global,'.','markersize',8); hold on;
+figure(1)
 mdl = fitlm(p_nan, acc_global);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+hold on
+plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
 text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
@@ -40,12 +41,15 @@ box off;
 ylim([.55 1]);
 title('Global Model');
 set(gca, 'fontsize',14);
+set(gca, 'Ticklength', [0 0])
+
 
 %% personal model accuracy vs missing sensor data
-figure;
-plot(p_nan, acc_personal,'.','markersize',8); hold on;
+figure(2)
 mdl = fitlm(p_nan, acc_personal);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+hold on
+plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7])
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
 text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
@@ -54,6 +58,7 @@ box off;
 ylim([.55 1]);
 title('Personal Model');
 set(gca, 'fontsize',14);
+set(gca, 'Ticklength', [0 0])
 
 % for i=1:length(feature)
 %     cnt = 0;
@@ -88,10 +93,11 @@ for i=1:length(state),
 end
 
 %% global model accuracy vs missing data in EMA
-figure;
-plot(p_nan, acc_global,'.','markersize',8); hold on;
+figure(3)
 mdl = fitlm(p_nan, acc_global);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+hold on
+plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
 text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
@@ -100,12 +106,14 @@ box off;
 ylim([.55 1]);
 title('Global Model');
 set(gca, 'fontsize',14);
+set(gca, 'Ticklength', [0 0])
 
 %% personal model accuracy vs missing data in EMA
-figure;
-plot(p_nan, acc_personal,'.','markersize',8); hold on;
+figure(4)
 mdl = fitlm(p_nan, acc_personal);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'-','color',[.5 .5 .5]);
+plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+hold on
+plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
 text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
@@ -114,7 +122,7 @@ box off;
 ylim([.55 1]);
 title('Personal Model');
 set(gca, 'fontsize',14);
-
+set(gca, 'Ticklength', [0 0])
 
 if save_bad_subjects
     save('bad_subjects','ind_bad');

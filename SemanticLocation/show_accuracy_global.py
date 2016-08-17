@@ -46,11 +46,11 @@ for (j, a) in enumerate(auc_top10):
     auc_ci_sensor = np.append(auc_ci_sensor, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[3]:
+# In[9]:
 
 # reading model trained on both sensor and foursquare data
 
-file = 'accuracy_new600_3_depth6_fsq2_distance2_longterm.dat'
+file = 'accuracy_new600_3_depth6_fsq2_distance2_longterm_vareta.dat'
 
 with open(file) as f:
     aucs, confs, labels, aucs_fsq, confs_fsq = pickle.load(f)
@@ -88,7 +88,7 @@ for (i,a) in enumerate(auc_top10_fsq):
     auc_ci_fsq = np.append(auc_ci_fsq, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[4]:
+# In[10]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')

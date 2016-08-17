@@ -66,7 +66,7 @@ errorbar([1:5 8], [nanmean(p_nan_light) nanmean(p_nan_sound) nanmean(p_nan_gps),
     [nanstd(p_nan_light)/n nanstd(p_nan_sound)/n nanstd(p_nan_gps)/n, ...
     nanstd(p_nan_battery)/n nanstd(p_nan_wifi)/n nanstd(p_nan)/n],...
     'o','linewidth',1,'markersize',7);
-plot([0 9],[1 1],'color',[.2 .2 .2]);
+plot([0 9],[1 1],'color',[.2 .2 .2],'linewidth',2);
 text(1,nanmean(p_nan_light)+nanstd(p_nan_light)/n+.1,'Light','horizontalalignment','center');
 text(2,nanmean(p_nan_sound)+nanstd(p_nan_sound)/n+.1,'Sound','horizontalalignment','center');
 text(3,nanmean(p_nan_gps)+nanstd(p_nan_gps)/n+.1,'GPS','horizontalalignment','center');
@@ -95,3 +95,4 @@ xlim([0 9])
 ylim([.75 2.5])
 box off
 ylabel('Sleep-to-Awake Missing Sensor Data Ratio')
+set(gca, 'Ticklength', [0 0])
