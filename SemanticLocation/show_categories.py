@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[119]:
+# In[5]:
 
 import csv
 import os
@@ -36,7 +36,7 @@ for subj in subjects:
 
 
 
-# In[130]:
+# In[2]:
 
 # finding number of subjects who used each location
 import pickle
@@ -63,12 +63,12 @@ loc_top10 = loc_all_uniq[91:]
 
 # saving the most frequent locations
 if save_results:
-    with open('top10.dat', 'w') as file_out:
+    with open('top10location.dat', 'w') as file_out:
         pickle.dump(loc_top10, file_out)
     file_out.close()
 
 
-# In[101]:
+# In[3]:
 
 plt.figure(figsize=(18,30))
 #print freq[92:]
@@ -82,7 +82,7 @@ plt.yticks(range(len(loc_all_uniq)-show_from), loc_all_uniq[show_from:], fontsiz
 print loc_all_uniq[91:]
 
 
-# In[127]:
+# In[4]:
 
 # finding the number of samples for each location in all subjects
 # this will be roughly equivalent to the average percentage of time spent at that location across the subjects

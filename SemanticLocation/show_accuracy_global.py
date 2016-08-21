@@ -8,7 +8,8 @@
 import pickle
 import numpy as np
 
-with open('top10.dat') as f:
+#with open('top10.dat') as f:
+with open('top10reason.dat') as f:
     state_top10 = pickle.load(f)
 f.close()
 for (i,s) in enumerate(state_top10):
@@ -23,7 +24,8 @@ for (i,s) in enumerate(state_top10):
 #files = ['accuracy_new100_3_depth6.dat','accuracy_new100_3_depth6_fsq2_distance.dat']
 #files = ['accuracy_new100_3_depth6_fsq2.dat','accuracy_new100_3_depth6_fsq2_distance.dat']
 
-file = 'accuracy_new300_3.dat'
+#file = 'accuracy_new300_3.dat' # location prediction
+file = 'accuracy_reason_100_d3.dat' # reason prediction
 
 with open(file) as f:
     aucs, confs, labels = pickle.load(f)
@@ -88,26 +90,28 @@ for (i,a) in enumerate(auc_top10_fsq):
     auc_ci_fsq = np.append(auc_ci_fsq, 2*np.nanstd(a)/np.sqrt(208))
 
 
-# In[10]:
+# In[11]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
 plt.figure(figsize=(15,8))
 w = 1/5.0
-plt.bar(np.arange(0,10,1), auc_mean_fsq, w, yerr=auc_ci_fsq, align='center',         color=(.7,.7,.7), alpha=0.9, ecolor=(0,0,0))
+# plt.bar(np.arange(0,10,1), auc_mean_fsq, w, yerr=auc_ci_fsq, align='center',\
+#          color=(.7,.7,.7), alpha=0.9, ecolor=(0,0,0))
 plt.bar(np.arange(w,10+w,1), auc_mean_sensor, w, yerr=auc_ci_sensor, align='center',          color=(1,.5,.5), alpha=0.9, ecolor=(0,0,0))
-plt.bar(np.arange(2*w,10+2*w,1), auc_mean_all, w, yerr=auc_ci_all, align='center',          color=(.3,.7,.3), alpha=0.9, ecolor=(0,0,0))
-#plt.legend(['foursquare','sensor','foursquare+sensor'], loc=2)
-plt.legend(['foursquare','sensor','sensor+foursquare'], loc='upper center')
+# plt.bar(np.arange(2*w,10+2*w,1), auc_mean_all, w, yerr=auc_ci_all, align='center', \
+#          color=(.3,.7,.3), alpha=0.9, ecolor=(0,0,0))
+# plt.legend(['foursquare','sensor','sensor+foursquare'], loc='upper center')
 plt.ylabel('AUC',fontsize=15,color=(0,0,0))
 axes = plt.gca()
 axes.set_xlim([-1, len(state_top10)])
-axes.set_ylim([.4, 1])
+axes.set_ylim([0.4, 1])
 axes.yaxis.grid();
 plt.xticks(np.arange(.2,10.2,1), state_top10, fontsize=15, color=(0,0,0), rotation=90, ha='right');
-plt.yticks(np.arange(.4,1,.05), np.arange(.4,1,.05), fontsize=12, color=(0,0,0));
-print np.nanmean(auc_mean_fsq)
-print np.mean(auc_mean_all)
+# plt.yticks(np.arange(.4,1,.05), np.arange(.4,1,.05), fontsize=12, color=(0,0,0));
+print auc_mean_sensor
+# print np.nanmean(auc_mean_fsq)
+# print np.mean(auc_mean_all)
 
 
 # In[ ]:

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[137]:
+# In[1]:
 
 # this program uses short-term features from features_new/ and adds personal, long-term features to them
 
@@ -24,7 +24,7 @@ files = os.listdir(feature_dir)
 for filename in files:
     print filename
     with open(feature_dir+filename) as f:  
-        feature, state, state_fsq, feature_label = pickle.load(f)
+        feature, state, state_fsq, state_reason, feature_label = pickle.load(f)
         rf = np.zeros([state.size,1])
         ai = np.zeros([state.size,1])
         for i in range(state.size):
@@ -43,13 +43,8 @@ for filename in files:
     if save_results:
         feature_label = np.append(feature_label, ['LT frequency','LT interval mean'])
         with open(feature_out+filename, 'w') as f:
-            pickle.dump([feature, state, state_fsq, feature_label], f)
+            pickle.dump([feature, state, state_fsq, state_reason, feature_label], f)
         f.close()
 
     
-
-
-# In[141]:
-
-print rf
 

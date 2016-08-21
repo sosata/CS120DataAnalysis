@@ -1,232 +1,234 @@
 
 # coding: utf-8
 
-# In[33]:
+# In[ ]:
 
 import csv
 import os
 import numpy as np
 from get_data_at_location import get_data_at_location
 from calculate_confusion_matrix import calculate_confusion_matrix
-import matplotlib.pyplot as plt
-from sklearn import preprocessing
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.cross_validation import cross_val_score
 import math
-import xgboost
 import pickle
-from sys import exit
+import pandas as pd
+import datetime
+from scipy import stats
+from count_transitions import count_transitions
+from sklearn.preprocessing import OneHotEncoder
+from sklearn import preprocessing
 
-get_ipython().magic(u'matplotlib inline')
+save_results = True
 
-n_folds = 5
-save_results = False
+data_dir = 'data/'
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+feature_label = np.array(['lgt mean','lgt std','lgt off','lgt zcrossing','lgt skew','lgt kurt',                          'aud mean','aud std','aud skew','aud kurt','aud frq mean','aud frq std','aud frq skew','aud frq kurt',                          'scr frq mean','scr dur mean','scr dur std',                          'still','tilting','walking','unknown act', 'still-walking','still-tilting','still-unknown',                          'walking-unknown','messaging','facebook','chrome','mobilyze','phone','gmail','contacts','internet',                          'gallery','email','settings','messenger','camera','clock','maps','calendar','youtube','calculator',                          'purple robot','system ui',                          'n call in','n call out','n sms in','n sms out','n missed',                          'n wifi',                          'lat mean','lng mean','loc var',                          'temperature','dew point','weather',                          'duration','midtime','weekday start','weekday end',                          'fsq location','fsq distance'])
+
+fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',          'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',          'Professional & Other Places':'Professional or Medical Office',          'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
+
+# building one hot encoder for foursquare locations (as extra features)
+state7 = np.array(fsq_map.values()+['Unknown'])
+le = preprocessing.LabelEncoder()
+le.fit(state7)
+state7_code = le.transform(state7)
+enc = OneHotEncoder()
+enc.fit(state7_code.reshape(-1, 1))
 
 subjects = os.listdir(data_dir)
-subjects[48] = ''
-subjects[52] = ''
-#48 skipped / this subject's eml.csv file contain lots of empty elements that should be removed
-#52 as well
-#subjects = subjects[154:]
+#subjects = [subjects[0]]
 
-#subjects = [subjects[1]]
-#subjects = ['506107']
-
-#print subjects
-
-for subj in subjects:
-    filename = data_dir + subj + '/eml.csv'
-    if os.path.exists(filename):
-        print filename
-        loc = []
-        lat_report = []
-        lng_report = []
-        t_report = []
-        with open(filename) as file_in:
-            data = csv.reader(file_in, delimiter='\t')
-            for data_row in data:
-                if data_row:
-                    # reading location category (state)
-                    loc_string = data_row[6]
-                    loc_string = loc_string[1:len(loc_string)-1]
-                    loc_string.split(',')
-                    loc.append(loc_string)
-                    
-                    # reading lat. and long.
-                    lat_report.append(float(data_row[2]))
-                    lng_report.append(float(data_row[3]))
-                    t_report.append(float(data_row[0]))
-        file_in.close()
-    else:
-        print 'skipping subject '+subj+' without location report data.'
-        continue
-                       
-    # looking into data between current and previous report
-    filename = data_dir + subj + '/fus.csv'
-    if os.path.exists(filename):
-        with open(filename) as file_in:
-            data_gps = csv.reader(file_in, delimiter='\t')
-            t_gps = []
-            lat_gps = []
-            lng_gps = []
-            for row_gps in data_gps:
-                t_gps.append(float(row_gps[0]))
-                lat_gps.append(float(row_gps[1]))
-                lng_gps.append(float(row_gps[2]))
-        file_in.close()
-    else:
-        print 'skipping subject '+subj+' without location data.'
-        continue
-
-    ############################################################################################################
-    # creating feature and state matrices
-    t_prev = 0
+for (cnt,subj) in enumerate(subjects):
+    subject_dir = data_dir + subj + '/'
+    samples = os.listdir(subject_dir)
+    print str(cnt) + ' ' + subj
     feature = np.array([])
-    state = []
-    for i in range(len(t_report)):
-
-        ft_row = np.array([])
-
-        # location features
-        #data_value = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'fus')
-        #for j in range(len(data_value)):
-            #feature.append([float(data_value[j][1]), float(data_value[j][2])])
-            #state.append(loc[i])
-
-        # light features
-        data_lgt = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'lgt')
-        if data_lgt.size:
-            lgt = data_lgt[:,1]
-            lgt = lgt.astype(np.float)
-            ft_row = np.append(ft_row, [np.mean(lgt), np.std(lgt)])
+    state = np.array([])
+    state_fsq = np.array([])
+    state_reason = np.array([])
+    for (i,samp) in enumerate(samples):
+        sensor_dir = subject_dir + samp + '/'
+        sensors = os.listdir(sensor_dir)
+        if not ('eml.csv' in sensors):
+            print 'subject '+subj+' does not have location report data at '+samp
+            continue
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan])
-
-        # sound features
-        data_aud = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'aud')
-        if data_aud.size:
-            aud = data_aud[:,1]
-            aud = aud.astype(np.float)
-            ft_row = np.append(ft_row, [np.mean(aud), np.std(aud)])
-        else:
-            ft_row = np.append(ft_row, [np.nan, np.nan])
-
-        # screen features
-        data_scr = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'scr')
-        if data_scr.size:
-            if len(data_scr[:,0])>=2:
-                deltat = float(data_scr[len(data_scr)-1,0])-float(data_scr[0,0])
-                if deltat!=0:
-                    ft_row = np.append(ft_row, len(data_scr[:,0])/deltat)
-                else:
-                    ft_row = np.append(ft_row, np.nan)
+            filename = sensor_dir+'eml.csv'
+            data_eml = pd.read_csv(filename, delimiter='\t', header=None)
+            loc = data_eml.loc[0,6]
+            #loc = loc[1:len(loc)-1]
+            loc = loc.replace('[','')
+            loc = loc.replace(']','')
+            loc = loc.replace('"','')
+            
+            reason = data_eml.loc[0,7]
+            reason = reason.replace('"','')
+            reason = reason.replace('[','')
+            reason = reason.replace(']','')
+            reason = reason.replace(' ','')
+            # sorting if there are multipe reasons
+            if ',' in reason:
+                reason_parsed = reason.split(',')
+                reason_parsed = sorted(reason_parsed)
+                reason = ','.join(reason_parsed)
+            
+        
+        if 'fsq2.csv' in sensors:
+            data_fsq = pd.read_csv(sensor_dir+'fsq2.csv', delimiter='\t', header=None)
+            loc_fsq = data_fsq.loc[10,1]
+            distance_fsq = float(data_fsq.loc[11,1])
+            
+            # converting foursquare category name to standard name
+            if loc_fsq in fsq_map:
+                loc_fsq = fsq_map[loc_fsq]
             else:
-                ft_row = np.append(ft_row, 0.0)
+                loc_fsq = 'Unknown'
+                
         else:
-            ft_row = np.append(ft_row, 0.0)
-
-        # activity features
-        data_act = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'act')
-        if data_act.size:
-            per_still = len(np.where(data_act[:,1]=='STILL')[0])/float(len(data_act[:,0]))
-            per_tilt = len(np.where(data_act[:,1]=='TILTING')[0])/float(len(data_act[:,0]))
-            per_onfoot = len(np.where(data_act[:,1]=='ONFOOT')[0])/float(len(data_act[:,0]))
-            per_unknown = len(np.where(data_act[:,1]=='UNKNOWN')[0])/float(len(data_act[:,0]))
+            loc_fsq = 'Unknown'
+            distance_fsq = np.nan
+        
+        ft_row = np.array([])
+        
+        # light
+        if 'lgt.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'lgt.csv', delimiter='\t', header=None)
+            lgt = data[:][1]
+            ft_row = np.append(ft_row, [np.nanmean(lgt), np.nanstd(lgt), np.sum(lgt==0)/float(lgt.size),                                        np.sum(np.diff(np.sign(lgt-np.nanmean(lgt))))/float(lgt.size),                                       stats.skew(lgt), stats.kurtosis(lgt)]) # prop. zero-crossings
         else:
-            per_still = 0
-            per_tilt = 0
-            per_onfoot = 0
-            per_unknown = 0
-        ft_row = np.append(ft_row, [per_still, per_tilt, per_onfoot, per_unknown])
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
 
-        # app features
-        data_app = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'app')
-        if data_app.size:
-            n_mobilyze = len(np.where(data_app[:,2]=='Mobilyze')[0])
-            n_phone = len(np.where(data_app[:,2]=='Phone')[0])
-            n_contacts = len(np.where(data_app[:,2]=='Contacts')[0])
-            n_messaging = len(np.where(data_app[:,2]=='Messaging')[0])
-            n_chrome = len(np.where(data_app[:,2]=='Chrome')[0])
-            n_facebook = len(np.where(data_app[:,2]=='Facebook')[0])
-            n_messenger = len(np.where(data_app[:,2]=='Messenger')[0])
-            n_twitter = len(np.where(data_app[:,2]=='Twitter')[0])
-            n_video = len(np.where(data_app[:,2]=='Video Player')[0])
-            n_camera = len(np.where(data_app[:,2]=='Camera')[0])
-            ft_row = np.append(ft_row, [n_mobilyze, n_phone, n_contacts, n_messaging, n_chrome, n_facebook, n_messenger,                                    n_twitter, n_video, n_camera])
+        # audio
+        if 'aud.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'aud.csv', delimiter='\t', header=None)
+            ft_row = np.append(ft_row, [np.nanmean(data[:][1]), np.nanstd(data[:][1]),                                         stats.skew(data[:][1]), stats.kurtosis(data[:][1]),                                        np.nanmean(data[:][2]), np.nanstd(data[:][2]),                                        stats.skew(data[:][2]), stats.kurtosis(data[:][2])])
         else:
-            ft_row = np.append(ft_row, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
 
-        # communication events
-        data_coe = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'coe')
-        if data_coe.size:
-            n_call = len(np.where(data_coe[:,3]=='PHONE')[0])
-            n_sms = len(np.where(data_coe[:,3]=='SMS')[0])
-            n_missedcall = len(np.where(data_coe[:,4]=='MISSED')[0])
-            ft_row = np.append(ft_row, [n_call, n_sms, n_missedcall])
+        # screen
+        if 'scr.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'scr.csv', delimiter='\t', header=None)
+            if data[:][0].size>=2:
+                deltat = data[0][data[0][:].size-1] - data[0][0]
+                if deltat!=0:
+                    scr_dur = np.array([])
+                    scr_frq = 0
+                    for j in range(data[1][:].size-1):
+                        if data[1][j]=='True' and data[1][j+1]=='False':
+                            scr_dur = np.append(scr_dur, data[0][j+1]-data[0][j])
+                            scr_frq += 1
+                    ft_row = np.append(ft_row, [scr_frq/float(deltat), np.mean(scr_dur), np.std(scr_dur)])
+                else:
+                    ft_row = np.append(ft_row, [np.nan,np.nan,np.nan])
+            else:
+                ft_row = np.append(ft_row, [0,0,0])
         else:
-            ft_row = np.append(ft_row, [0, 0, 0])
-
+            ft_row = np.append(ft_row, [0,0,0])
+        
+        # activity
+        if 'act.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'act.csv', delimiter='\t', header=None)
+            n = float(data[0][:].size)
+            per_still = np.sum(data[1][:]=='STILL')/n
+            per_tilt = np.sum(data[1][:]=='TILTING')/n
+            per_onfoot = np.sum(data[1][:]=='ONFOOT')/n
+            per_unknown = np.sum(data[1][:]=='UNKNOWN')/n
+            n_trans1 = count_transitions(data[1][:],'STILL','ONFOOT')/n
+            n_trans2 = count_transitions(data[1][:],'STILL','TILTING')/n
+            n_trans3 = count_transitions(data[1][:],'STILL','UNKNOWN')/n
+            n_trans4 = count_transitions(data[1][:],'ONFOOT','UNKNOWN')/n
+            ft_row = np.append(ft_row, [per_still, per_tilt, per_onfoot, per_unknown, n_trans1, n_trans2,                                       n_trans3, n_trans4])
+        else:
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+        
+        # apps
+        if 'app.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'app.csv', delimiter='\t', header=None)
+            ft_row = np.append(ft_row, [np.sum(data[2][:]=='Messaging'),                                        np.sum(data[2][:]=='Facebook'),                                        np.sum(data[2][:]=='Chrome'),                                        np.sum(data[2][:]=='Mobilyze'),                                        np.sum(data[2][:]=='Phone'),                                        np.sum(data[2][:]=='Gmail'),                                        np.sum(data[2][:]=='Contacts'),                                        np.sum(data[2][:]=='Internet'),                                        np.sum(data[2][:]=='Gallery'),                                        np.sum(data[2][:]=='Email'),                                        np.sum(data[2][:]=='Settings'),                                        np.sum(data[2][:]=='Messenger'),                                        np.sum(data[2][:]=='Camera'),                                        np.sum(data[2][:]=='Clock'),                                        np.sum(data[2][:]=='Maps'),                                        np.sum(data[2][:]=='Calendar'),                                        np.sum(data[2][:]=='Youtube'),                                        np.sum(data[2][:]=='Calculator'),                                        np.sum(data[2][:]=='Purple Robot'),                                        np.sum(data[2][:]=='System UI')])
+        else:
+            ft_row = np.append(ft_row, np.zeros([1,20]))
+            
+        # communication
+        if 'coe.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'coe.csv', delimiter='\t', header=None)
+            n_call_in = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='INCOMING'))
+            n_call_out = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='OUTGOING'))
+            n_sms_in = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='INCOMING'))
+            n_sms_out = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='OUTGOING'))
+            n_missedcall = np.sum(data[4][:]=='MISSED')
+            ft_row = np.append(ft_row, [n_call_in,n_call_out,n_sms_in,n_sms_out,n_missedcall])
+        else:
+            ft_row = np.append(ft_row, [0, 0, 0, 0, 0])
+        
         # wifi
-        data_wif = get_data_at_location(data_dir+subj, t_report[i], t_prev, lat_report[i], lng_report[i], 'wif')
-        if data_wif.size:
-            n_w = data_wif[:,3]
-            n_w = n_w.astype(np.float)
-            n_wifi = np.mean(n_w)
-            ft_row = np.append(ft_row, n_wifi)
+        if 'wif.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'wif.csv', delimiter='\t', header=None)
+            ft_row = np.append(ft_row, np.mean(data[3][:]))
         else:
             ft_row = np.append(ft_row, np.nan)
+        
+        # GPS 
+        if 'fus.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'fus.csv', delimiter='\t', header=None)
+            t_start = data[0][0]
+            t_end = data[0][data[0][:].size-1]
+            lat = data[1][:]
+            lng = data[2][:]
+            ft_row = np.append(ft_row, [np.mean(lat), np.mean(lng), np.log(np.var(lat)+np.var(lng)+1e-16)])
+        else:
+            ft_row = np.append(ft_row,[np.nan, np.nan, np.nan])
+        
+        # weather
+        if 'wtr.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'wtr.csv', delimiter='\t', header=None)
+            wtr_cond = stats.mode(data[9][:])[0][0]
+            if not isinstance(wtr_cond, basestring):
+                wtr_cond = str(wtr_cond)
+            ft_row = np.append(ft_row, [np.mean(data[1][:]), np.mean(data[3][:]), sum(ord(c) for c in wtr_cond)])
+        else:
+            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan])
+        
+        # time
+        dow_start = datetime.datetime.fromtimestamp(t_start).weekday()
+        dow_end = datetime.datetime.fromtimestamp(t_end).weekday()
+        ft_row = np.append(ft_row, [t_end-t_start, ((t_end+t_start)/2.0)%86400, dow_start, dow_end])
+        
+        # foursquare location
+        loc_fsq_code = le.transform(loc_fsq)
+        loc_fsq_bin = enc.transform(loc_fsq_code.reshape(-1,1)).toarray()            
+        ft_row = np.append(ft_row, loc_fsq_bin[0])
+        
+        # distance to closest foursquare location (m)
+        ft_row = np.append(ft_row, distance_fsq)
 
-        # general features
-        ft_row = np.append(ft_row, [t_report[i]-t_prev, ((t_report[i]-t_prev)/2.0)%86400])
-
-        # adding to feature vector
+        # adding to feature matrix
         if i==0:
             feature = np.array([ft_row])
-            state = np.array(loc[i])
+            state = np.array(loc)
+            state_fsq = np.array(loc_fsq)
+            state_reason = np.array(reason)
         else:
             feature = np.append(feature, [ft_row], axis=0)
-            state = np.append(state, loc[i])
-            
-        #state.append(loc[i])
-
-        if i<len(t_report)-1:
-            if t_report[i]!=t_report[i+1]:
-                t_prev = t_report[i]
-                
-    feature_label = np.array(['lgt mean','lgt std','aud mean','snd std','screen','still','tilt','foot','unknown',                             'mobilyze','phone','contacts','messaging','chrome','facebook','messenger','twitter',                             'video','camera','n call','n sms','n missed','n wifi','delta_t','mid hour'])
-
-    # keeping only classes with more than 2 samples
-    # inds = [i for (i,s) in enumerate(state) if state.count(state[i])>=n_folds]
-    # feature = feature[inds,:]
-    # state_label = [s for (i,s) in enumerate(loc_uniq) if state.count(s)>=n_folds]
-    # state = [s for (i,s) in enumerate(state) if state.count(state[i])>=n_folds]
-
-    # converting location categories to codes
-    # le = preprocessing.LabelEncoder()
-    # le.fit(state)
-    # state = le.transform(state) 
-
-    # saving features and states
+            state = np.append(state, loc)
+            state_fsq = np.append(state_fsq, loc_fsq)
+            state_reason = np.append(state_reason, reason)
+        
     if save_results:
-        with open('features/features_'+subj+'.dat', 'w') as file_out:
-            pickle.dump([feature, state], file_out)
+        with open('features_new/features_'+subj+'.dat', 'w') as file_out:
+            pickle.dump([feature, state, state_fsq, state_reason, feature_label], file_out)
         file_out.close()
 
-exit(0)
+os._exit(0)
 
 
-# In[37]:
+# In[ ]:
 
-print len(loc)
-print len(t_report)
-print loc
+print feature
 
 
-# In[43]:
+# In[ ]:
 
 # spatial visualization
+import matplotlib.pyplot as plt
+get_ipython().magic(u'matplotlib inline')
 colors = plt.cm.jet(np.linspace(0,1,len(loc_uniq)))
 plt.figure(figsize=(18,15))
 plt.rcParams['figure.figsize'] = (10, 6)
@@ -238,9 +240,10 @@ plt.legend(['gps']+loc_uniq, frameon=False, loc='center left', bbox_to_anchor=(0
 plt.box()
 
 
-# In[83]:
+# In[ ]:
 
 # temporal visualization
+from sklearn import preprocessing
 print loc
 le = preprocessing.LabelEncoder()
 le.fit(loc)
@@ -254,17 +257,7 @@ axes.set_ylim([-1, len(loc_uniq)])
 print t_report
 
 
-# In[3]:
-
-
-
-
-# In[12]:
-
-
-
-
-# In[13]:
+# In[ ]:
 
 # temporal visualization
 plt.figure(figsize=(12,6))
@@ -276,15 +269,7 @@ axes.set_ylim([-1, len(loc_uniq)])
 print loc_uniq
 
 
-# In[15]:
-
-plt.figure(figsize=(18,15))
-plt.plot(np.array(lng_gps),np.array(lat_gps),'k.', markersize=12, alpha=.6)
-plt.plot(feature[:,1],feature[:,0],'r.', markersize=12, alpha=.6)
-#plt.plot(np.array(lng_report),np.array(lat_report),'r.', markersize=12, alpha=.6)
-
-
-# In[18]:
+# In[ ]:
 
 # distribution of features across locations
 ft = 0
@@ -295,35 +280,7 @@ axes.set_xlim([-.5, len(loc_uniq)-.5])
 plt.xticks(range(len(loc_uniq)), loc_uniq)
 
 
-# In[14]:
-
-#creating train and test sets
-split = np.floor(state_code.size/2)
-x_train = feature[0:split,:]
-x_test = feature[(split+1):,:]
-y_train = state_code[0:split]
-y_test = state_code[(split+1):]
-
-#train
-gbm = xgboost.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05).fit(x_train, y_train)
-
-#test
-predictions = gbm.predict(x_test)
-
-#print predictions
-#print y_test
-conf, roc_auc = calculate_confusion_matrix(predictions, y_test)
-print loc_uniq
-print conf
-print roc_auc
-
-#clf = RandomForestClassifier(n_estimators=100)
-#scores = cross_val_score(clf, feature, state_code, cv=n_folds)
-#print scores.mean()
+# In[ ]:
 
 
-# In[18]:
-
-print subj
-print len(subjects[26:])
 
