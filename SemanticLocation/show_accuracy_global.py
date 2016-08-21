@@ -116,24 +116,6 @@ print auc_mean_sensor
 
 # In[ ]:
 
-import matplotlib.pyplot as plt
-get_ipython().magic(u'matplotlib inline')
-
-def plot_confusion_matrix(cm, labels, title='Confusion matrix', cmap=plt.cm.Blues):
-    plt.figure(figsize=(9,9))
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(labels))
-    plt.xticks(tick_marks, labels, rotation=90)
-    plt.yticks(tick_marks, labels)
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-
-
-# In[ ]:
-
 conf = np.zeros([10,10])
 for (i,c_row) in enumerate(conf_top10):
     for (j,c) in enumerate(c_row):

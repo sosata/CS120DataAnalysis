@@ -1,32 +1,6 @@
 
 # coding: utf-8
 
-# In[ ]:
-
-def stratify(x, y):
-    
-    import collections as col
-    counts = col.Counter(y)
-    n_max = np.max(counts.values())
-    
-    y_uniq = np.unique(y)
-    y_out_class = [[] for i in range(y_uniq.size)]
-    x_out_class = [[] for i in range(y_uniq.size)]
-    for (i,y_u) in enumerate(y_uniq):
-        inds = y==y_u
-        y_class = y[inds]
-        x_class = x[inds,:]
-        inds = np.random.choice(np.arange(0,y_class.size), n_max, replace=True)
-        y_out_class[i] = y_class[inds]
-        x_out_class[i] = x_class[inds]
-        
-    y = np.concatenate(y_out_class)
-    x = np.concatenate(x_out_class, axis=0)
-    
-    return x,y
-        
-
-
 # In[4]:
 
 import os
@@ -38,8 +12,6 @@ import time
 from copy import deepcopy
 # from sklearn.preprocessing import OneHotEncoder
 # from sklearn import preprocessing
-
-feature_label = np.array(['light mean','light std','light off','light zcrossing','light skew','light kurt',                          'audio mean','audio std','audio skew','audio kurt','audio frq mean','audio frq std','audio frq skew','audio frq kurt',                          'screen frq mean','screen dur mean','screen dur std',                          'still','tilting','walking','unknown act', 'still-walking','still-tilting','still-unknown','walking-unknown',                          'messaging app','facebook app','chrome app','mobilyze app','phone app','gmail app','contacts app','internet app',                          'gallery app','email app','settings app',                          'messenger app','camera app','clock app','maps app','calendar app','youtube app','calculator app',                          'purple robot app','system ui app',                          'n call in','n call out','n sms in','n sms out','n missed',                          'n wifi',                          'latitude mean','longitude mean','location var',                          'temperature','dew point','weather',                          'visit duration','visit midtime','weekday start','weekday end',                          '4square cat 1','4square cat 2','4square cat 3','4square cat 4','4square cat 5','4square cat 6','4square cat 7',                          '4square cat 8','4square distance',                         'visit frequency','visit interval mean'])
 
 save_results = True
 do_stratify = False

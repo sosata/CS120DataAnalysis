@@ -211,7 +211,12 @@ plot_confusion_matrix(data_cov, labels=data_fm.columns)
 
 
 
-# In[ ]:
+# In[33]:
 
-
+fr = pd.DataFrame()
+fr.loc[0,'a']=0
+fr.loc[0,'c']=0
+fr.loc[0,'d']=1
+fr.loc[1,'d']=1
+fr
 

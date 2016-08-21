@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[22]:
 
 import csv
 import os
@@ -16,12 +16,12 @@ from scipy import stats
 from count_transitions import count_transitions
 from sklearn.preprocessing import OneHotEncoder
 from sklearn import preprocessing
+from preprocess import *
 
 save_results = True
 
 data_dir = 'data/'
-
-feature_label = np.array(['lgt mean','lgt std','lgt off','lgt zcrossing','lgt skew','lgt kurt',                          'aud mean','aud std','aud skew','aud kurt','aud frq mean','aud frq std','aud frq skew','aud frq kurt',                          'scr frq mean','scr dur mean','scr dur std',                          'still','tilting','walking','unknown act', 'still-walking','still-tilting','still-unknown',                          'walking-unknown','messaging','facebook','chrome','mobilyze','phone','gmail','contacts','internet',                          'gallery','email','settings','messenger','camera','clock','maps','calendar','youtube','calculator',                          'purple robot','system ui',                          'n call in','n call out','n sms in','n sms out','n missed',                          'n wifi',                          'lat mean','lng mean','loc var',                          'temperature','dew point','weather',                          'duration','midtime','weekday start','weekday end',                          'fsq location','fsq distance'])
+data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
 
 fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',          'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',          'Professional & Other Places':'Professional or Medical Office',          'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
 
@@ -34,42 +34,42 @@ enc = OneHotEncoder()
 enc.fit(state7_code.reshape(-1, 1))
 
 subjects = os.listdir(data_dir)
-#subjects = [subjects[0]]
+# subjects = [subjects[0]]
 
 for (cnt,subj) in enumerate(subjects):
+    
+    print str(cnt) + ' ' + subj
+    
     subject_dir = data_dir + subj + '/'
     samples = os.listdir(subject_dir)
-    print str(cnt) + ' ' + subj
-    feature = np.array([])
-    state = np.array([])
-    state_fsq = np.array([])
-    state_reason = np.array([])
+    
+    # checking in the original directory if the subject has app data
+    sensors = os.listdir(data_dir_orig+subj)
+    if 'app.csv' in sensors:
+        has_app_data = True
+    else:
+        has_app_data = False
+    
+    # initialization
+    feature = pd.DataFrame()
+    target = pd.DataFrame()
+    
+    ind_last = 0
+    
     for (i,samp) in enumerate(samples):
+        
         sensor_dir = subject_dir + samp + '/'
         sensors = os.listdir(sensor_dir)
-        if not ('eml.csv' in sensors):
-            print 'subject '+subj+' does not have location report data at '+samp
-            continue
-        else:
+        
+        # reading semantic location data and skipping if it does not exist
+        if 'eml.csv' in sensors:
             filename = sensor_dir+'eml.csv'
-            data_eml = pd.read_csv(filename, delimiter='\t', header=None)
-            loc = data_eml.loc[0,6]
-            #loc = loc[1:len(loc)-1]
-            loc = loc.replace('[','')
-            loc = loc.replace(']','')
-            loc = loc.replace('"','')
-            
-            reason = data_eml.loc[0,7]
-            reason = reason.replace('"','')
-            reason = reason.replace('[','')
-            reason = reason.replace(']','')
-            reason = reason.replace(' ','')
-            # sorting if there are multipe reasons
-            if ',' in reason:
-                reason_parsed = reason.split(',')
-                reason_parsed = sorted(reason_parsed)
-                reason = ','.join(reason_parsed)
-            
+            data = pd.read_csv(filename, delimiter='\t', header=None)
+            target.loc[ind_last, 'location'] = preprocess_location(data.loc[0,6], parse=False)
+            target.loc[ind_last, 'reason'] = preprocess_reason(data.loc[0,7], parse=False)
+        else:
+            print 'subject {} does not have location report data at i. skipping'.format(subject,samp)
+            continue
         
         if 'fsq2.csv' in sensors:
             data_fsq = pd.read_csv(sensor_dir+'fsq2.csv', delimiter='\t', header=None)
@@ -86,22 +86,48 @@ for (cnt,subj) in enumerate(subjects):
             loc_fsq = 'Unknown'
             distance_fsq = np.nan
         
-        ft_row = np.array([])
+        target.loc[ind_last, 'fsq'] = loc_fsq
         
+        ## sensor features
         # light
         if 'lgt.csv' in sensors:
             data = pd.read_csv(sensor_dir+'lgt.csv', delimiter='\t', header=None)
             lgt = data[:][1]
-            ft_row = np.append(ft_row, [np.nanmean(lgt), np.nanstd(lgt), np.sum(lgt==0)/float(lgt.size),                                        np.sum(np.diff(np.sign(lgt-np.nanmean(lgt))))/float(lgt.size),                                       stats.skew(lgt), stats.kurtosis(lgt)]) # prop. zero-crossings
+            feature.loc[ind_last, 'lgt mean'] = np.nanmean(lgt)
+            feature.loc[ind_last, 'lgt std'] = np.nanstd(lgt)
+            feature.loc[ind_last, 'lgt off'] = np.sum(lgt==0)/float(lgt.size)
+            feature.loc[ind_last, 'lgt zcrossing'] = np.sum(np.diff(np.sign(lgt-np.nanmean(lgt))))/float(lgt.size)
+            feature.loc[ind_last, 'lgt skew'] = stats.skew(lgt)
+            feature.loc[ind_last, 'lgt kurt'] = stats.kurtosis(lgt)
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+            feature.loc[ind_last, 'lgt mean'] = np.nan
+            feature.loc[ind_last, 'lgt std'] = np.nan
+            feature.loc[ind_last, 'lgt off'] = np.nan
+            feature.loc[ind_last, 'lgt zcrossing'] = np.nan
+            feature.loc[ind_last, 'lgt skew'] = np.nan
+            feature.loc[ind_last, 'lgt kurt'] = np.nan
 
         # audio
         if 'aud.csv' in sensors:
             data = pd.read_csv(sensor_dir+'aud.csv', delimiter='\t', header=None)
-            ft_row = np.append(ft_row, [np.nanmean(data[:][1]), np.nanstd(data[:][1]),                                         stats.skew(data[:][1]), stats.kurtosis(data[:][1]),                                        np.nanmean(data[:][2]), np.nanstd(data[:][2]),                                        stats.skew(data[:][2]), stats.kurtosis(data[:][2])])
+            feature.loc[ind_last, 'aud mean'] = np.nanmean(data[:][1])
+            feature.loc[ind_last, 'aud std'] = np.nanstd(data[:][1])
+            feature.loc[ind_last, 'aud skew'] = stats.skew(data[:][1])
+            feature.loc[ind_last, 'aud kurt'] = stats.kurtosis(data[:][1])
+            feature.loc[ind_last, 'aud frq mean'] = np.nanmean(data[:][2])
+            feature.loc[ind_last, 'aud frq std'] = np.nanstd(data[:][2])
+            feature.loc[ind_last, 'aud frq skew'] = stats.skew(data[:][2])
+            feature.loc[ind_last, 'aud frq kurt'] = stats.kurtosis(data[:][2])
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+            feature.loc[ind_last, 'aud mean'] = np.nan
+            feature.loc[ind_last, 'aud std'] = np.nan
+            feature.loc[ind_last, 'aud skew'] = np.nan
+            feature.loc[ind_last, 'aud kurt'] = np.nan
+            feature.loc[ind_last, 'aud frq mean'] = np.nan
+            feature.loc[ind_last, 'aud frq std'] = np.nan
+            feature.loc[ind_last, 'aud frq skew'] = np.nan
+            feature.loc[ind_last, 'aud frq kurt'] = np.nan
+
 
         # screen
         if 'scr.csv' in sensors:
@@ -115,66 +141,132 @@ for (cnt,subj) in enumerate(subjects):
                         if data[1][j]=='True' and data[1][j+1]=='False':
                             scr_dur = np.append(scr_dur, data[0][j+1]-data[0][j])
                             scr_frq += 1
-                    ft_row = np.append(ft_row, [scr_frq/float(deltat), np.mean(scr_dur), np.std(scr_dur)])
+                    feature.loc[ind_last, 'scr frq'] = scr_frq/float(deltat)
+                    feature.loc[ind_last, 'scr dur mean'] = np.mean(scr_dur)
+                    feature.loc[ind_last, 'scr dur std'] = np.std(scr_dur)
                 else:
-                    ft_row = np.append(ft_row, [np.nan,np.nan,np.nan])
+                    feature.loc[ind_last, 'scr frq'] = np.nan
+                    feature.loc[ind_last, 'scr dur mean'] = np.nan
+                    feature.loc[ind_last, 'scr dur std'] = np.nan
             else:
-                ft_row = np.append(ft_row, [0,0,0])
+                feature.loc[ind_last, 'scr frq'] = 0
+                feature.loc[ind_last, 'scr dur mean'] = 0
+                feature.loc[ind_last, 'scr dur std'] = np.nan
         else:
-            ft_row = np.append(ft_row, [0,0,0])
+            feature.loc[ind_last, 'scr frq'] = 0
+            feature.loc[ind_last, 'scr dur mean'] = 0
+            feature.loc[ind_last, 'scr dur std'] = np.nan
         
         # activity
         if 'act.csv' in sensors:
             data = pd.read_csv(sensor_dir+'act.csv', delimiter='\t', header=None)
             n = float(data[0][:].size)
-            per_still = np.sum(data[1][:]=='STILL')/n
-            per_tilt = np.sum(data[1][:]=='TILTING')/n
-            per_onfoot = np.sum(data[1][:]=='ONFOOT')/n
-            per_unknown = np.sum(data[1][:]=='UNKNOWN')/n
-            n_trans1 = count_transitions(data[1][:],'STILL','ONFOOT')/n
-            n_trans2 = count_transitions(data[1][:],'STILL','TILTING')/n
-            n_trans3 = count_transitions(data[1][:],'STILL','UNKNOWN')/n
-            n_trans4 = count_transitions(data[1][:],'ONFOOT','UNKNOWN')/n
-            ft_row = np.append(ft_row, [per_still, per_tilt, per_onfoot, per_unknown, n_trans1, n_trans2,                                       n_trans3, n_trans4])
+            feature.loc[ind_last, 'still'] = np.sum(data[1][:]=='STILL')/n
+            feature.loc[ind_last, 'tilting'] = np.sum(data[1][:]=='TILTING')/n
+            feature.loc[ind_last, 'walking'] = np.sum(data[1][:]=='ONFOOT')/n
+            feature.loc[ind_last, 'unknown act'] = np.sum(data[1][:]=='UNKNOWN')/n
+            feature.loc[ind_last, 'still-walking'] = count_transitions(data[1][:],'STILL','ONFOOT')/n
+            feature.loc[ind_last, 'still-tilting'] = count_transitions(data[1][:],'STILL','TILTING')/n
+            feature.loc[ind_last, 'still-unknown'] = count_transitions(data[1][:],'STILL','UNKNOWN')/n
+            feature.loc[ind_last, 'walking-unknown'] = count_transitions(data[1][:],'ONFOOT','UNKNOWN')/n
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
-        
+            feature.loc[ind_last, 'still'] = np.nan
+            feature.loc[ind_last, 'tilting'] = np.nan
+            feature.loc[ind_last, 'walking'] = np.nan
+            feature.loc[ind_last, 'unknown act'] = np.nan
+            feature.loc[ind_last, 'still-walking'] = np.nan
+            feature.loc[ind_last, 'still-tilting'] = np.nan
+            feature.loc[ind_last, 'still-unknown'] = np.nan
+            feature.loc[ind_last, 'walking-unknown'] = np.nan
+            
         # apps
         if 'app.csv' in sensors:
             data = pd.read_csv(sensor_dir+'app.csv', delimiter='\t', header=None)
-            ft_row = np.append(ft_row, [np.sum(data[2][:]=='Messaging'),                                        np.sum(data[2][:]=='Facebook'),                                        np.sum(data[2][:]=='Chrome'),                                        np.sum(data[2][:]=='Mobilyze'),                                        np.sum(data[2][:]=='Phone'),                                        np.sum(data[2][:]=='Gmail'),                                        np.sum(data[2][:]=='Contacts'),                                        np.sum(data[2][:]=='Internet'),                                        np.sum(data[2][:]=='Gallery'),                                        np.sum(data[2][:]=='Email'),                                        np.sum(data[2][:]=='Settings'),                                        np.sum(data[2][:]=='Messenger'),                                        np.sum(data[2][:]=='Camera'),                                        np.sum(data[2][:]=='Clock'),                                        np.sum(data[2][:]=='Maps'),                                        np.sum(data[2][:]=='Calendar'),                                        np.sum(data[2][:]=='Youtube'),                                        np.sum(data[2][:]=='Calculator'),                                        np.sum(data[2][:]=='Purple Robot'),                                        np.sum(data[2][:]=='System UI')])
+            feature.loc[ind_last, 'messaging'] = np.sum(data[2][:]=='Messaging')
+            feature.loc[ind_last, 'facebook'] = np.sum(data[2][:]=='Facebook')
+            feature.loc[ind_last, 'chrome'] = np.sum(data[2][:]=='Chrome')
+            feature.loc[ind_last, 'mobilyze'] = np.sum(data[2][:]=='Mobilyze')
+            feature.loc[ind_last, 'phone'] = np.sum(data[2][:]=='Phone')
+            feature.loc[ind_last, 'gmail'] = np.sum(data[2][:]=='Gmail')
+            feature.loc[ind_last, 'contacts'] = np.sum(data[2][:]=='Contacts')
+            feature.loc[ind_last, 'internet'] = np.sum(data[2][:]=='Internet')
+            feature.loc[ind_last, 'gallery'] = np.sum(data[2][:]=='Gallery')
+            feature.loc[ind_last, 'email'] = np.sum(data[2][:]=='Email')
+            feature.loc[ind_last, 'settings'] = np.sum(data[2][:]=='Settings')
+            feature.loc[ind_last, 'messenger'] = np.sum(data[2][:]=='Messenger')
+            feature.loc[ind_last, 'camera'] = np.sum(data[2][:]=='Camera')
+            feature.loc[ind_last, 'clock'] = np.sum(data[2][:]=='Clock')
+            feature.loc[ind_last, 'maps'] = np.sum(data[2][:]=='Maps')
+            feature.loc[ind_last, 'calendar'] = np.sum(data[2][:]=='Calendar')
+            feature.loc[ind_last, 'youtube'] = np.sum(data[2][:]=='Youtube')
+            feature.loc[ind_last, 'calculator'] = np.sum(data[2][:]=='Calculator')
+            feature.loc[ind_last, 'purple robot'] = np.sum(data[2][:]=='Purple Robot')
+            feature.loc[ind_last, 'system ui'] = np.sum(data[2][:]=='System UI')
         else:
-            ft_row = np.append(ft_row, np.zeros([1,20]))
+            if has_app_data: # if not, leave them as NaN
+                feature.loc[ind_last, 'messaging'] = 0
+                feature.loc[ind_last, 'facebook'] = 0
+                feature.loc[ind_last, 'chrome'] = 0
+                feature.loc[ind_last, 'mobilyze'] = 0
+                feature.loc[ind_last, 'phone'] = 0
+                feature.loc[ind_last, 'gmail'] = 0
+                feature.loc[ind_last, 'contacts'] = 0
+                feature.loc[ind_last, 'internet'] = 0
+                feature.loc[ind_last, 'gallery'] = 0
+                feature.loc[ind_last, 'email'] = 0
+                feature.loc[ind_last, 'settings'] = 0
+                feature.loc[ind_last, 'messenger'] = 0
+                feature.loc[ind_last, 'camera'] = 0
+                feature.loc[ind_last, 'clock'] = 0
+                feature.loc[ind_last, 'maps'] = 0
+                feature.loc[ind_last, 'calendar'] = 0
+                feature.loc[ind_last, 'youtube'] = 0
+                feature.loc[ind_last, 'calculator'] = 0
+                feature.loc[ind_last, 'purple robot'] = 0
+                feature.loc[ind_last, 'system ui'] = 0
+            else:
+                feature.loc[ind_last, 'messaging'] = np.nan
+                feature.loc[ind_last, 'facebook'] = np.nan
+                feature.loc[ind_last, 'chrome'] = np.nan
+                feature.loc[ind_last, 'mobilyze'] = np.nan
+                feature.loc[ind_last, 'phone'] = np.nan
+                feature.loc[ind_last, 'gmail'] = np.nan
+                feature.loc[ind_last, 'contacts'] = np.nan
+                feature.loc[ind_last, 'internet'] = np.nan
+                feature.loc[ind_last, 'gallery'] = np.nan
+                feature.loc[ind_last, 'email'] = np.nan
+                feature.loc[ind_last, 'settings'] = np.nan
+                feature.loc[ind_last, 'messenger'] = np.nan
+                feature.loc[ind_last, 'camera'] = np.nan
+                feature.loc[ind_last, 'clock'] = np.nan
+                feature.loc[ind_last, 'maps'] = np.nan
+                feature.loc[ind_last, 'calendar'] = np.nan
+                feature.loc[ind_last, 'youtube'] = np.nan
+                feature.loc[ind_last, 'calculator'] = np.nan
+                feature.loc[ind_last, 'purple robot'] = np.nan
+                feature.loc[ind_last, 'system ui'] = np.nan
             
         # communication
         if 'coe.csv' in sensors:
             data = pd.read_csv(sensor_dir+'coe.csv', delimiter='\t', header=None)
-            n_call_in = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='INCOMING'))
-            n_call_out = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='OUTGOING'))
-            n_sms_in = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='INCOMING'))
-            n_sms_out = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='OUTGOING'))
-            n_missedcall = np.sum(data[4][:]=='MISSED')
-            ft_row = np.append(ft_row, [n_call_in,n_call_out,n_sms_in,n_sms_out,n_missedcall])
+            feature.loc[ind_last, 'call in'] = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='INCOMING'))
+            feature.loc[ind_last, 'call out'] = np.sum(np.logical_and(data[3][:]=='PHONE',data[4][:]=='OUTGOING'))
+            feature.loc[ind_last, 'sms in'] = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='INCOMING'))
+            feature.loc[ind_last, 'sms out'] = np.sum(np.logical_and(data[3][:]=='SMS',data[4][:]=='OUTGOING'))
+            feature.loc[ind_last, 'call missed'] = np.sum(data[4][:]=='MISSED')
         else:
-            ft_row = np.append(ft_row, [0, 0, 0, 0, 0])
+            feature.loc[ind_last, 'call in'] = 0
+            feature.loc[ind_last, 'call out'] = 0
+            feature.loc[ind_last, 'sms in'] = 0
+            feature.loc[ind_last, 'sms out'] = 0
+            feature.loc[ind_last, 'call missed'] = 0
         
         # wifi
         if 'wif.csv' in sensors:
             data = pd.read_csv(sensor_dir+'wif.csv', delimiter='\t', header=None)
-            ft_row = np.append(ft_row, np.mean(data[3][:]))
+            feature.loc[ind_last, 'n wifi'] = np.mean(data[3][:])
         else:
-            ft_row = np.append(ft_row, np.nan)
-        
-        # GPS 
-        if 'fus.csv' in sensors:
-            data = pd.read_csv(sensor_dir+'fus.csv', delimiter='\t', header=None)
-            t_start = data[0][0]
-            t_end = data[0][data[0][:].size-1]
-            lat = data[1][:]
-            lng = data[2][:]
-            ft_row = np.append(ft_row, [np.mean(lat), np.mean(lng), np.log(np.var(lat)+np.var(lng)+1e-16)])
-        else:
-            ft_row = np.append(ft_row,[np.nan, np.nan, np.nan])
+            feature.loc[ind_last, 'n wifi'] = np.nan
         
         # weather
         if 'wtr.csv' in sensors:
@@ -182,46 +274,59 @@ for (cnt,subj) in enumerate(subjects):
             wtr_cond = stats.mode(data[9][:])[0][0]
             if not isinstance(wtr_cond, basestring):
                 wtr_cond = str(wtr_cond)
-            ft_row = np.append(ft_row, [np.mean(data[1][:]), np.mean(data[3][:]), sum(ord(c) for c in wtr_cond)])
+            feature.loc[ind_last, 'temperature'] = np.mean(data[1][:])
+            feature.loc[ind_last, 'dew point'] = np.mean(data[3][:])
+            feature.loc[ind_last, 'weather'] = sum(ord(c) for c in wtr_cond)
         else:
-            ft_row = np.append(ft_row, [np.nan, np.nan, np.nan])
+            feature.loc[ind_last, 'temperature'] = np.nan
+            feature.loc[ind_last, 'dew point'] = np.nan
+            feature.loc[ind_last, 'weather'] = np.nan
         
-        # time
-        dow_start = datetime.datetime.fromtimestamp(t_start).weekday()
-        dow_end = datetime.datetime.fromtimestamp(t_end).weekday()
-        ft_row = np.append(ft_row, [t_end-t_start, ((t_end+t_start)/2.0)%86400, dow_start, dow_end])
+        # GPS and time
+        if 'fus.csv' in sensors:
+            data = pd.read_csv(sensor_dir+'fus.csv', delimiter='\t', header=None)
+            t_start = data[0][0]
+            t_end = data[0][data[0][:].size-1]
+            feature.loc[ind_last, 'lat mean'] = np.mean(data[1][:])
+            feature.loc[ind_last, 'lng mean'] = np.mean(data[2][:])
+            feature.loc[ind_last, 'loc var'] = np.log(np.var(data[1][:])+np.var(data[2][:])+1e-16)
+            feature.loc[ind_last, 'duration'] = t_end-t_start
+            feature.loc[ind_last, 'midtime'] = ((t_end+t_start)/2.0)%86400
+            feature.loc[ind_last, 'dow start'] = datetime.datetime.fromtimestamp(t_start).weekday()
+            feature.loc[ind_last, 'dow end'] = datetime.datetime.fromtimestamp(t_end).weekday()
+        else:
+            feature.loc[ind_last, 'lat mean'] = np.nan
+            feature.loc[ind_last, 'lng mean'] = np.nan
+            feature.loc[ind_last, 'loc var'] = np.nan
+            feature.loc[ind_last, 'duration'] = np.nan
+            feature.loc[ind_last, 'midtime'] = np.nan
+            feature.loc[ind_last, 'dow start'] = np.nan
+            feature.loc[ind_last, 'dow end'] = np.nan
         
-        # foursquare location
+        # foursquare location in binary form
         loc_fsq_code = le.transform(loc_fsq)
-        loc_fsq_bin = enc.transform(loc_fsq_code.reshape(-1,1)).toarray()            
-        ft_row = np.append(ft_row, loc_fsq_bin[0])
+        loc_fsq_bin = enc.transform(loc_fsq_code.reshape(-1,1)).toarray()
+        loc_fsq_bin = loc_fsq_bin[0]
+        for j in range(loc_fsq_bin.size):
+            feature.loc[ind_last, 'fsq {}'.format(j)] = loc_fsq_bin[j]
         
         # distance to closest foursquare location (m)
-        ft_row = np.append(ft_row, distance_fsq)
-
-        # adding to feature matrix
-        if i==0:
-            feature = np.array([ft_row])
-            state = np.array(loc)
-            state_fsq = np.array(loc_fsq)
-            state_reason = np.array(reason)
-        else:
-            feature = np.append(feature, [ft_row], axis=0)
-            state = np.append(state, loc)
-            state_fsq = np.append(state_fsq, loc_fsq)
-            state_reason = np.append(state_reason, reason)
+        feature.loc[ind_last, 'fsq distance'] = distance_fsq
         
+        ind_last += 1
+
+    print feature.shape, target.shape
     if save_results:
-        with open('features_new/features_'+subj+'.dat', 'w') as file_out:
-            pickle.dump([feature, state, state_fsq, state_reason, feature_label], file_out)
+        with open('features/features_'+subj+'.dat', 'w') as file_out:
+            pickle.dump([feature, target], file_out)
         file_out.close()
 
-os._exit(0)
+# os._exit(0)
 
 
-# In[ ]:
+# In[38]:
 
-print feature
+feature
 
 
 # In[ ]:
