@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_confusion_matrix(cm, labels, title='Correlation', cmap=plt.cm.RdYlGn):
+def plot_confusion_matrix(cm, labels, title='Correlation', cmap=plt.cm.seismic):
     plt.figure(figsize=(12,12))
     plt.imshow(cm, interpolation='nearest', cmap=cmap, vmin=-1, vmax=1)
     plt.title(title)

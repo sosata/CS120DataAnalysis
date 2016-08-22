@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[7]:
+# In[1]:
 
 # this program uses short-term features from features_new/ and adds personal, long-term features to them
 
@@ -25,7 +25,7 @@ for filename in files:
     print filename
     with open(feature_dir+filename) as f:  
         feature, target = pickle.load(f)
-        rf = pd.DataFrame(columns=['LT freeuqncy'])
+        rf = pd.DataFrame(columns=['LT frequency'])
         ai = pd.DataFrame(columns=['LT interval mean'])
         for i in range(feature.shape[0]):
             dist_squared = (feature.loc[:,'lat mean'] - feature.loc[i,'lat mean'])**2 +             (feature.loc[:,'lng mean'] - feature.loc[i,'lng mean'])**2
@@ -44,5 +44,8 @@ for filename in files:
             pickle.dump([feature, target], f)
         f.close()
 
-    
+
+# In[12]:
+
+target
 

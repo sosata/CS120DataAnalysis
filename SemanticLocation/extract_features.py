@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[22]:
+# In[4]:
 
 import csv
 import os
@@ -67,6 +67,8 @@ for (cnt,subj) in enumerate(subjects):
             data = pd.read_csv(filename, delimiter='\t', header=None)
             target.loc[ind_last, 'location'] = preprocess_location(data.loc[0,6], parse=False)
             target.loc[ind_last, 'reason'] = preprocess_reason(data.loc[0,7], parse=False)
+            target.loc[ind_last, 'accomplishment'] = data.loc[0,8]
+            target.loc[ind_last, 'pleasure'] = data.loc[0,9]
         else:
             print 'subject {} does not have location report data at i. skipping'.format(subject,samp)
             continue
@@ -317,14 +319,14 @@ for (cnt,subj) in enumerate(subjects):
 
     print feature.shape, target.shape
     if save_results:
-        with open('features/features_'+subj+'.dat', 'w') as file_out:
+        with open('features/'+subj+'.dat', 'w') as file_out:
             pickle.dump([feature, target], file_out)
         file_out.close()
 
-# os._exit(0)
+os._exit(0)
 
 
-# In[38]:
+# In[3]:
 
 feature
 
