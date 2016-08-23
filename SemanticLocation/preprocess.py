@@ -22,6 +22,13 @@ def remove_extra_space(x):
                 y += [xi]
     return y
 
+def correct_order(x):
+    if ',' in x:
+        x_parsed = x.split(',')
+        x_parsed = [remove_extra_space(x_p) for x_p in x_parsed]
+        x_parsed = sorted(x_parsed)
+        x = ','.join(x_parsed)
+    return x
 
 def preprocess_reason(reason, parse=True):
     
@@ -32,6 +39,7 @@ def preprocess_reason(reason, parse=True):
         if '\\u2026' in reason:
             reason = reason.replace('\\u2026','')
         reason = reason.lower()
+        reason = correct_order(reason)
     else:
         reason_new = []
         for r in reason:
@@ -89,25 +97,3 @@ def preprocess_location(location, parse=True):
         location = location_new
 
     return location
-
-# xs should be a list of lists. First level is subjects, and second samples for that subject.
-def get_top(xs, n):
-    
-    x_all = [x_ for x in xs for x_ in x]
-    x_uniq = list(set(x_all))
-
-    freq = []
-    for i in range(len(x_uniq)):
-        freq.append(0)
-        for j in range(len(xs)):
-            if x_uniq[i] in xs[j]:
-                freq[i] += 1
-
-    ind_sort = sorted(range(len(freq)), key=lambda k: freq[k], reverse=True)
-    freq_sorted = [freq[i] for i in ind_sort]
-    x_uniq_sorted = [x_uniq[i] for i in ind_sort]
-
-    freq_top = freq_sorted[:n]
-    x_top = x_uniq_sorted[:n]
-
-    return x_top, freq_top

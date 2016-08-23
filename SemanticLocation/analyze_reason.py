@@ -9,7 +9,6 @@ import os
 data_dir = 'data/'
 
 subjects = os.listdir(data_dir)
-#subjects = [subjects[1]]
 
 reason_all = []
 location_all = []

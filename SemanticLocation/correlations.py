@@ -10,13 +10,13 @@ from preprocess import *
 from soplata import *
 from utils import *
 
-# loading assessment data
+# read assessment data
 with open('/home/sohrob/Dropbox/Code/MATLAB/CS120/Assessment/assessment.dat') as f:
     assessment = pickle.load(f)
 f.close()
 subjects = assessment['Subject']
 
-# reading location and reason data
+# read location and reason data
 data_dir = 'features/'
 
 reasons = []
@@ -44,14 +44,16 @@ for (i,subject) in enumerate(subjects):
         ind_toremove.append(i) 
         print 'subject {} skipped because no data.'.format(subject)
 
-# removing assessments of subject which don't exist in sensor feature data
+# remove assessments of subject which don't exist in sensor feature data
 assessment = assessment.drop(ind_toremove, axis=0)
 assessment = assessment.reset_index(drop=True)
 
 
-# In[15]:
+# In[19]:
 
 # finding location frequencies across subjects
+
+save_results = True
 
 # getting top locations
 loc_top, _ = get_top(locations, 10)
@@ -65,13 +67,19 @@ for (i,loc_subject) in enumerate(locations):
         loc_freq.loc[i,loc_t] = loc_subject.count(loc_t)/float(len(loc_subject))
         loc_dur.loc[i,loc_top_dur[j]] = np.mean(durations[i][np.array(loc_subject)==loc_t])
 
+if save_results:
+    with open('top_locations.dat','w') as f:
+        pickle.dump(loc_top, f)
+    f.close()
 
-# In[16]:
+
+# In[21]:
 
 # finding reason frequencies across subjects
 
+save_results = True
 # getting top reasons
-reason_top, _ = get_top(reasons, 12)
+reason_top, freq_top = get_top(reasons, 12)
 
 reason_top_dur = ['DUR '+rt for rt in reason_top]
 
@@ -81,12 +89,22 @@ for (i,reason_subject) in enumerate(reasons):
     for (j,reason_t) in enumerate(reason_top):
         reason_freq.loc[i,reason_t] = reason_subject.count(reason_t)/float(len(reason_subject))
         reason_dur.loc[i,reason_top_dur[j]] = np.mean(durations[i][np.array(reason_subject)==reason_t])
-        
+
+if save_results:
+    with open('top_reasons.dat','w') as f:
+        pickle.dump(reason_top, f)
+    f.close()        
+
+
+# In[23]:
+
+print reason_top
+print freq_top
 
 
 # In[17]:
 
-# accomplishment and pleasure vars
+# accomplishment and pleasure means and vars
 
 accomp = pd.DataFrame(index=range(len(locations)),columns=['accomplishment mean','accomplishment var'])
 for (i,acc) in enumerate(accomplishments):
