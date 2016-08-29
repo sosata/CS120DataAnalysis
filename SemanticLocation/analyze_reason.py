@@ -1,54 +1,66 @@
 
 # coding: utf-8
 
-# In[46]:
+# In[1]:
+
+# extract top locations and reasons from feature files
+
+def get_top(xs, n):
+    
+    x_all = [x_ for x in xs for x_ in x]
+    x_uniq = list(set(x_all))
+    
+    freq = []
+    for i in range(len(x_uniq)):
+        freq.append(0)
+        for j in range(len(xs)):
+            if x_uniq[i] in xs[j]:
+                freq[i] += 1
+
+    ind_sort = sorted(range(len(freq)), key=lambda k: freq[k], reverse=True)
+    freq_sorted = [freq[i] for i in ind_sort]
+    x_uniq_sorted = [x_uniq[i] for i in ind_sort]
+
+    freq_top = freq_sorted[:n]
+    x_top = x_uniq_sorted[:n]
+
+    return x_top, freq_top
+
+
+# In[2]:
 
 import pandas as pd
 import os
+from preprocess import *
+import pickle
 
-data_dir = 'data/'
+data_dir = 'features/'
 
-subjects = os.listdir(data_dir)
+files = os.listdir(data_dir)
 
-reason_all = []
-location_all = []
-reason_subject = []
-for (i,subject) in enumerate(subjects):
-    print i,
-    samp_dirs = os.listdir(data_dir+subject)
-    reason_subject.append([])
-    for samp_dir in samp_dirs:
-        filename = data_dir + subject + '/' + samp_dir + '/' + 'eml.csv'
-        if os.path.exists(filename):
-            eml = pd.read_csv(filename, delimiter='\t', header=None)
-            
-            # reason for visiting
-            reason = eml.loc[0,7]
-            reason = reason.replace('"','')
-            reason = reason.replace('[','')
-            reason = reason.replace(']','')
-            reason = reason.replace(' ','')
-            
-            # sorting if there are multipe reasons
-            if ',' in reason:
-                reason_parsed = reason.split(',')
-                reason_parsed = sorted(reason_parsed)
-                reason = ','.join(reason_parsed)
-            
-            reason_all.append(reason)
-            reason_subject[i].append(reason)
-            
-            # location type
-            location = eml.loc[0,6]
-            location = location.replace('"','')
-            location = location.replace('[','')
-            location = location.replace(']','')
-            location_all.append(location)
-            
-            
+locations = []
+reasons = []
+for filename in files:
+
+    with open(data_dir+filename) as f:
+        _, target = pickle.load(f)
+    f.close()
+    
+    location = list(target['location'])
+    for (i,_) in enumerate(location):
+        location[i] = preprocess_location(location[i])
+    locations.append(location)
+    
+    reason = list(target['reason'])
+    for (i,_) in enumerate(reason):
+        reason[i] = preprocess_reason(reason[i])
+    reasons.append(reason)
+
+reason_all = [r for r1 in reasons for r in r1]
+location_all = [l for l1 in locations for l in l1]
 
 
-# In[41]:
+# In[3]:
 
 # overall frequency
 
@@ -71,26 +83,11 @@ plt.yticks(np.arange(len(freq_sorted_top)), reason_uniq_sorted_top);
 plt.ylim(-1,len(freq_sorted_top))
 
 
-# In[44]:
+# In[4]:
 
-# subject-wise frequency
+# subject-wise frequency for reason
 
-import pickle
-save_results = True
-
-freq = []
-for i in range(len(reason_uniq)):
-    freq.append(0)
-    for j in range(len(subjects)):
-        if reason_uniq[i] in reason_subject[j]:
-            freq[i] += 1
-
-ind_sort = sorted(range(len(freq)), key=lambda k: freq[k], reverse=True)
-freq_sorted = [freq[x] for x in ind_sort]
-reason_uniq_sorted = [reason_uniq[x] for x in ind_sort]
-
-freq_sorted_top = freq_sorted[:20]
-reason_uniq_sorted_top = reason_uniq_sorted[:20]
+reason_uniq_sorted_top, freq_sorted_top = get_top(reasons, 20)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -102,29 +99,20 @@ plt.ylim(-1,len(freq_sorted_top))
 plt.xlabel('number of subjects with reason')
 plt.ylabel('reason')
 
-if save_results:
-    with open('top10reason.dat', 'w') as file_out:
-        pickle.dump(reason_uniq_sorted[:10], file_out)
-    file_out.close()
 
-
-# In[39]:
+# In[ ]:
 
 print reason_parsed
 
 
-# In[8]:
+# In[5]:
 
-location_uniq = list(set(location_all))
-freq = [location_all.count(x) for x in location_uniq]
-ind_sort = sorted(range(len(freq)), key=lambda k: freq[k], reverse=True)
+# subject-wise frequency for location
 
-location_uniq_sorted = [location_uniq[x] for x in ind_sort]
-
-location_uniq_sorted_top = location_uniq_sorted[:20]
+location_uniq_sorted_top, _ = get_top(locations, 20)
 
 
-# In[45]:
+# In[7]:
 
 img = np.zeros([len(reason_uniq_sorted_top),len(location_uniq_sorted_top)])
 for (i,_) in enumerate(reason_all):
@@ -135,7 +123,7 @@ for (i,_) in enumerate(reason_all):
 #img_normalized = img.astype('float') / img.sum(axis=1)[:, np.newaxis]        
 img_normalized = img.astype('float') / img.sum(axis=0)[np.newaxis,:]
 
-plt.figure(figsize=(9,9))
+plt.figure(figsize=(13,13))
 plt.imshow(img_normalized, interpolation='nearest', cmap=plt.cm.Blues)
 plt.yticks(np.arange(len(reason_uniq_sorted_top)),reason_uniq_sorted_top)
 plt.xticks(np.arange(len(location_uniq_sorted_top)),location_uniq_sorted_top,rotation=90)
@@ -143,4 +131,9 @@ plt.xlabel('location')
 plt.ylabel('reason')
 #plt.title()
 plt.colorbar()
+
+
+# In[ ]:
+
+len(reason_all)
 

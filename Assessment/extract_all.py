@@ -5,13 +5,20 @@ import pandas as pd
 import os
 import pickle
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
-subjects = os.listdir(data_dir)
-subjects_df = pd.DataFrame(subjects, columns=['Subject'])
+#data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+#subjects = os.listdir(data_dir)
+#subjects_df = pd.DataFrame(subjects, columns=['Subject'])
 
 # screener
 xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Screener.xlsx')
 df = xl.parse('Sheet1')
+
+ind_subject = np.where(df.loc[0:999,'ID'].astype(str)!='nan')[0]
+subjects_df = df.loc[ind_subject, 'ID'].astype(str)
+subjects_df.columns = ['Subject']
+subjects_df = subjects_df.reset_index(drop=True)
+subjects = list(subjects_df)
+
 phq0 = pd.DataFrame(index=range(len(subjects)),columns=['PHQ9 W0'],dtype=object)
 gad0 = pd.DataFrame(index=range(len(subjects)),columns=['GAD7 W0'],dtype=object)
 for (i,subject) in enumerate(subjects):
@@ -99,6 +106,8 @@ for (i,subject) in enumerate(subjects):
         phq6.loc[i] = np.nan
         gad6.loc[i] = np.nan
         spin6.loc[i] = np.nan
+
+print subjects
 
 assessment = pd.concat([subjects_df, phq0, gad0, spin0, phq3, gad3, spin3, phq6, gad6, spin6], axis=1)
 

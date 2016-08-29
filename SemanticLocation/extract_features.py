@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[21]:
 
 from ipyparallel import Client
 
@@ -28,6 +28,7 @@ def extract_features(subjects):
     from sklearn import preprocessing
 
     save_results = True
+    break_locations = True # generate separate locations for each of the meniotned locations
 
     data_dir = 'data/'
     data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
@@ -73,7 +74,10 @@ def extract_features(subjects):
             if 'eml.csv' in sensors:
                 filename = sensor_dir+'eml.csv'
                 data = pd.read_csv(filename, delimiter='\t', header=None)
-                target.loc[ind_last, 'location'] = preprocess_location(data.loc[0,6], parse=False)
+                if break_locations:
+                    target.loc[ind_last, 'location'] = data.loc[0,6]
+                else:
+                    target.loc[ind_last, 'location'] = preprocess_location(data.loc[0,6], parse=False)
                 target.loc[ind_last, 'reason'] = preprocess_reason(data.loc[0,7], parse=False)
                 target.loc[ind_last, 'accomplishment'] = data.loc[0,8]
                 target.loc[ind_last, 'pleasure'] = data.loc[0,9]
@@ -322,23 +326,60 @@ def extract_features(subjects):
 
             # distance to closest foursquare location (m)
             feature.loc[ind_last, 'fsq distance'] = distance_fsq
-
-            ind_last += 1
+            
+            # break locations and generate duplicate data for other sensors
+            if break_locations:
+                locs = target.loc[ind_last, 'location']
+                locs = locs[1:-1] # remove brackets
+                locs = locs.split('", "')
+                locs = [l.replace('"','') for l in locs]
+                locs = filter(None, locs) # remove any empty strings
+                # first repeating everything
+                for i in range(len(locs)-1):
+                    target.loc[ind_last+1+i,:] = target.loc[ind_last,:]
+                    feature.loc[ind_last+1+i,:] = feature.loc[ind_last,:]
+                # noew replacing locations with new values
+                for (i,_) in enumerate(locs):
+                    target.loc[ind_last+i,'location'] = locs[i]
+                # last index
+                ind_last += len(locs)
+                
+            else:
+                ind_last += 1
 
 #         print feature.shape, target.shape
         if save_results:
-            with open('features/'+subj+'.dat', 'w') as file_out:
+            with open('features_breakloc/'+subj+'.dat', 'w') as file_out:
                 pickle.dump([feature, target], file_out)
             file_out.close()
 
     # os._exit(0)
 
 
-# In[2]:
+# In[22]:
 
 import os
 subjects = os.listdir('data/')
+# subjects = subjects[:2]
 extract_features(subjects)
+
+
+# In[20]:
+
+import pickle
+import pandas as pd
+with open('features_breakloc/MQ077WG.dat') as f:
+    feature, target = pickle.load(f)
+f.close()
+pd.options.display.max_rows = 999
+target.loc[11:12, :]
+feature.loc[11:12, :]
+
+
+# In[ ]:
+
+a='"Food (Restaurant, Cafe)", "Nightlife Spot (Bar, Club)"'
+a.split('", "')
 
 
 # In[ ]:

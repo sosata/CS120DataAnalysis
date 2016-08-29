@@ -16,13 +16,13 @@ threshold_distance_squared = 0.001**2 # equivalent to about 100 meters
 
 save_results = True
 
-feature_dir = 'features/'
+feature_dir = 'features_breakloc/'
 feature_out = 'features_long/'
 
 files = os.listdir(feature_dir)
 
 for filename in files:
-    print filename
+    print filename, 
     with open(feature_dir+filename) as f:  
         feature, target = pickle.load(f)
         rf = pd.DataFrame(columns=['LT frequency'])
@@ -45,7 +45,7 @@ for filename in files:
         f.close()
 
 
-# In[12]:
+# In[2]:
 
 target
 

@@ -103,14 +103,14 @@ for i in range(len(feature_all)):
     
     # train (layer 1)
     #eta_list = np.array([0.05]*200+[0.02]*200+[0.01]*200)
-    gbm1 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train1, y_train1)
+    gbm1 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train1, y_train1)
     y_pred1 = gbm1.predict(x_train1)
     # train (layer 2)
     y_pred1_code = pd.DataFrame(columns=['loc {}'.format(j) for j in range(len(location_top))])
     for j in range(x_train1.shape[0]):
         y_pred1_code.loc[j,:] = one_hot_encoder(y_pred1[j], np.array(location_top))
     x_train2 = pd.concat([x_train1, y_pred1_code], axis=1)
-    gbm2 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train2, y_train2)
+    gbm2 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train2, y_train2)
     
     # train performance
 #     y_pred = gbm.predict(x_train)
@@ -118,9 +118,9 @@ for i in range(len(feature_all)):
 
     # test (layer 1)
     y_pred1 = gbm1.predict(x_test1)
-    y_pred1_code = pd.DataFrame(columns=['loc {}'.format(j) for j in range(len(location_top))])
     
     # test (layer 2)
+    y_pred1_code = pd.DataFrame(columns=['loc {}'.format(j) for j in range(len(location_top))])
     for j in range(x_test1.shape[0]):
         y_pred1_code.loc[j,:] = one_hot_encoder(y_pred1[j], np.array(location_top))
     x_test2 = pd.concat([x_test1, y_pred1_code], axis=1)

@@ -35,7 +35,7 @@ for i=1:length(subject_sleep),
 end
 
 h = figure;
-set(h,'position',[560   528   893   420])
+set(h,'position',[683   244   703   577])
 res = 1;
 hist_edges = 0:res:24;
 hist_centers = (hist_edges(1)+res/2):res:(hist_edges(end)-res/2);
@@ -55,11 +55,11 @@ set(l,'fontsize',14)
 set(gca,'xgrid','on')
 
 h = figure;
-set(h,'position',[560   377   893   571])
+set(h,'position',[245   252   714   571])
 % plot([12 12],[0 25],'linewidth',1,'color',[.5 .5 .5])
 % hold on
-scatter(sleep_time_all, sleep_duration_all,25,'o','filled','markerfacecolor',[0 .3 .5]);
-alpha .25;
+plot(sleep_time_all, sleep_duration_all, '.k', 'markersize', 7);
+% alpha .25;
 xlim([0 24]);
 set(gca,'fontsize',12)
 xlabel('Sleep Time (hours)','fontsize',14);

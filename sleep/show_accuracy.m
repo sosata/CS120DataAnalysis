@@ -69,7 +69,6 @@ set(gca, 'xtick',.5:.1:1)
 set(gca, 'ytick',.5:.1:1)
 set(gca, 'Ticklength', [0 0])
 
-return;
 % mdl = fitlm(acc_global_all, acc_personal_all);
 % [coefs, ~, latent] = pca([acc_global_all, acc_personal_all]);
 % slope = coefs(2,1)/coefs(1,1);
@@ -143,7 +142,7 @@ set(gca, 'ygrid', 'on')
 box off
 set(gca, 'fontsize',12)
 ylabel('Classification Accuracy','fontsize',14)
-l = legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest');
+l = legend('Before Quality Improvement','After Quality Improvement (Step 1)','After Quality Improvement (Step 2)','location','northwest');
 set(l,'fontsize',12)
 title('Personal Models','fontsize',14);
 
@@ -181,6 +180,6 @@ set(gca, 'ygrid', 'on')
 set(gca,'fontsize',12)
 box off
 ylabel('Classification Accuracy','fontsize',14)
-l = legend('Before Quality Improvement','After Quality Improvement','After Removing Participants with Missing Data','location','northwest');
+l = legend('Before Quality Improvement','After Quality Improvement (Step 1)','After Quality Improvement (Step 2)', 'location','northwest');
 set(l,'fontsize',12)
 title('Global Models','fontsize',14);

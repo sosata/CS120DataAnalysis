@@ -101,7 +101,7 @@ ylabel('Number of Subjects');
 box off
 
 h = figure;
-set(h,'position',[360   192   670   426]);
+set(h,'position',[360   192   661   563]);
 hold on;
 ind_empty = find(cellfun(@isempty, time_ems));
 time_ems(ind_empty) = [];
@@ -111,7 +111,7 @@ for i=1:length(time_ems)
     plot(time_ems{i}, i*ones(length(time_ems{i}),1),'.k');
 end
 axis tight;
-set_date_ticks(gca, 14);
-xlabel('Date');
-ylabel('Subjects');
+set_date_ticks(gca, 16);
+xlabel('Date','fontsize',16);
+ylabel('Subjects','fontsize',16);
 box off;

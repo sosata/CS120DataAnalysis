@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[4]:
 
 import os
 import pickle
@@ -82,20 +82,20 @@ for i in range(len(feature_all)):
     j_range = range(len(feature_all))
     j_range.pop(i)
     
-    x_train1 = pd.concat([feature_all[j] for j in j_range], axis=0)
-    y_train1 = pd.concat([target_all[j]['location'] for j in j_range], axis=0)
-    y_train2 = pd.concat([target_all[j]['reason'] for j in j_range], axis=0)
+    x_train = pd.concat([feature_all[j] for j in j_range], axis=0)
+    y_train = pd.concat([target_all[j]['location'] for j in j_range], axis=0)
+#     y_train = pd.concat([target_all[j]['reason'] for j in j_range], axis=0)
     
-    x_train1 = x_train1.reset_index(drop=True)
-    y_train1 = y_train1.reset_index(drop=True)
-    y_train2 = y_train2.reset_index(drop=True)
+    x_train = x_train.reset_index(drop=True)
+    y_train = y_train.reset_index(drop=True)
     
 #     if do_stratify:
 #         x_train, y_train = stratify(x_train,y_train)
     
     # test set
-    x_test1 = feature_all[i]
-    y_test = target_all[i]['reason']
+    x_test = feature_all[i]
+    y_test = target_all[i]['location']
+#     y_test = target_all[i]['reason']
     
     # remove foursquare data
 #     x_train = x_train.drop(['fsq 0','fsq 1','fsq 2','fsq 3','fsq 4','fsq 5','fsq 6','fsq 7'],axis=1)
@@ -103,28 +103,14 @@ for i in range(len(feature_all)):
     
     # train (layer 1)
     #eta_list = np.array([0.05]*200+[0.02]*200+[0.01]*200)
-    gbm1 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train1, y_train1)
-    y_pred1 = gbm1.predict(x_train1)
-    # train (layer 2)
-    y_pred1_code = pd.DataFrame(columns=['loc {}'.format(j) for j in range(len(location_top))])
-    for j in range(x_train1.shape[0]):
-        y_pred1_code.loc[j,:] = one_hot_encoder(y_pred1[j], np.array(location_top))
-    x_train2 = pd.concat([x_train1, y_pred1_code], axis=1)
-    gbm2 = xgb.XGBClassifier(max_depth=3, n_estimators=20, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train2, y_train2)
+    gbm = xgb.XGBClassifier(max_depth=3, n_estimators=100, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
     
     # train performance
 #     y_pred = gbm.predict(x_train)
 #     conf_train, roc_auc_train = calculate_confusion_matrix(y_pred, y_train)
 
     # test (layer 1)
-    y_pred1 = gbm1.predict(x_test1)
-    y_pred1_code = pd.DataFrame(columns=['loc {}'.format(j) for j in range(len(location_top))])
-    
-    # test (layer 2)
-    for j in range(x_test1.shape[0]):
-        y_pred1_code.loc[j,:] = one_hot_encoder(y_pred1[j], np.array(location_top))
-    x_test2 = pd.concat([x_test1, y_pred1_code], axis=1)
-    y_pred = gbm2.predict(x_test2)
+    y_pred = gbm.predict(x_test)
     
     # test performance
     conf, roc_auc = calculate_confusion_matrix(y_pred, y_test)
@@ -153,14 +139,14 @@ for i in range(len(feature_all)):
     
 # saving the results
 if save_results:
-    with open('auc_reason_sensor_fsq_predlocation.dat','w') as f:
+    with open('auc_location_sensor_fsq.dat','w') as f:
         #pickle.dump([aucs, confs, labels, aucs_fsq, confs_fsq], f)
         pickle.dump([aucs, confs, labels], f)
     f.close()
 
 
 
-# In[10]:
+# In[3]:
 
-x_train2.shape
+location_top
 

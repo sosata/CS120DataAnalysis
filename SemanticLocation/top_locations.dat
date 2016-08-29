@@ -1,7 +1,7 @@
 (lp0
-S'Shop or Store'
+S'Home'
 p1
-aS'Home'
+aS'Shop or Store'
 p2
 aS'Food (Restaurant, Cafe)'
 p3
@@ -15,7 +15,7 @@ aS'Arts & Entertainment (Theater, Music Venue, Etc.)'
 p7
 aS'Outdoors & Recreation'
 p8
-aS'Spiritual (Church, Temple, Etc.)'
+aS'Nightlife Spot (Bar, Club)'
 p9
 aS'Vehicle'
 p10

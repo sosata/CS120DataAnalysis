@@ -40,3 +40,10 @@ def stratify(x, y):
     x = np.concatenate(x_out_class, axis=0)
     
     return x,y
+
+def one_hot_encoder(x, xset):
+
+    y = np.zeros(xset.size)
+    ind = np.where(xset==x)[0]
+    y[ind] = 1.0
+    return y
