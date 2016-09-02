@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[2]:
 
 # extract top locations and reasons from feature files
 
@@ -27,7 +27,7 @@ def get_top(xs, n):
     return x_top, freq_top
 
 
-# In[5]:
+# In[14]:
 
 # extract top locations
 import os
@@ -35,13 +35,12 @@ import pickle
 
 # TODO: deep dish instead of pickle
 
-data_dir = 'features_breakloc/'
+data_dir = 'features/'
 files = os.listdir(data_dir)
 
 reasons = []
 locations = []
 for (i,filename) in enumerate(files):
-#     print i,
     with open(data_dir+filename) as f:
         feature, target = pickle.load(f)
     f.close()
@@ -60,18 +59,9 @@ with open('top_reasons.dat', 'w') as f:
 f.close()
 
 
-# In[3]:
+# In[15]:
 
-for i in range(0):
-    print i
-
-
-# In[6]:
-
-print loc_top
-print loc_freq
-print reason_top
-print reason_freq
+loc_top
 
 
 # In[4]:

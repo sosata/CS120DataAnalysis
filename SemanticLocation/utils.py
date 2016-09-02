@@ -47,3 +47,24 @@ def one_hot_encoder(x, xset):
     ind = np.where(xset==x)[0]
     y[ind] = 1.0
     return y
+
+def get_top(xs, n):
+    
+    x_all = [x_ for x in xs for x_ in x]
+    x_uniq = list(set(x_all))
+    
+    freq = []
+    for i in range(len(x_uniq)):
+        freq.append(0)
+        for j in range(len(xs)):
+            if x_uniq[i] in xs[j]:
+                freq[i] += 1
+
+    ind_sort = sorted(range(len(freq)), key=lambda k: freq[k], reverse=True)
+    freq_sorted = [freq[i] for i in ind_sort]
+    x_uniq_sorted = [x_uniq[i] for i in ind_sort]
+
+    freq_top = freq_sorted[:n]
+    x_top = x_uniq_sorted[:n]
+
+    return x_top, freq_top

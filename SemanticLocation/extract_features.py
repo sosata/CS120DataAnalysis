@@ -1,13 +1,12 @@
 
 # coding: utf-8
 
-# In[21]:
+# In[2]:
 
 from ipyparallel import Client
 
 rc = Client()
 dv = rc[:]
-
 
 @dv.parallel(block = True)
 def extract_features(subjects):
@@ -28,7 +27,8 @@ def extract_features(subjects):
     from sklearn import preprocessing
 
     save_results = True
-    break_locations = True # generate separate locations for each of the meniotned locations
+    break_locations = False # generate separate locations for each of the meniotned locations
+    remove_vehicle = True
 
     data_dir = 'data/'
     data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
@@ -74,6 +74,10 @@ def extract_features(subjects):
             if 'eml.csv' in sensors:
                 filename = sensor_dir+'eml.csv'
                 data = pd.read_csv(filename, delimiter='\t', header=None)
+                # removing Vehicle category
+                if remove_vehicle and data.loc[0,6]=='["Vehicle"]':
+                    print 'vehicle category skipped'
+                    continue
                 if break_locations:
                     target.loc[ind_last, 'location'] = data.loc[0,6]
                 else:
@@ -305,7 +309,8 @@ def extract_features(subjects):
                 feature.loc[ind_last, 'lng mean'] = np.mean(data[2][:])
                 feature.loc[ind_last, 'loc var'] = np.log(np.var(data[1][:])+np.var(data[2][:])+1e-16)
                 feature.loc[ind_last, 'duration'] = t_end-t_start
-                feature.loc[ind_last, 'midtime'] = ((t_end+t_start)/2.0)%86400
+                feature.loc[ind_last, 'midtime'] = (t_end+t_start)/2.0
+                feature.loc[ind_last, 'midhour'] = ((t_end+t_start)/2.0)%86400
                 feature.loc[ind_last, 'dow start'] = datetime.datetime.fromtimestamp(t_start).weekday()
                 feature.loc[ind_last, 'dow end'] = datetime.datetime.fromtimestamp(t_end).weekday()
             else:
@@ -314,6 +319,7 @@ def extract_features(subjects):
                 feature.loc[ind_last, 'loc var'] = np.nan
                 feature.loc[ind_last, 'duration'] = np.nan
                 feature.loc[ind_last, 'midtime'] = np.nan
+                feature.loc[ind_last, 'midhour'] = np.nan
                 feature.loc[ind_last, 'dow start'] = np.nan
                 feature.loc[ind_last, 'dow end'] = np.nan
 
@@ -347,16 +353,15 @@ def extract_features(subjects):
             else:
                 ind_last += 1
 
-#         print feature.shape, target.shape
         if save_results:
-            with open('features_breakloc/'+subj+'.dat', 'w') as file_out:
+            with open('features/'+subj+'.dat', 'w') as file_out:
                 pickle.dump([feature, target], file_out)
             file_out.close()
 
-    # os._exit(0)
+    return 0
 
 
-# In[22]:
+# In[3]:
 
 import os
 subjects = os.listdir('data/')

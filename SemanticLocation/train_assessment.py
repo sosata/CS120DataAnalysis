@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[102]:
+# In[14]:
 
 # This code trains models to predict target assessments (PHQ-9, GAD-7) from semntaic location and reason data
 
@@ -19,9 +19,26 @@ with open('location_assessment.dat') as f:
     data = pickle.load(f)
 f.close
 
-feature = data[['Home', 'Shop or Store', 'Food (Restaurant, Cafe)',                "Another's Home", 'Professional or Medical Office', 'Work',                'Arts & Entertainment (Theater, Music Venue, Etc.)',                'Outdoors & Recreation', 'Nightlife Spot (Bar, Club)', 'Vehicle',                'DUR Home', 'DUR Shop or Store', 'DUR Food (Restaurant, Cafe)',                "DUR Another's Home", 'DUR Professional or Medical Office',                'DUR Work', 'DUR Arts & Entertainment (Theater, Music Venue, Etc.)',                'DUR Outdoors & Recreation', 'DUR Nightlife Spot (Bar, Club)',                'DUR Vehicle', 'home', 'errand', 'dining', 'socialize', 'work',                'entertainment', 'dining,socialize', 'travelling / traffic',                'exercise', 'entertainment,socialize', 'DUR home', 'DUR errand',                'DUR dining', 'DUR socialize', 'DUR work', 'DUR entertainment',                'DUR dining,socialize', 'DUR travelling / traffic', 'DUR exercise',                'DUR entertainment,socialize']].astype(float)
+# feature = data[['Shop or Store', 'Home', 'Food (Restaurant, Cafe)',\
+#        "Another's Home", 'Professional or Medical Office', 'Work',\
+#        'Arts & Entertainment (Theater, Music Venue, Etc.)',\
+#        'Outdoors & Recreation', 'Spiritual (Church, Temple, Etc.)',\
+#        'Nightlife Spot (Bar, Club)', 'DUR Shop or Store', 'DUR Home',\
+#        'DUR Food (Restaurant, Cafe)', "DUR Another's Home",\
+#        'DUR Professional or Medical Office', 'DUR Work',\
+#        'DUR Arts & Entertainment (Theater, Music Venue, Etc.)',\
+#        'DUR Outdoors & Recreation', 'DUR Spiritual (Church, Temple, Etc.)',\
+#        'DUR Nightlife Spot (Bar, Club)', 'home', 'errand', 'dining',\
+#        'socialize', 'work', 'entertainment', 'dining,socialize',\
+#        'travelling / traffic', 'exercise', 'entertainment,socialize',\
+#        'DUR home', 'DUR errand', 'DUR dining', 'DUR socialize',\
+#        'DUR work', 'DUR entertainment', 'DUR dining,socialize',\
+#        'DUR travelling / traffic', 'DUR exercise',\
+#        'DUR entertainment,socialize','PHQ9 W0']].astype(float)
 
-target = data['SPIN W3']
+feature = data[['DUR Spiritual (Church, Temple, Etc.)',       'DUR entertainment','entropy','entropy norm']].astype(float)
+
+target = data['PHQ9 W6']
 
 # remove nans from target
 ind = np.where(np.array(pd.isnull(target)))[0]
@@ -31,8 +48,8 @@ target = target.reset_index(drop=True)
 feature = feature.reset_index(drop=True)
 
 # classification
-target.loc[target<19] = 0
-target.loc[target>=19] = 1
+target.loc[target<10] = 0
+target.loc[target>=10] = 1
 
 confs = []
 aucs = []
@@ -63,7 +80,7 @@ for i in range(feature.shape[0]):
     
     # train (layer 1)
     #eta_list = np.array([0.05]*200+[0.02]*200+[0.01]*200)
-    gbm = xgb.XGBClassifier(max_depth=1, n_estimators=1000, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
+    gbm = xgb.XGBClassifier(max_depth=2, n_estimators=1000, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
     
     # train performance
 #     y_pred = gbm.predict(x_train)
@@ -81,7 +98,9 @@ for i in range(feature.shape[0]):
 
 conf, roc_auc = calculate_confusion_matrix(y_pred, np.array(target))
 
-print roc_auc[0]
+print
+print 'AUC: {}'.format(roc_auc[0])
+print 'confusion matrix:'
 print conf
 
 # saving the results
@@ -95,8 +114,7 @@ if save_results:
 
 
 
-# In[98]:
+# In[3]:
 
-# feature.to_csv("x.csv")
-# target.to_csv("y.csv")
+data.columns
 
