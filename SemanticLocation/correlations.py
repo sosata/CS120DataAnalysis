@@ -42,7 +42,6 @@ for (i,subject) in enumerate(subjects):
         durations.append(np.array(feature['duration']))
         accomplishments.append(np.array(target['accomplishment']))
         pleasures.append(np.array(target['pleasure']))
-       
     else:
         ind_toremove.append(i)
         print 'subject {} skipped because no data.'.format(subject)
@@ -168,7 +167,6 @@ entropy = pd.DataFrame(index=range(len(locations)))
 cm = pd.DataFrame(index=range(len(locations)))
 change = pd.DataFrame(index=range(len(locations)))
 for i in range(len(locations)):
-    
     for j in np.arange(2,10):
         ent, entn = estimate_entropy(locations[i],j)
         entropy.loc[i,'entropy {}'.format(j)] = ent
@@ -205,7 +203,8 @@ if save_data:
     f.close()
 
 
-# In[131]:
+# In[4]:
 
-change.loc[126]
+import numpy as np
+np.mod(10,4)
 
