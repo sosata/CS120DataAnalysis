@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 import os
 import pickle
@@ -15,7 +15,7 @@ from utils import one_hot_encoder
 # from sklearn.preprocessing import OneHotEncoder
 # from sklearn import preprocessing
 
-save_results = True
+save_results = False
 do_stratify = False
 
 ft_dir = 'features_long/'
@@ -89,9 +89,6 @@ for i in range(len(feature_all)):
     x_train = x_train.reset_index(drop=True)
     y_train = y_train.reset_index(drop=True)
     
-#     if do_stratify:
-#         x_train, y_train = stratify(x_train,y_train)
-    
     # test set
     x_test = feature_all[i]
     y_test = target_all[i]['location']
@@ -105,14 +102,12 @@ for i in range(len(feature_all)):
     #eta_list = np.array([0.05]*200+[0.02]*200+[0.01]*200)
     gbm = xgb.XGBClassifier(max_depth=3, n_estimators=100, learning_rate=0.01, nthread=12, subsample=1,                               max_delta_step=0).fit(x_train, y_train)
     
-    # train performance
+    # training performance
 #     y_pred = gbm.predict(x_train)
 #     conf_train, roc_auc_train = calculate_confusion_matrix(y_pred, y_train)
 
-    # test (layer 1)
+    # test
     y_pred = gbm.predict(x_test)
-    
-    # test performance
     conf, roc_auc = calculate_confusion_matrix(y_pred, y_test)
     
     # foursquare performance
@@ -146,7 +141,7 @@ if save_results:
 
 
 
-# In[3]:
+# In[2]:
 
 location_top
 

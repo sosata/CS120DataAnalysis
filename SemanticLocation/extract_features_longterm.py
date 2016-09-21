@@ -16,7 +16,7 @@ threshold_distance_squared = 0.001**2 # equivalent to about 100 meters
 
 save_results = True
 
-feature_dir = 'features_breakloc/'
+feature_dir = 'features/'
 feature_out = 'features_long/'
 
 files = os.listdir(feature_dir)
@@ -45,7 +45,8 @@ for filename in files:
         f.close()
 
 
-# In[2]:
+# In[4]:
 
-target
+print feature.columns
+print feature.shape
 

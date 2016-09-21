@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 def stratify(x, y):
     
@@ -27,12 +27,14 @@ def stratify(x, y):
         
 
 
-# In[65]:
+# In[15]:
 
 import os
 import pickle
 import numpy as np
 import xgboost as xgb
+import pandas as pd
+
 # from sklearn.preprocessing import OneHotEncoder
 # from sklearn import preprocessing
 
@@ -46,7 +48,7 @@ ft_dir = 'features_long/'
 # list feature files
 files = os.listdir(ft_dir)
 
-with open('top10.dat') as f:
+with open('top_locations.dat') as f:
     state_top10 = pickle.load(f)
 f.close()
 for (i,s) in enumerate(state_top10):
@@ -59,23 +61,23 @@ state_all = []
 state_fsq_all = []
 for filename in files:
     with open(ft_dir+filename) as f:  
-        feature, state, _, feature_label_ = pickle.load(f)
-
+        feature, state = pickle.load(f)
+        
         # only keeping top 10 states
         ind = np.array([], int)
-        for (i,st) in enumerate(state):
+        for (i,st) in enumerate(state['location']):
             if st in state_top10:
                 ind = np.append(ind, i)
-        feature = feature[ind,:]
-        state = state[ind]
+        feature = feature.loc[ind,:]
+        state = state.loc[ind,'location']
         
         feature_all.append(feature)
         state_all.append(state)
         
     f.close()
 
-x_train = np.concatenate(feature_all, axis=0)
-y_train = np.concatenate(state_all)
+x_train = pd.concat(feature_all, axis=0)
+y_train = pd.concat(state_all)
 
 if do_stratify:
     x_train, y_train = stratify(x_train,y_train)
@@ -86,20 +88,12 @@ for sd in range(n_bootstrap):
     gbm[sd] = xgb.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0, seed=sd).fit(x_train, y_train)
 
 
-# In[64]:
+# In[13]:
 
-print 
-
-
-# In[61]:
-
-# create map from fxx --> feature name
-feature_map = {}
-for (i,lab) in enumerate(feature_label):
-    feature_map['f{}'.format(i)] = lab
+state_top10
 
 
-# In[69]:
+# In[37]:
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -107,18 +101,20 @@ get_ipython().magic(u'matplotlib inline')
 plt.figure(figsize=(10,15))
 axes = plt.gca()
 #xgb.plot_importance(gbm, ax=axes, label=feature_label)
-fscore = gbm[5].booster().get_fscore()
-val_sorted = np.sort(np.array(fscore.values()))
-ind = np.argsort(np.array(fscore.values()))
-key_sorted = list(np.array(fscore.keys())[ind])
-label_sorted = [feature_map[k] for k in key_sorted]
-plt.barh(np.arange(val_sorted.size), val_sorted, .7, color=(.5,.2,.2))
-plt.yticks(np.arange(len(label_sorted)), label_sorted, fontsize=12, color=(0,0,0));
-axes.set_ylim([-1, len(label_sorted)])
+
+fscore = pd.DataFrame()
+for i in range(n_bootstrap):
+    fscore.loc[i,:] = np.array(gbm[i].booster().get_fscore().values())
+fscore_mean = np.array(np.mean(fscore,axis=0))
+ind_sort = np.argsort(fscore_mean)
+val_sorted = fscore_mean[ind_sort]
+key_sorted = list(np.array(gbm[0].booster().get_fscore().keys())[ind_sort])
+plt.barh(np.arange(val_sorted.size), val_sorted, .7, color=(.4,.4,1), align='center')
+plt.yticks(np.arange(len(key_sorted)), key_sorted, fontsize=12, color=(0,0,0));
+axes.set_ylim([-1, len(key_sorted)])
 
 
-# In[71]:
+# In[35]:
 
-print gbm[5].booster().get_fscore()
-print gbm[0].booster().get_fscore()
+np.array(gbm[i].booster().get_fscore().values())
 

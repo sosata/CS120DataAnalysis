@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 from ipyparallel import Client
 
@@ -198,71 +198,71 @@ def extract_features(subjects):
                 feature.loc[ind_last, 'walking-unknown'] = np.nan
 
             # apps
-            if 'app.csv' in sensors:
-                data = pd.read_csv(sensor_dir+'app.csv', delimiter='\t', header=None)
-                feature.loc[ind_last, 'messaging'] = np.sum(data[2][:]=='Messaging')
-                feature.loc[ind_last, 'facebook'] = np.sum(data[2][:]=='Facebook')
-                feature.loc[ind_last, 'chrome'] = np.sum(data[2][:]=='Chrome')
-                feature.loc[ind_last, 'mobilyze'] = np.sum(data[2][:]=='Mobilyze')
-                feature.loc[ind_last, 'phone'] = np.sum(data[2][:]=='Phone')
-                feature.loc[ind_last, 'gmail'] = np.sum(data[2][:]=='Gmail')
-                feature.loc[ind_last, 'contacts'] = np.sum(data[2][:]=='Contacts')
-                feature.loc[ind_last, 'internet'] = np.sum(data[2][:]=='Internet')
-                feature.loc[ind_last, 'gallery'] = np.sum(data[2][:]=='Gallery')
-                feature.loc[ind_last, 'email'] = np.sum(data[2][:]=='Email')
-                feature.loc[ind_last, 'settings'] = np.sum(data[2][:]=='Settings')
-                feature.loc[ind_last, 'messenger'] = np.sum(data[2][:]=='Messenger')
-                feature.loc[ind_last, 'camera'] = np.sum(data[2][:]=='Camera')
-                feature.loc[ind_last, 'clock'] = np.sum(data[2][:]=='Clock')
-                feature.loc[ind_last, 'maps'] = np.sum(data[2][:]=='Maps')
-                feature.loc[ind_last, 'calendar'] = np.sum(data[2][:]=='Calendar')
-                feature.loc[ind_last, 'youtube'] = np.sum(data[2][:]=='Youtube')
-                feature.loc[ind_last, 'calculator'] = np.sum(data[2][:]=='Calculator')
-                feature.loc[ind_last, 'purple robot'] = np.sum(data[2][:]=='Purple Robot')
-                feature.loc[ind_last, 'system ui'] = np.sum(data[2][:]=='System UI')
-            else:
-                if has_app_data: # if not, leave them as NaN
-                    feature.loc[ind_last, 'messaging'] = 0
-                    feature.loc[ind_last, 'facebook'] = 0
-                    feature.loc[ind_last, 'chrome'] = 0
-                    feature.loc[ind_last, 'mobilyze'] = 0
-                    feature.loc[ind_last, 'phone'] = 0
-                    feature.loc[ind_last, 'gmail'] = 0
-                    feature.loc[ind_last, 'contacts'] = 0
-                    feature.loc[ind_last, 'internet'] = 0
-                    feature.loc[ind_last, 'gallery'] = 0
-                    feature.loc[ind_last, 'email'] = 0
-                    feature.loc[ind_last, 'settings'] = 0
-                    feature.loc[ind_last, 'messenger'] = 0
-                    feature.loc[ind_last, 'camera'] = 0
-                    feature.loc[ind_last, 'clock'] = 0
-                    feature.loc[ind_last, 'maps'] = 0
-                    feature.loc[ind_last, 'calendar'] = 0
-                    feature.loc[ind_last, 'youtube'] = 0
-                    feature.loc[ind_last, 'calculator'] = 0
-                    feature.loc[ind_last, 'purple robot'] = 0
-                    feature.loc[ind_last, 'system ui'] = 0
-                else:
-                    feature.loc[ind_last, 'messaging'] = np.nan
-                    feature.loc[ind_last, 'facebook'] = np.nan
-                    feature.loc[ind_last, 'chrome'] = np.nan
-                    feature.loc[ind_last, 'mobilyze'] = np.nan
-                    feature.loc[ind_last, 'phone'] = np.nan
-                    feature.loc[ind_last, 'gmail'] = np.nan
-                    feature.loc[ind_last, 'contacts'] = np.nan
-                    feature.loc[ind_last, 'internet'] = np.nan
-                    feature.loc[ind_last, 'gallery'] = np.nan
-                    feature.loc[ind_last, 'email'] = np.nan
-                    feature.loc[ind_last, 'settings'] = np.nan
-                    feature.loc[ind_last, 'messenger'] = np.nan
-                    feature.loc[ind_last, 'camera'] = np.nan
-                    feature.loc[ind_last, 'clock'] = np.nan
-                    feature.loc[ind_last, 'maps'] = np.nan
-                    feature.loc[ind_last, 'calendar'] = np.nan
-                    feature.loc[ind_last, 'youtube'] = np.nan
-                    feature.loc[ind_last, 'calculator'] = np.nan
-                    feature.loc[ind_last, 'purple robot'] = np.nan
-                    feature.loc[ind_last, 'system ui'] = np.nan
+#             if 'app.csv' in sensors:
+#                 data = pd.read_csv(sensor_dir+'app.csv', delimiter='\t', header=None)
+#                 feature.loc[ind_last, 'messaging'] = np.sum(data[2][:]=='Messaging')
+#                 feature.loc[ind_last, 'facebook'] = np.sum(data[2][:]=='Facebook')
+#                 feature.loc[ind_last, 'chrome'] = np.sum(data[2][:]=='Chrome')
+#                 feature.loc[ind_last, 'mobilyze'] = np.sum(data[2][:]=='Mobilyze')
+#                 feature.loc[ind_last, 'phone'] = np.sum(data[2][:]=='Phone')
+#                 feature.loc[ind_last, 'gmail'] = np.sum(data[2][:]=='Gmail')
+#                 feature.loc[ind_last, 'contacts'] = np.sum(data[2][:]=='Contacts')
+#                 feature.loc[ind_last, 'internet'] = np.sum(data[2][:]=='Internet')
+#                 feature.loc[ind_last, 'gallery'] = np.sum(data[2][:]=='Gallery')
+#                 feature.loc[ind_last, 'email'] = np.sum(data[2][:]=='Email')
+#                 feature.loc[ind_last, 'settings'] = np.sum(data[2][:]=='Settings')
+#                 feature.loc[ind_last, 'messenger'] = np.sum(data[2][:]=='Messenger')
+#                 feature.loc[ind_last, 'camera'] = np.sum(data[2][:]=='Camera')
+#                 feature.loc[ind_last, 'clock'] = np.sum(data[2][:]=='Clock')
+#                 feature.loc[ind_last, 'maps'] = np.sum(data[2][:]=='Maps')
+#                 feature.loc[ind_last, 'calendar'] = np.sum(data[2][:]=='Calendar')
+#                 feature.loc[ind_last, 'youtube'] = np.sum(data[2][:]=='Youtube')
+#                 feature.loc[ind_last, 'calculator'] = np.sum(data[2][:]=='Calculator')
+#                 feature.loc[ind_last, 'purple robot'] = np.sum(data[2][:]=='Purple Robot')
+#                 feature.loc[ind_last, 'system ui'] = np.sum(data[2][:]=='System UI')
+#             else:
+#                 if has_app_data: # if not, leave them as NaN
+#                     feature.loc[ind_last, 'messaging'] = 0
+#                     feature.loc[ind_last, 'facebook'] = 0
+#                     feature.loc[ind_last, 'chrome'] = 0
+#                     feature.loc[ind_last, 'mobilyze'] = 0
+#                     feature.loc[ind_last, 'phone'] = 0
+#                     feature.loc[ind_last, 'gmail'] = 0
+#                     feature.loc[ind_last, 'contacts'] = 0
+#                     feature.loc[ind_last, 'internet'] = 0
+#                     feature.loc[ind_last, 'gallery'] = 0
+#                     feature.loc[ind_last, 'email'] = 0
+#                     feature.loc[ind_last, 'settings'] = 0
+#                     feature.loc[ind_last, 'messenger'] = 0
+#                     feature.loc[ind_last, 'camera'] = 0
+#                     feature.loc[ind_last, 'clock'] = 0
+#                     feature.loc[ind_last, 'maps'] = 0
+#                     feature.loc[ind_last, 'calendar'] = 0
+#                     feature.loc[ind_last, 'youtube'] = 0
+#                     feature.loc[ind_last, 'calculator'] = 0
+#                     feature.loc[ind_last, 'purple robot'] = 0
+#                     feature.loc[ind_last, 'system ui'] = 0
+#                 else:
+#                     feature.loc[ind_last, 'messaging'] = np.nan
+#                     feature.loc[ind_last, 'facebook'] = np.nan
+#                     feature.loc[ind_last, 'chrome'] = np.nan
+#                     feature.loc[ind_last, 'mobilyze'] = np.nan
+#                     feature.loc[ind_last, 'phone'] = np.nan
+#                     feature.loc[ind_last, 'gmail'] = np.nan
+#                     feature.loc[ind_last, 'contacts'] = np.nan
+#                     feature.loc[ind_last, 'internet'] = np.nan
+#                     feature.loc[ind_last, 'gallery'] = np.nan
+#                     feature.loc[ind_last, 'email'] = np.nan
+#                     feature.loc[ind_last, 'settings'] = np.nan
+#                     feature.loc[ind_last, 'messenger'] = np.nan
+#                     feature.loc[ind_last, 'camera'] = np.nan
+#                     feature.loc[ind_last, 'clock'] = np.nan
+#                     feature.loc[ind_last, 'maps'] = np.nan
+#                     feature.loc[ind_last, 'calendar'] = np.nan
+#                     feature.loc[ind_last, 'youtube'] = np.nan
+#                     feature.loc[ind_last, 'calculator'] = np.nan
+#                     feature.loc[ind_last, 'purple robot'] = np.nan
+#                     feature.loc[ind_last, 'system ui'] = np.nan
 
             # communication
             if 'coe.csv' in sensors:
@@ -361,11 +361,10 @@ def extract_features(subjects):
     return 0
 
 
-# In[3]:
+# In[2]:
 
 import os
 subjects = os.listdir('data/')
-# subjects = subjects[:2]
 extract_features(subjects)
 
 
