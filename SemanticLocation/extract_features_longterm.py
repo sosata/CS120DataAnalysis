@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[9]:
 
 # this program uses short-term features from features_new/ and adds personal, long-term features to them
 
@@ -12,7 +12,7 @@ import pandas as pd
 
 ind_lat = 51
 ind_long = 52
-threshold_distance_squared = 0.001**2 # equivalent to about 100 meters
+threshold_distance_squared = 0.0005**2 # equivalent to about 50 meters
 
 save_results = True
 
@@ -45,8 +45,7 @@ for filename in files:
         f.close()
 
 
-# In[4]:
+# In[8]:
 
-print feature.columns
-print feature.shape
+target
 

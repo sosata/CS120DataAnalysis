@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[85]:
+# In[3]:
 
 import csv
 import os
@@ -12,7 +12,7 @@ import pandas as pd
 
 get_ipython().magic(u'matplotlib inline')
 
-emply = pd.read_excel(open('../../../../Data/CS120Clinical/CS120Final_Baseline.xlsx','r'))
+emply = pd.read_excel(open('../../../Data/CS120Clinical/CS120Final_Baseline.xlsx','r'))
 subjects = emply['ID']
 subjects = subjects.astype(str)
 subjects_employed = subjects[emply['slabels02']==1]
@@ -153,12 +153,12 @@ axes.set_xlim([-1, len(loc_all_uniq)-show_from])
 plt.xticks(range(len(loc_all_uniq)-show_from), loc_all_uniq[show_from:], fontsize=10, color=(0,0,0), rotation=270);
 
 
-# In[90]:
+# In[8]:
 
 # a better measure of the average percentage of time spent at that location across the subjects
 # the percentage is calculated for each subejcts and then averaged across the subjects - with CIs computed as well
 
-save_results = True
+save_results = False
 
 loc_all_uniq = np.unique(np.append(loc_all_employed,loc_all_unemployed))
 print loc_all_uniq.size
@@ -200,6 +200,7 @@ perc_unemployed_ci = perc_unemployed_ci[ind_sort]
 
 show_until = 11
 xlabel = loc_all_uniq[:show_until]
+print loc_all_uniq[:show_until]
 
 if save_results:
     import pickle
@@ -227,7 +228,7 @@ plt.grid(axis='y')
 
 
 
-# In[82]:
+# In[7]:
 
 print loc_all_uniq[:show_until]
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[7]:
 
 from ipyparallel import Client
 
@@ -33,7 +33,7 @@ def extract_features(subjects):
     data_dir = 'data/'
     data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
 
-    fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',              'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',              'Professional & Other Places':'Professional or Medical Office',              'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store'}
+    fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',              'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',              'Professional & Other Places':'Professional or Medical Office',              'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store',               'Travel & Transport':'Travel or Transport (Airport, Bus Stop, Train Station, Etc.)'}
 
     # building one hot encoder for foursquare locations (as extra features)
     state7 = np.array(fsq_map.values()+['Unknown'])
@@ -361,7 +361,7 @@ def extract_features(subjects):
     return 0
 
 
-# In[2]:
+# In[8]:
 
 import os
 subjects = os.listdir('data/')
