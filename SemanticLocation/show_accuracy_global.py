@@ -82,7 +82,7 @@ file = 'auc_location_new_10fold3.dat'
 with open(file) as f:
     aucs, confs, labels = pickle.load(f)
 f.close()
-    
+
 auc_top10 = list(np.array([]) for ii in range(len(state_top10)))
 conf_top10 = list([np.array([]) for iii in range(len(state_top10))] for ii in range(len(state_top10)))
 for (k,lab) in enumerate(labels):

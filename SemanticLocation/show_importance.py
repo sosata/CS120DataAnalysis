@@ -27,7 +27,7 @@ def stratify(x, y):
         
 
 
-# In[15]:
+# In[104]:
 
 import os
 import pickle
@@ -35,12 +35,7 @@ import numpy as np
 import xgboost as xgb
 import pandas as pd
 
-# from sklearn.preprocessing import OneHotEncoder
-# from sklearn import preprocessing
-
-feature_label = np.array(['light mean','light std','light off','light zcrossing','light skew','light kurt',                          'audio mean','audio std','audio skew','audio kurt','audio frq mean','audio frq std','audio frq skew','audio frq kurt',                          'screen frq mean','screen dur mean','screen dur std',                          'still','tilting','walking','unknown act', 'still-walking','still-tilting','still-unknown','walking-unknown',                          'messaging app','facebook app','chrome app','mobilyze app','phone app','gmail app','contacts app','internet app',                          'gallery app','email app','settings app',                          'messenger app','camera app','clock app','maps app','calendar app','youtube app','calculator app',                          'purple robot app','system ui app',                          'n call in','n call out','n sms in','n sms out','n missed',                          'n wifi',                          'latitude mean','longitude mean','location var',                          'temperature','dew point','weather',                          'visit duration','visit midtime','weekday start','weekday end',                          '4square cat 1','4square cat 2','4square cat 3','4square cat 4','4square cat 5','4square cat 6','4square cat 7',                          '4square cat 8','4square distance',                         'visit frequency','visit interval mean'])
-
-n_bootstrap = 10
+n_bootstrap = 100
 do_stratify = False
 
 ft_dir = 'features_long/'
@@ -76,16 +71,27 @@ for filename in files:
         
     f.close()
 
-x_train = pd.concat(feature_all, axis=0)
-y_train = pd.concat(state_all)
+# x_train = pd.concat(feature_all, axis=0)
+# y_train = pd.concat(state_all)
 
 if do_stratify:
     x_train, y_train = stratify(x_train,y_train)
 
+inds = np.arange(0,len(feature_all),1)
+inds_split = np.floor(0.7*len(feature_all))
+    
 gbm = [[] for _ in range(n_bootstrap)]
 for sd in range(n_bootstrap):
     print 'bootstrap {}'.format(sd)
-    gbm[sd] = xgb.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05, nthread=12, subsample=1,                               max_delta_step=0, seed=sd).fit(x_train, y_train)
+#     gbm[sd] = xgb.XGBClassifier(max_depth=3, n_estimators=300, learning_rate=0.05, nthread=12, subsample=1,\
+#                                max_delta_step=0, seed=sd).fit(x_train, y_train)
+    np.random.shuffle(inds)
+    ind_train = inds[:inds_split]
+    ind_test = inds[inds_split:]
+    x_train = pd.concat([feature_all[j] for j in ind_train], axis=0)
+    y_train = pd.concat([state_all[j] for j in ind_train], axis=0)
+
+    gbm[sd] = xgb.XGBClassifier(max_depth=6, n_estimators=75, learning_rate=0.05, nthread=12, subsample=0.25,                         colsample_bytree=0.2, max_delta_step=0, gamma=3, objective='mlogloss', reg_alpha=0.5,                         missing=np.nan).fit(x_train, y_train)
 
 
 # In[13]:
@@ -93,28 +99,43 @@ for sd in range(n_bootstrap):
 state_top10
 
 
-# In[37]:
+# In[122]:
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+dic = {'lgt mean':'light intensity mean', 'lgt std':'light intensity std', 'lgt off':'% no light', 'lgt zcrossing':'light change',       'lgt skew':'light intensity skewness', 'lgt kurt':'light intensity kurtosis', 'aud mean':'sound amplitude mean',        'aud std':'sound amplitude std', 'aud skew':'sound amplitude skewness', 'aud kurt':'sound amplitude kurtosis',       'aud frq mean':'sound frequency mean', 'aud frq std':'sound frequency std', 'aud frq skew':'sound frequency skewness',       'aud frq kurt':'sound frequency kurtosis', 'scr frq':'screen on/off frequency', 'scr dur mean':'screen on duration mean',        'scr dur std':'screen on duration std', 'still':'% stillness', 'tilting':'% tilting', 'walking':'% walking',       'unknown act':'unknown activity', 'still-walking':'still to walking', 'still-tilting':'still to tilting',       'still-unknown':'still to unknown', 'walking-unknown':'walking to unknown', 'call in':'no incoming calls', 'call out':       'no outgoing calls', 'sms in':'no incoming sms', 'sms out':'no outgoing sms', 'call missed':'no missed calls', 'n wifi':       'no wifi nets', 'temperature':'outside temperature', 'dew point':'outside windchill', 'weather':'outside weather',        'lat mean':'latitude mean', 'lng mean':'longitude mean', 'loc var':'location variance', 'duration':'visit duration',       'midtime':'visit timestamp', 'midhour':'visit time of day', 'dow start':'arrive day of week', 'dow end':       'leave day of week', 'fsq 0':'Foursquare Nightlife Spot', 'fsq 1':'Foursquare Outdoors & Recreation', 'fsq 2':'Foursquare Arts & Entertainment'       , 'fsq 3':'Foursquare Professional or Medical Office', 'fsq 4':'Foursquare Food', 'fsq 5':'Foursquare Home',        'fsq 6':'Foursquare Shop or Store', 'fsq 7':'Foursquare Travel or Transport', 'fsq 8':'Foursquare Unknown', 'fsq distance':       'Foursquare distance', 'LT frequency':'visit frequency', 'LT interval mean':'mean time between visits'}
+
+# extracting means and CIs
+feature_label = x_train.columns
+
+fscore = pd.DataFrame(index=np.arange(n_bootstrap), columns=feature_label)
+for i in range(n_bootstrap):
+    keys = np.array(gbm[i].booster().get_fscore().keys())
+    vals = np.array(gbm[i].booster().get_fscore().values()).astype(float)
+    for lab in feature_label:
+        ind = np.where(keys==lab)[0]
+        if ind.size>0:
+            fscore.loc[i,lab] = vals[ind[0]]
+fscore_mean = np.array(fscore.mean(axis=0))
+fscore_ci = np.array(fscore.std(axis=0)/np.sqrt(n_bootstrap))
+ind_sort = np.array(np.argsort(fscore_mean))
+val_sorted = fscore_mean[ind_sort]
+ci_sorted = fscore_ci[ind_sort]
+feature_label_sorted = feature_label[ind_sort]
+feature_label_short = []
+for i in range(feature_label_sorted.size):
+    feature_label_short.append(dic[feature_label_sorted[i]])
+    
 get_ipython().magic(u'matplotlib inline')
 plt.figure(figsize=(10,15))
 axes = plt.gca()
-#xgb.plot_importance(gbm, ax=axes, label=feature_label)
-
-fscore = pd.DataFrame()
-for i in range(n_bootstrap):
-    fscore.loc[i,:] = np.array(gbm[i].booster().get_fscore().values())
-fscore_mean = np.array(np.mean(fscore,axis=0))
-ind_sort = np.argsort(fscore_mean)
-val_sorted = fscore_mean[ind_sort]
-key_sorted = list(np.array(gbm[0].booster().get_fscore().keys())[ind_sort])
-plt.barh(np.arange(val_sorted.size), val_sorted, .7, color=(.4,.4,1), align='center')
-plt.yticks(np.arange(len(key_sorted)), key_sorted, fontsize=12, color=(0,0,0));
-axes.set_ylim([-1, len(key_sorted)])
+plt.barh(np.arange(val_sorted.size), val_sorted, xerr=ci_sorted, color=(.7,.7,1), align='center')
+plt.yticks(np.arange(len(feature_label_short)), feature_label_short, fontsize=12, color=(0,0,0));
+axes.set_ylim([-1, len(feature_label_short)-1.5])
 
 
-# In[35]:
+# In[121]:
 
-np.array(gbm[i].booster().get_fscore().values())
+dic[feature_label_sorted[i]]
 
