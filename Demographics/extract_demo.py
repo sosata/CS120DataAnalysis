@@ -1,0 +1,45 @@
+
+# coding: utf-8
+
+# In[40]:
+
+def convert_date_to_age(date):
+    y_study = 2015
+    m_study = 10
+    d_study = 15
+    date,_ = date.split(' ')
+    y,m,d = date.split('-')
+    age = (y_study-float(y)) + (m_study-float(m))/12.0 + (d_study-float(d))/365.0
+    return age
+
+
+# In[41]:
+
+import pandas as pd
+import os
+import pickle
+import numpy as np
+
+xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Baseline.xlsx')
+df = xl.parse('Sheet1')
+
+ind_subject = np.where(df.loc[0:999,'ID'].astype(str)!='nan')[0]
+subjects = df.loc[ind_subject, 'ID'].astype(str)
+gender = df.loc[ind_subject, 'demo09'].astype(int)
+age = df.loc[ind_subject, 'demo08'].astype(str)
+age = age.apply(convert_date_to_age)
+employment = df.loc[ind_subject, 'slabels02'].astype(int)
+
+demo = pd.concat([subjects, gender, age, employment], axis=1)
+demo.columns = ['ID','gender','age','employment']
+demo = demo.reset_index(drop=True)
+
+with open('demo.dat','w') as f:
+    pickle.dump(demo, f)
+f.close()
+
+
+# In[42]:
+
+demo
+
