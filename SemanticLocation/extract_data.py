@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 import csv
 import os
@@ -25,6 +25,8 @@ subjects[52] = ''
 #48 skipped / this subject's eml.csv file contain lots of empty elements that should be removed
 #52 as well
 #subjects = subjects[148:]
+
+subjects = ['1307899']
 
 for subj in subjects:
     filename = fsq_data_dir + subj + '/fsq.csv'

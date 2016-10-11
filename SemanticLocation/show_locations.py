@@ -1,7 +1,18 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[49]:
+
+def remove_parentheses(ss):
+    ss = np.array(ss)
+    for i in range(ss.size):
+        s = ss[i].split('(')
+        s = s[0]
+        ss[i] = s
+    return ss
+
+
+# In[26]:
 
 # Visualizes the location visit durations across different demographic (e.g., emplotyment) and mental health (e.g. depression)
 # groups
@@ -56,10 +67,12 @@ for filename in files:
         data.loc[ind_subject, location_top] = 0
         dur_all = 0
         for (i,loc) in enumerate(target['location']):
-            if not np.isnan(feature['duration'][i]):
+            if not np.isnan(feature['n gps'][i]):
                 if loc in location_top:
-                    data.loc[ind_subject, loc] += feature['duration'][i]
-                dur_all += feature['duration'][i]
+                    data.loc[ind_subject, loc] += feature['n gps'][i]
+                dur_all += feature['n gps'][i]
+            else:
+                print 'warning: n gps was nan'
         
         # normalize
         data.loc[ind_subject, location_top] /= dur_all
@@ -67,7 +80,7 @@ for filename in files:
     f.close()
 
 
-# In[7]:
+# In[50]:
 
 # all subjects
 
@@ -79,11 +92,16 @@ mean = np.mean(data_loc, axis=0)
 ci = np.std(data_loc, axis=0)/np.sqrt(data_loc.shape[0])
 
 plt.bar(np.arange(mean.size), mean, yerr=ci, width=.3, color=(0.7,0.7,0.7))
-plt.xticks(np.arange(mean.size), data_loc.columns, rotation=270)
+plt.xticks(np.arange(mean.size), remove_parentheses(data_loc.columns), rotation=270)
 plt.legend(['n={}'.format(data_loc.shape[0])])
 
 
-# In[8]:
+# In[47]:
+
+location
+
+
+# In[60]:
 
 # compare depressed to non-depressed
 
@@ -111,32 +129,32 @@ mean_nodep = np.mean(data_nodep, axis=0)
 ci_dep = np.std(data_dep, axis=0)/np.sqrt(data_dep.shape[0])
 ci_nodep = np.std(data_nodep, axis=0)/np.sqrt(data_nodep.shape[0])
 
-plt.bar(np.arange(mean_dep.size), mean_dep, yerr=ci_dep, width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_nodep.size)+.3, mean_nodep, yerr=ci_nodep, width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_dep.size)+.3, data_dep.columns, rotation=270)
+plt.bar(np.arange(mean_dep.size), mean_dep, yerr=ci_dep, width=.3, color=(1,.5,.5))
+plt.bar(np.arange(mean_nodep.size)+.3, mean_nodep, yerr=ci_nodep, width=.3, color=(.5,.5,1))
+plt.xticks(np.arange(mean_dep.size)+.3, remove_parentheses(data_dep.columns), rotation=270)
 plt.legend(['depression (n={})'.format(data_dep.shape[0]),'no depression (n={})'.format(data_nodep.shape[0])])
 plt.title('non-normalized')
 
 
-# In[9]:
+# In[61]:
 
 # same plot, normalized
 
-plt.bar(np.arange(mean_dep.size), np.divide(mean_dep,mean_dep+mean_nodep), yerr=np.divide(ci_dep,mean_dep+mean_nodep), width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_nodep.size)+.3, np.divide(mean_nodep,mean_dep+mean_nodep), yerr=np.divide(ci_nodep,mean_dep+mean_nodep), width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_dep.size)+.3, data_dep.columns, rotation=270)
+plt.bar(np.arange(mean_dep.size), np.divide(mean_dep,mean_dep+mean_nodep), yerr=np.divide(ci_dep,mean_dep+mean_nodep), width=.3, color=(1,.5,.5))
+plt.bar(np.arange(mean_nodep.size)+.3, np.divide(mean_nodep,mean_dep+mean_nodep), yerr=np.divide(ci_nodep,mean_dep+mean_nodep), width=.3, color=(.5,.5,1))
+plt.xticks(np.arange(mean_dep.size)+.3, remove_parentheses(data_dep.columns), rotation=270)
 plt.legend(['depression (n={})'.format(data_dep.shape[0]),'no depression (n={})'.format(data_nodep.shape[0])])
 plt.title('normalized')
 
 # ttest
 for (i,loc) in enumerate(location_top):
     _,p = ttest_ind(data_dep.loc[np.logical_not(np.isnan(data_dep.loc[:,loc])),loc],                     data_nodep.loc[np.logical_not(np.isnan(data_nodep.loc[:,loc])),loc], equal_var=False)
-    print p
+#     print p
     if p<.05:
         plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
 
 
-# In[10]:
+# In[62]:
 
 # compare anxious to non-anxious
 
@@ -163,32 +181,31 @@ mean_noanx = np.mean(data_noanx, axis=0)
 ci_anx = np.std(data_anx, axis=0)/np.sqrt(data_anx.shape[0])
 ci_noanx = np.std(data_noanx, axis=0)/np.sqrt(data_noanx.shape[0])
 
-plt.bar(np.arange(mean_anx.size), mean_anx, yerr=ci_anx, width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_noanx.size)+.3, mean_noanx, yerr=ci_noanx, width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_anx.size)+.3, data_anx.columns, rotation=270)
+plt.bar(np.arange(mean_anx.size), mean_anx, yerr=ci_anx, width=.3, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_noanx.size)+.3, mean_noanx, yerr=ci_noanx, width=.3, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_anx.size)+.3, remove_parentheses(data_anx.columns), rotation=270)
 plt.legend(['anxiety (n={})'.format(data_anx.shape[0]),'no anxiety (n={})'.format(data_noanx.shape[0])])
 plt.title('non-normalized')
 
 
-# In[11]:
+# In[63]:
 
 # same but normalized
 
-plt.bar(np.arange(mean_anx.size), np.divide(mean_anx,mean_anx+mean_noanx), yerr=np.divide(ci_anx,mean_anx+mean_noanx), width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_noanx.size)+.3, np.divide(mean_noanx,mean_anx+mean_noanx), yerr=np.divide(ci_noanx,mean_anx+mean_noanx), width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_anx.size)+.3, data_anx.columns, rotation=270)
+plt.bar(np.arange(mean_anx.size), np.divide(mean_anx,mean_anx+mean_noanx), yerr=np.divide(ci_anx,mean_anx+mean_noanx), width=.3, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_noanx.size)+.3, np.divide(mean_noanx,mean_anx+mean_noanx), yerr=np.divide(ci_noanx,mean_anx+mean_noanx), width=.3, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_anx.size)+.3, remove_parentheses(data_anx.columns), rotation=270)
 plt.legend(['anxiety (n={})'.format(data_anx.shape[0]),'no anxiety (n={})'.format(data_noanx.shape[0])])
 plt.title('normalized')
 
 # ttest
 for (i,loc) in enumerate(location_top):
     _,p = ttest_ind(data_anx.loc[np.logical_not(np.isnan(data_anx.loc[:,loc])),loc],                     data_noanx.loc[np.logical_not(np.isnan(data_noanx.loc[:,loc])),loc], equal_var=False)
-    print p
     if p<.05:
         plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
 
 
-# In[12]:
+# In[64]:
 
 # gender
 
@@ -206,30 +223,30 @@ mean_female = np.mean(data_female, axis=0)
 ci_male = np.std(data_male, axis=0)/np.sqrt(data_male.shape[0])
 ci_female = np.std(data_female, axis=0)/np.sqrt(data_female.shape[0])
 
-plt.bar(np.arange(mean_male.size), mean_male, yerr=ci_male, width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_female.size)+.3, mean_female, yerr=ci_female, width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_male.size)+.3, data_male.columns, rotation=270)
+plt.bar(np.arange(mean_male.size), mean_male, yerr=ci_male, width=.3, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_female.size)+.3, mean_female, yerr=ci_female, width=.3, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_male.size)+.3, remove_parentheses(data_male.columns), rotation=270)
 plt.legend(['male (n={})'.format(data_male.shape[0]),'female (n={})'.format(data_female.shape[0])])
 plt.title('non-normalized')
 
 
-# In[13]:
+# In[65]:
 
-plt.bar(np.arange(mean_male.size), np.divide(mean_male,mean_male+mean_female), yerr=np.divide(ci_male,mean_male+mean_female), width=.3, color=(1,0,0))
-plt.bar(np.arange(mean_female.size)+.3, np.divide(mean_female,mean_male+mean_female), yerr=np.divide(ci_female,mean_male+mean_female), width=.3, color=(0,0,1))
-plt.xticks(np.arange(mean_male.size)+.3, data_anx.columns, rotation=270)
+plt.bar(np.arange(mean_male.size), np.divide(mean_male,mean_male+mean_female), yerr=np.divide(ci_male,mean_male+mean_female), width=.3, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_female.size)+.3, np.divide(mean_female,mean_male+mean_female), yerr=np.divide(ci_female,mean_male+mean_female), width=.3, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_male.size)+.3, remove_parentheses(data_anx.columns), rotation=270)
 plt.legend(['male (n={})'.format(data_male.shape[0]),'female (n={})'.format(data_female.shape[0])])
 plt.title('normalized')
 
 # ttest
 for (i,loc) in enumerate(location_top):
     _,p = ttest_ind(data_male.loc[np.logical_not(np.isnan(data_male.loc[:,loc])),loc],                     data_female.loc[np.logical_not(np.isnan(data_female.loc[:,loc])),loc], equal_var=False)
-    print p
+#     print p
     if p<.05:
         plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
 
 
-# In[16]:
+# In[66]:
 
 # age
 
@@ -255,26 +272,26 @@ ci_2 = np.std(data_2, axis=0)/np.sqrt(data_1.shape[0])
 ci_3 = np.std(data_3, axis=0)/np.sqrt(data_1.shape[0])
 ci_4 = np.std(data_4, axis=0)/np.sqrt(data_1.shape[0])
 
-plt.bar(np.arange(mean_1.size), mean_1, yerr=ci_1, width=.2, color=(1,0,0))
-plt.bar(np.arange(mean_2.size)+.2, mean_2, yerr=ci_2, width=.2, color=(1,1,0))
-plt.bar(np.arange(mean_3.size)+.4, mean_3, yerr=ci_3, width=.2, color=(0,1,1))
-plt.bar(np.arange(mean_4.size)+.6, mean_4, yerr=ci_4, width=.2, color=(0,0,1))
-plt.xticks(np.arange(mean_male.size)+.4, data_male.columns, rotation=270)
-plt.legend(['< 30 (n={})'.format(data_1.shape[0]),'30 - 40 (n={})'.format(data_2.shape[0]),            '< 40 - 50 (n={})'.format(data_3.shape[0]), '> 50 (n={})'.format(data_4.shape[0])])
+plt.bar(np.arange(mean_1.size), mean_1, yerr=ci_1, width=.2, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_2.size)+.2, mean_2, yerr=ci_2, width=.2, color=(1,1,0.5))
+plt.bar(np.arange(mean_3.size)+.4, mean_3, yerr=ci_3, width=.2, color=(0.5,1,1))
+plt.bar(np.arange(mean_4.size)+.6, mean_4, yerr=ci_4, width=.2, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_male.size)+.4, remove_parentheses(data_male.columns), rotation=270)
+plt.legend(['< 30 (n={})'.format(data_1.shape[0]),'30 - 40 (n={})'.format(data_2.shape[0]),            '40 - 50 (n={})'.format(data_3.shape[0]), '> 50 (n={})'.format(data_4.shape[0])])
 plt.title('non-normalized')
 
 # plt.hist(data['age'])
 
 
-# In[18]:
+# In[67]:
 
 mean_all = mean_1+mean_2+mean_3+mean_4
-plt.bar(np.arange(mean_1.size), np.divide(mean_1,mean_all), yerr=np.divide(ci_1,mean_all), width=.2, color=(1,0,0))
-plt.bar(np.arange(mean_2.size)+.2, np.divide(mean_2,mean_all), yerr=np.divide(ci_2,mean_all), width=.2, color=(1,1,0))
-plt.bar(np.arange(mean_3.size)+.4, np.divide(mean_3,mean_all), yerr=np.divide(ci_3,mean_all), width=.2, color=(0,1,1))
-plt.bar(np.arange(mean_4.size)+.6, np.divide(mean_4,mean_all), yerr=np.divide(ci_4,mean_all), width=.2, color=(0,0,1))
-plt.xticks(np.arange(mean_1.size)+.4, data_1.columns, rotation=270)
-plt.legend(['< 30 (n={})'.format(data_1.shape[0]),'30 - 40 (n={})'.format(data_2.shape[0]),            '< 40 - 50 (n={})'.format(data_3.shape[0]), '> 50 (n={})'.format(data_4.shape[0])])
+plt.bar(np.arange(mean_1.size), np.divide(mean_1,mean_all), yerr=np.divide(ci_1,mean_all), width=.2, color=(1,0.5,0.5))
+plt.bar(np.arange(mean_2.size)+.2, np.divide(mean_2,mean_all), yerr=np.divide(ci_2,mean_all), width=.2, color=(1,1,0.5))
+plt.bar(np.arange(mean_3.size)+.4, np.divide(mean_3,mean_all), yerr=np.divide(ci_3,mean_all), width=.2, color=(0.5,1,1))
+plt.bar(np.arange(mean_4.size)+.6, np.divide(mean_4,mean_all), yerr=np.divide(ci_4,mean_all), width=.2, color=(0.5,0.5,1))
+plt.xticks(np.arange(mean_1.size)+.4, remove_parentheses(data_1.columns), rotation=270)
+plt.legend(['< 30 (n={})'.format(data_1.shape[0]),'30 - 40 (n={})'.format(data_2.shape[0]),            '40 - 50 (n={})'.format(data_3.shape[0]), '> 50 (n={})'.format(data_4.shape[0])])
 plt.title('normalized')
 
 # ttest -- should change to anova

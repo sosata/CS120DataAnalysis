@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[7]:
+# In[4]:
 
 from ipyparallel import Client
 
@@ -31,7 +31,7 @@ def extract_features(subjects):
     remove_vehicle = True
 
     data_dir = 'data/'
-    data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
+#     data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
 
     fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',              'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',              'Professional & Other Places':'Professional or Medical Office',              'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store',               'Travel & Transport':'Travel or Transport (Airport, Bus Stop, Train Station, Etc.)'}
 
@@ -53,11 +53,11 @@ def extract_features(subjects):
         samples = os.listdir(subject_dir)
 
         # checking in the original directory if the subject has app data
-        sensors = os.listdir(data_dir_orig+subj)
-        if 'app.csv' in sensors:
-            has_app_data = True
-        else:
-            has_app_data = False
+#         sensors = os.listdir(data_dir_orig+subj)
+#         if 'app.csv' in sensors:
+#             has_app_data = True
+#         else:
+#             has_app_data = False
 
         # initialization
         feature = pd.DataFrame()
@@ -313,6 +313,7 @@ def extract_features(subjects):
                 feature.loc[ind_last, 'midhour'] = ((t_end+t_start)/2.0)%86400
                 feature.loc[ind_last, 'dow start'] = datetime.datetime.fromtimestamp(t_start).weekday()
                 feature.loc[ind_last, 'dow end'] = datetime.datetime.fromtimestamp(t_end).weekday()
+                feature.loc[ind_last, 'n gps'] = data.shape[0]
             else:
                 feature.loc[ind_last, 'lat mean'] = np.nan
                 feature.loc[ind_last, 'lng mean'] = np.nan
@@ -322,6 +323,7 @@ def extract_features(subjects):
                 feature.loc[ind_last, 'midhour'] = np.nan
                 feature.loc[ind_last, 'dow start'] = np.nan
                 feature.loc[ind_last, 'dow end'] = np.nan
+                feature.loc[ind_last, 'n gps'] = 0.0
 
             # foursquare location in binary form
             loc_fsq_code = le.transform(loc_fsq)
@@ -361,7 +363,7 @@ def extract_features(subjects):
     return 0
 
 
-# In[8]:
+# In[5]:
 
 import os
 subjects = os.listdir('data/')

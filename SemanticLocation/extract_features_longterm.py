@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[9]:
+# In[2]:
 
 # this program uses short-term features from features_new/ and adds personal, long-term features to them
 
@@ -22,9 +22,10 @@ feature_out = 'features_long/'
 files = os.listdir(feature_dir)
 
 for filename in files:
-    print filename, 
+#     print filename, 
     with open(feature_dir+filename) as f:  
         feature, target = pickle.load(f)
+        print feature.shape
         rf = pd.DataFrame(columns=['LT frequency'])
         ai = pd.DataFrame(columns=['LT interval mean'])
         for i in range(feature.shape[0]):

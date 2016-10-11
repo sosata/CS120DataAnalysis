@@ -22,21 +22,22 @@ def get_time_from_gps(path, time_now, time_prev, lat_report, lng_report):
         print 'error: location file not found'
         return np.array([]), np.array([])
 
-    # filtering gps data based on time
-    dif = [abs(x-time_prev) for x in t]
-    ind_start = dif.index(min(dif))
-    dif = [abs(x-time_now) for x in t]
-    ind_end = dif.index(min(dif))
-    t = t[ind_start:ind_end]
-    lat = lat[ind_start:ind_end]
-    lng = lng[ind_start:ind_end]
-    
+    # limiting data to current window
+#    dif = [abs(x-time_prev) for x in t]
+#    ind_start = dif.index(min(dif))
+#    dif = [abs(x-time_now) for x in t]
+#    ind_end = dif.index(min(dif))
+#    t = t[ind_start:ind_end]
+#    lat = lat[ind_start:ind_end]
+#    lng = lng[ind_start:ind_end]
+    lat = [lat[i] for i in range(len(t)) if (t[i]>time_prev and t[i]<time_now)]
+    lng = [lng[i] for i in range(len(t)) if (t[i]>time_prev and t[i]<time_now)]
+    t = [t[i] for i in range(len(t)) if (t[i]>time_prev and t[i]<time_now)]
+
     # filtering gps data based on location
     d = [math.sqrt((lat[i]-lat_report)**2+(lng[i]-lng_report)**2) for i in range(len(lat))]
     ind_within = [i for i in range(len(d)) if d[i]<.001]
     t = [t[i] for i in ind_within]
-    #lat = [lat[i] for i in ind_within]
-    #lng = [lng[i] for i in ind_within]
 
     if not t:
         print 'no data - instance skipped'
