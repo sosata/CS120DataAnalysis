@@ -59,7 +59,7 @@ def remove_parentheses(ss):
     return ss
 
 
-# In[357]:
+# In[ ]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
