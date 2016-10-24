@@ -1,10 +1,13 @@
 import numpy as np
+import scipy.stats as stats
 
 def calculate_covariance(data):
     
     n = data.shape[1]
 
     data_cov = np.zeros([n, n])
+    pval = np.zeros([n, n])
+
     mean = np.zeros(n)
     std = np.zeros(n)
     for i in range(n):
@@ -16,8 +19,12 @@ def calculate_covariance(data):
         for j in range(n):
             y = data[:,j]
             data_cov[i,j] = np.nanmean(np.multiply((x-mean[i]),(y-mean[j])))/(std[i]*std[j])
+            # calculating p-value
+            nn = np.sum(np.logical_and(np.logical_not(np.isnan(x)),np.logical_not(np.isnan(y))))
+            tt = data_cov[i,j]*np.sqrt(nn-2)/np.sqrt(1-data_cov[i,j]**2)
+            pval[i,j] = stats.t.sf(np.abs(tt), nn-1)*2
 
-    return data_cov
+    return data_cov, pval
 
 def stratify(x, y):
     

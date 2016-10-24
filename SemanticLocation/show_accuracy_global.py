@@ -154,7 +154,7 @@ for (i,c_row) in enumerate(conf_top10_fsq):
     for (j,c) in enumerate(c_row):
         conf[i,j] = np.sum(conf_top10_fsq[i][j])
 cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
-plot_confusion_matrix(cm_normalized, state_top10, title='confurion matrix: foursquare')
+plot_confusion_matrix(cm_normalized, state_top10, title='confusion matrix: foursquare')
 print cm_normalized[3,:]
 
 

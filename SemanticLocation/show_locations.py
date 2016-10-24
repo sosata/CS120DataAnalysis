@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[49]:
+# In[3]:
 
 def remove_parentheses(ss):
     ss = np.array(ss)
@@ -12,7 +12,7 @@ def remove_parentheses(ss):
     return ss
 
 
-# In[279]:
+# In[4]:
 
 import numpy as np
 import pandas as pd
@@ -26,12 +26,7 @@ def bootstrap(x, n_boot):
     return np.median(mean,axis=0), np.percentile(mean, 2.5, axis=0), np.percentile(mean, 97.5, axis=0)
 
 
-# In[256]:
-
-bootstrap(np.array(data_dep_norm),1000)
-
-
-# In[99]:
+# In[5]:
 
 # Visualizes the location visit durations across different demographic (e.g., emplotyment) and mental health (e.g. depression)
 # groups
@@ -77,31 +72,56 @@ for (i,subj) in enumerate(data['ID']):
 for loc_top in location_top:
     data.insert(loc=len(data.columns), column=loc_top, value=np.nan)
 
-for filename in files:
-    with open(ft_dir+filename) as f:  
-        feature, target = pickle.load(f)
+# for filename in files:
+#     with open(ft_dir+filename) as f:  
+#         feature, target = pickle.load(f)
+#         ind_subject = np.where(data['ID']==filename[:-4])[0][0]
+#         data.loc[ind_subject, location_top] = 0
+#         dur_all = 0
+#         for (i,loc) in enumerate(target['location']):
+#             if not np.isnan(feature['n gps'][i]):
+#                 if loc in location_top:
+#                     data.loc[ind_subject, loc] += feature['n gps'][i]
+#                 dur_all += feature['n gps'][i]
+#         data.loc[ind_subject, location_top] /= dur_all #normalize
+#     f.close()
 
-        ind_subject = np.where(data['ID']==filename[:-4])[0][0]
-        
-        data.loc[ind_subject, location_top] = 0
-        dur_all = 0
-        for (i,loc) in enumerate(target['location']):
-            if not np.isnan(feature['n gps'][i]):
-                if loc in location_top:
-                    data.loc[ind_subject, loc] += feature['n gps'][i]
-                dur_all += feature['n gps'][i]
-#             else:
-#                 print 'warning: n gps was nan'
-        
-        # normalize
-        data.loc[ind_subject, location_top] /= dur_all
-        
-    f.close()
+folders = os.listdir('data/')
+for fol in folders:
+    ind_subject = np.where(data['ID']==fol)[0][0]
+    subfolders = os.listdir('data/'+fol)
+    data.loc[ind_subject, location_top] = 0
+    dur_all = 0
+#     tmin=np.inf
+#     tmax=-np.inf
+    for subf in subfolders:
+        file_eml = 'data/'+fol+'/'+subf+'/eml.csv'
+        file_fus = 'data/'+fol+'/'+subf+'/fus.csv'
+        if os.path.exists(file_eml) and os.path.exists(file_fus):
+            df = pd.read_csv(file_eml, sep='\t', header=None)
+            loc = df.loc[0,6][2:-2]
+            df = pd.read_csv(file_fus, sep='\t', header=None)
+            t = np.array(df.loc[:,0])
+            tdiff = t[1:]-t[:-1]
+            tdiff = tdiff[tdiff<600]
+            dur = np.sum(tdiff)
+#             if tmin>df.loc[0,0]:
+#                 tmin = df.loc[0,0]
+#             if tmax<df.loc[df.shape[0]-1,0]:
+#                 tmax = df.loc[df.shape[0]-1,0]
+
+            if loc in location_top:
+                data.loc[ind_subject, loc] += dur
+            dur_all += dur
+#         else:
+#             print 'no data for subject {} instance {}'.format(fol, subf)
+#     data.loc[ind_subject, location_top] /= ((tmax-tmin)/86400.0) #normalize
+    data.loc[ind_subject, location_top] /= dur_all #normalize
 
 
 # # Overall Distribution
 
-# In[317]:
+# In[399]:
 
 # all subjects
 
@@ -115,11 +135,12 @@ ci = np.std(data_loc, axis=0)/np.sqrt(data_loc.shape[0])
 plt.bar(np.arange(mean.size), mean, yerr=ci, width=.3, color=(0.7,0.7,0.7))
 plt.xticks(np.arange(mean.size), remove_parentheses(data_loc.columns), rotation=270)
 plt.legend(['n={}'.format(data_loc.shape[0])])
+plt.ylabel('Hours')
 
 
 # # Depression (PHQ-9)
 
-# In[302]:
+# In[6]:
 
 # PHQ-9
 
@@ -128,16 +149,16 @@ from scipy.stats import ttest_ind
 get_ipython().magic(u'matplotlib inline')
 
 # option 1: all <> 10
-ind_dep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']>=10, data['PHQ9 W3']>=10), data['PHQ9 W6']>=10))[0]
-ind_nodep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']<10, data['PHQ9 W3']<10), data['PHQ9 W6']<10))[0]
+# ind_dep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']>=10, data['PHQ9 W3']>=10), data['PHQ9 W6']>=10))[0]
+# ind_nodep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']<10, data['PHQ9 W3']<10), data['PHQ9 W6']<10))[0]
 
 # option 2: average <> 10
 # ind_dep = np.where(data['PHQ9 W0']+data['PHQ9 W3']+data['PHQ9 W6']>=30)[0]
 # ind_nodep = np.where(data['PHQ9 W0']+data['PHQ9 W3']+data['PHQ9 W6']<30)[0]
 
-# option 3: change <> 0
-# ind_dep = np.where(data['PHQ9 W6']-data['PHQ9 W0']>5)[0]
-# ind_nodep = np.where(data['PHQ9 W6']-data['PHQ9 W0']<-2)[0]
+# option 3: |change| <> 5
+ind_dep = np.where(data['PHQ9 W6']-data['PHQ9 W0']>=5)[0]
+ind_nodep = np.where(data['PHQ9 W6']-data['PHQ9 W0']<=-5)[0]
 
 data_dep = data.loc[ind_dep, list(location_top)]
 data_nodep = data.loc[ind_nodep, list(location_top)]
@@ -157,9 +178,10 @@ plt.legend(['depression (n={})'.format(data_dep.shape[0]),'no depression (n={})'
 plt.title('non-normalized')
 
 
-# In[333]:
+# In[8]:
 
 # same plot, normalized
+plt.figure(figsize=[7,4])
 
 persum = (np.sum(data_dep,axis=0)+np.sum(data_nodep,axis=0)).reshape([1,data_dep.shape[1]])
 # persum = (np.mean(data_dep,axis=0)+np.mean(data_nodep,axis=0)).reshape([1,data_dep.shape[1]])
@@ -170,21 +192,23 @@ data_nodep_norm = np.divide(data_nodep, np.repeat(persum, data_nodep.shape[0], a
 mean_dep, lo_dep, hi_dep = bootstrap(np.array(data_dep_norm), 1000)
 mean_nodep, lo_nodep, hi_nodep = bootstrap(np.array(data_nodep_norm), 1000)
 
-plt.bar(np.arange(mean_dep.size), mean_dep, yerr=np.array([mean_dep-lo_dep,hi_dep-mean_dep]), width=.3, color=(1,.5,.5))
-plt.bar(np.arange(mean_nodep.size)+.3, mean_nodep, yerr=np.array([mean_nodep-lo_nodep,hi_nodep-mean_nodep]), width=.3, color=(.5,.5,1))
+plt.bar(np.arange(mean_dep.size), mean_dep, yerr=np.array([mean_dep-lo_dep,hi_dep-mean_dep]), width=.3, color=(1,.5,.5), ecolor=(0,0,0))
+plt.bar(np.arange(mean_nodep.size)+.3, mean_nodep, yerr=np.array([mean_nodep-lo_nodep,hi_nodep-mean_nodep]), width=.3, color=(.5,.5,1),ecolor=(0,0,0))
 
-plt.legend(['depression (n={})'.format(data_dep.shape[0]),'no depression (n={})'.format(data_nodep.shape[0])])
+# plt.legend(['depressed (n={})'.format(data_dep.shape[0]),'non-depressed (n={})'.format(data_nodep.shape[0])],loc='upper left')
+plt.legend(['depressed','non-depressed'],loc='upper left')
 plt.xticks(np.arange(mean_dep.size)+.3, remove_parentheses(data_dep.columns), rotation=270)
-plt.title('normalized')
+# plt.title('normalized')
+plt.ylabel('Average Relative Time',fontsize=14)
 
 # ttest
 for (i,loc) in enumerate(location_top):
     _,p = ttest_ind(data_dep.loc[np.logical_not(np.isnan(data_dep.loc[:,loc])),loc],                     data_nodep.loc[np.logical_not(np.isnan(data_nodep.loc[:,loc])),loc], equal_var=False)
 #     _,p = ranksums(data_dep.loc[np.logical_not(np.isnan(data_dep.loc[:,loc])),loc], \
 #                     data_nodep.loc[np.logical_not(np.isnan(data_nodep.loc[:,loc])),loc])
-#     print p
+    print p
     if p<.05:
-        plt.plot(i+.3, 0.002, '*', markersize=10, color=(0,1,0))
+        plt.plot(i+.3, max([hi_dep[i],hi_nodep[i]])+0.002, marker=(5,2), markersize=10, color=(0,0,0))
 
 
 # In[164]:
@@ -200,7 +224,7 @@ plt.xticks(np.arange(data_dep_norm.shape[1])+.1, remove_parentheses(data_dep_nor
 
 # # Anxiety (GAD-7)
 
-# In[328]:
+# In[9]:
 
 # compare anxious to non-anxious
 
@@ -208,16 +232,16 @@ import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
 
 # option 1: all <> 10
-ind_anx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']>=10, data['GAD7 W3']>=10), data['GAD7 W6']>=10))[0]
-ind_noanx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']<10, data['GAD7 W3']<10), data['GAD7 W6']<10))[0]
+# ind_anx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']>=10, data['GAD7 W3']>=10), data['GAD7 W6']>=10))[0]
+# ind_noanx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']<10, data['GAD7 W3']<10), data['GAD7 W6']<10))[0]
 
 # option 2: average <> 10
 # ind_anx = np.where(data['GAD7 W0']+data['GAD7 W3']+data['GAD7 W6']>=30)[0]
 # ind_noanx = np.where(data['GAD7 W0']+data['GAD7 W3']+data['GAD7 W6']<30)[0]
 
 # option 3: change <> 0
-# ind_anx = np.where(data['GAD7 W6']-data['GAD7 W0']>=5)[0]
-# ind_noanx = np.where(data['GAD7 W6']-data['GAD7 W0']<-5)[0]
+ind_anx = np.where(data['GAD7 W6']-data['GAD7 W0']>=5)[0]
+ind_noanx = np.where(data['GAD7 W6']-data['GAD7 W0']<=-5)[0]
 
 data_anx = data.loc[ind_anx, list(location_top)]
 data_noanx = data.loc[ind_noanx, list(location_top)]
@@ -236,28 +260,44 @@ plt.legend(['anxiety (n={})'.format(data_anx.shape[0]),'no anxiety (n={})'.forma
 plt.title('non-normalized')
 
 
-# In[334]:
+# In[11]:
 
 # same but normalized
+plt.figure(figsize=[7,4])
 
-persum = mean_anx+mean_noanx
-plt.bar(np.arange(mean_anx.size), np.divide(mean_anx,persum),         yerr=np.array([np.divide(mean_anx-lo_anx,persum),np.divide(hi_anx-mean_anx,persum)]), width=.3, color=(1,0.5,0.5))
-plt.bar(np.arange(mean_noanx.size)+.3, np.divide(mean_noanx,persum),         yerr=np.array([np.divide(mean_noanx-lo_noanx,persum),np.divide(hi_noanx-mean_noanx,persum)]), width=.3, color=(0.5,0.5,1))
+# persum = mean_anx+mean_noanx
+persum = (np.sum(data_anx,axis=0)+np.sum(data_noanx,axis=0)).reshape([1,data_anx.shape[1]])
+data_anx_norm = np.divide(data_anx, np.repeat(persum, data_anx.shape[0], axis=0))
+data_noanx_norm = np.divide(data_noanx, np.repeat(persum, data_noanx.shape[0], axis=0))
+mean_anx, lo_anx, hi_anx = bootstrap(np.array(data_anx_norm), 1000)
+mean_noanx, lo_noanx, hi_noanx = bootstrap(np.array(data_noanx_norm), 1000)
+
+# plt.bar(np.arange(mean_anx.size), np.divide(mean_anx,persum), \
+#         yerr=np.array([np.divide(mean_anx-lo_anx,persum),np.divide(hi_anx-mean_anx,persum)]), width=.3, color=(1,0.5,0.5))
+# plt.bar(np.arange(mean_noanx.size)+.3, np.divide(mean_noanx,persum), \
+#         yerr=np.array([np.divide(mean_noanx-lo_noanx,persum),np.divide(hi_noanx-mean_noanx,persum)]), width=.3, color=(0.5,0.5,1))
+
+plt.bar(np.arange(mean_anx.size), mean_anx, yerr=np.array([mean_anx-lo_anx,hi_anx-mean_anx]), width=.3, color=(1,.5,.5), ecolor=(0,0,0))
+plt.bar(np.arange(mean_noanx.size)+.3, mean_noanx, yerr=np.array([mean_noanx-lo_noanx,hi_noanx-mean_noanx]), width=.3, color=(.5,.5,1), ecolor=(0,0,0))
+
 plt.xticks(np.arange(mean_anx.size)+.3, remove_parentheses(data_anx.columns), rotation=270)
-plt.legend(['anxiety (n={})'.format(data_anx.shape[0]),'no anxiety (n={})'.format(data_noanx.shape[0])],loc='upper left')
-plt.title('normalized')
+# plt.legend(['anxiety (n={})'.format(data_anx.shape[0]),'no anxiety (n={})'.format(data_noanx.shape[0])],loc='upper left')
+plt.legend(['anxious','non-anxious'],loc='upper left')
+# plt.title('normalized')
+plt.ylabel('Average Relative Time',fontsize=14)
 
 for (i,loc) in enumerate(location_top):
     _,p = ttest_ind(data_anx.loc[np.logical_not(np.isnan(data_anx.loc[:,loc])),loc],                     data_noanx.loc[np.logical_not(np.isnan(data_noanx.loc[:,loc])),loc], equal_var=False)
 #     _,p = ranksums(data_anx.loc[np.logical_not(np.isnan(data_anx.loc[:,loc])),loc], \
 #                     data_noanx.loc[np.logical_not(np.isnan(data_noanx.loc[:,loc])),loc])
+    print p
     if p<.05:
-        plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
+        plt.plot(i+.3, max([hi_anx[i],hi_noanx[i]])+0.002, marker=(5, 2), markersize=10, color=(0,0,0))
 
 
 # # Social Anxiety (SPIN)
 
-# In[312]:
+# In[404]:
 
 # SPIN
 
@@ -288,7 +328,7 @@ plt.legend(['SPIN>=31 (n={})'.format(data_1.shape[0]),'SPIN<=30 (n={})'.format(d
 plt.title('non-normalized')
 
 
-# In[335]:
+# In[405]:
 
 # same but normalized
 from scipy.stats import ttest_ind,ranksums
@@ -308,7 +348,7 @@ for (i,loc) in enumerate(location_top):
         plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
 
 
-# In[64]:
+# In[406]:
 
 # gender
 
@@ -333,7 +373,7 @@ plt.legend(['male (n={})'.format(data_male.shape[0]),'female (n={})'.format(data
 plt.title('non-normalized')
 
 
-# In[65]:
+# In[407]:
 
 plt.bar(np.arange(mean_male.size), np.divide(mean_male,mean_male+mean_female), yerr=np.divide(ci_male,mean_male+mean_female), width=.3, color=(1,0.5,0.5))
 plt.bar(np.arange(mean_female.size)+.3, np.divide(mean_female,mean_male+mean_female), yerr=np.divide(ci_female,mean_male+mean_female), width=.3, color=(0.5,0.5,1))
