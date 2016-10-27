@@ -384,12 +384,6 @@ feature.loc[11:12, :]
 
 # In[ ]:
 
-a='"Food (Restaurant, Cafe)", "Nightlife Spot (Bar, Club)"'
-a.split('", "')
-
-
-# In[ ]:
-
 # spatial visualization
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')

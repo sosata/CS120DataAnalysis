@@ -83,9 +83,9 @@ for sd in range(n_bootstrap):
     gbm[sd] = xgb.XGBClassifier(max_depth=6, n_estimators=75, learning_rate=0.05, nthread=12, subsample=0.25,                         colsample_bytree=0.2, max_delta_step=0, gamma=3, objective='mlogloss', reg_alpha=0.5,                         missing=np.nan).fit(x_train, y_train)
 
 
-# In[72]:
+# In[66]:
 
-auc_ref
+np.random.choice(np.arange(state_uniq.size),size=1)
 
 
 # In[68]:

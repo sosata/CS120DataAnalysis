@@ -65,7 +65,7 @@ for fol in folders:
     data.loc[ind_subject, location_top] /= dur_all #normalize
 
 
-# In[8]:
+# In[2]:
 
 def remove_parentheses(ss):
     ss = np.array(ss)
@@ -76,7 +76,7 @@ def remove_parentheses(ss):
     return ss
 
 
-# In[10]:
+# In[4]:
 
 # correlation matrix
 
@@ -91,30 +91,30 @@ get_ipython().magic(u'matplotlib notebook')
 
 # truncate labels
 # labs = [lab[0:20] for lab in data_new.columns]
-labs = remove_parentheses(labs)
+labs = remove_parentheses(data_new.columns)
 
 data_cov[pval>=0.05]=0
 
 plot_confusion_matrix(data_cov, labels=labs, cmap=plt.cm.bwr, xsize=7, ysize=7, title='Pearson\'s r')
 
 
-# In[3]:
+# In[26]:
 
-plot_confusion_matrix(pval<0.05, labels=labs, cmap=plt.cm.bwr, xsize=7, ysize=7)
+plot_confusion_matrix(pval<0.05, labels=labs, cmap=plt.cm.bwr, xsize=5, ysize=5)
 
 
-# In[77]:
+# In[9]:
 
 # only mental health vars vs semantic locaiton
 
 from scipy.stats import pearsonr, spearmanr
 
 target = data_new[['PHQ9 W0','PHQ9 W3','PHQ9 W6','GAD7 W0','GAD7 W3','GAD7 W6']]
-location = data_new.drop(['PHQ9 W0','PHQ9 W3','PHQ9 W6','GAD7 W0','GAD7 W3','GAD7 W6','age'],axis=1)
+location = data_new.drop(['PHQ9 W0','PHQ9 W3','PHQ9 W6','GAD7 W0','GAD7 W3','GAD7 W6'],axis=1)
 
 r = pd.DataFrame(index=location.columns, columns=target.columns)
 p = pd.DataFrame(index=location.columns, columns=target.columns)
-tab = pd.DataFrame(index=location.columns, columns=target.columns, dtype=string)
+tab = pd.DataFrame(index=location.columns, columns=target.columns, dtype=str)
 for tar in target.columns:
     for loc in location.columns:
         x = target.loc[:,tar].astype(float)
@@ -129,12 +129,7 @@ for tar in target.columns:
         p.loc[loc,tar] = pp
 
 
-# In[79]:
-
-p
-
-
-# In[88]:
+# In[32]:
 
 # only mental health vars vs semantic locaiton - with bootstrap
 
@@ -162,22 +157,38 @@ for tar in target.columns:
             y_s = y.loc[ind]
             r[bs],p[bs] = pearsonr(x_s,y_s)
         corr_med.loc[loc,tar] = np.median(r)
-        corr_hi.loc[loc,tar] = np.percentile(r, 97.5)
-        corr_lo.loc[loc,tar] = np.percentile(r, 2.5)
+        corr_hi.loc[loc,tar] = np.percentile(r, 99.9)
+        corr_lo.loc[loc,tar] = np.percentile(r, 0.1)
 
 
-# In[81]:
+# In[24]:
+
+get_ipython().magic(u'matplotlib inline')
+plt.hist(r,25)
+
+
+# In[11]:
 
 # print the table
+corr_med
 
 
+# In[33]:
 
-# In[89]:
-
-np.sign(corr_hi)+np.sign(corr_lo)
+np.sign(corr_lo)+np.sign(corr_hi)
 
 
-# In[82]:
+# In[18]:
 
-corr_lo
+np.max(corr_hi, keepdims=False)
+
+
+# In[19]:
+
+np.min(corr_lo, keepdims=False)
+
+
+# In[35]:
+
+.05/66
 
