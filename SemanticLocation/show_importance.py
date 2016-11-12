@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[67]:
+# In[91]:
 
 import os
 import pickle
@@ -80,15 +80,27 @@ for sd in range(n_bootstrap):
         x_train = x_train.reset_index(drop = True)
         y_train = y_train.reset_index(drop = True)
 
-    gbm[sd] = xgb.XGBClassifier(max_depth=6, n_estimators=75, learning_rate=0.05, nthread=12, subsample=0.25,                         colsample_bytree=0.2, max_delta_step=0, gamma=3, objective='mlogloss', reg_alpha=0.5,                         missing=np.nan).fit(x_train, y_train)
+    gbm[sd] = xgb.XGBClassifier(max_depth=6, n_estimators=75, learning_rate=0.05, nthread=12, subsample=0.25,                         colsample_bytree=0.2, max_delta_step=0, gamma=3, objective='mlogloss', reg_alpha=0.5,                         missing=np.nan).fit(np.array(x_train), np.array(y_train))
 
 
-# In[72]:
+# In[126]:
 
-auc_ref
+gbb = gb.booster()
+gbb.dump_model('trees.txt')
 
 
-# In[68]:
+# In[118]:
+
+import matplotlib.pyplot as plt
+
+# %matplotlib inline
+fig = plt.figure(figsize=[10,10])
+ax = fig.gca()
+gb = gbm[0]
+xgb.plot_tree(gb, num_trees=13, ax=ax)
+
+
+# In[ ]:
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -127,7 +139,7 @@ plt.xlabel('Feature Importance',fontsize=14)
 plt.grid()
 
 
-# In[69]:
+# In[ ]:
 
 # extracting means and CIs
 feature_label = x_train.columns
@@ -162,7 +174,7 @@ plt.xlabel('Gini Importance',fontsize=14)
 plt.grid()
 
 
-# In[49]:
+# In[ ]:
 
 np.percentile(fscore, 2.5, axis=0)
 xgb.plot_importance()

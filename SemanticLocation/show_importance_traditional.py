@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[6]:
+# In[3]:
 
 # This code uses the traditional measure of features importance, i.e. the increase in validation error by removing each feature
 
@@ -11,8 +11,6 @@ import numpy as np
 import xgboost as xgb
 import pandas as pd
 from calculate_confusion_matrix import calculate_confusion_matrix
-
-save_results = True
 
 ft_dir = 'features_long/'
 
@@ -117,7 +115,7 @@ for (i,ft) in enumerate(feature.columns):
     print delta_auc_mean[i], delta_auc_lo[i], delta_auc_hi[i]
 
 
-# In[4]:
+# In[1]:
 
 auc_ref-auc_fold
 

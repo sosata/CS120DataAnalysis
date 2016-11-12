@@ -28,7 +28,7 @@ def bootstrap(x, n_boot):
 
 # # Loading data
 
-# In[5]:
+# In[3]:
 
 # Visualizes the location visit durations across different demographic (e.g., emplotyment) and mental health (e.g. depression)
 # groups
@@ -91,7 +91,7 @@ for fol in folders:
             df = pd.read_csv(file_fus, sep='\t', header=None)
             t = np.array(df.loc[:,0])
             tdiff = t[1:]-t[:-1]
-            tdiff = tdiff[tdiff<300]
+            tdiff = tdiff[tdiff<600]
             dur = np.sum(tdiff)
 #             if tmin>df.loc[0,0]:
 #                 tmin = df.loc[0,0]
@@ -109,7 +109,7 @@ for fol in folders:
 
 # # Overall Distribution
 
-# In[6]:
+# In[4]:
 
 # all subjects
 
@@ -128,7 +128,7 @@ plt.ylabel('Hours')
 
 # # Depression (PHQ-9)
 
-# In[8]:
+# In[6]:
 
 # PHQ-9
 
@@ -137,16 +137,16 @@ from scipy.stats import ttest_ind
 get_ipython().magic(u'matplotlib inline')
 
 # option 1: all <> 10
-ind_dep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']>=10, data['PHQ9 W3']>=10), data['PHQ9 W6']>=10))[0]
-ind_nodep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']<10, data['PHQ9 W3']<10), data['PHQ9 W6']<10))[0]
+# ind_dep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']>=10, data['PHQ9 W3']>=10), data['PHQ9 W6']>=10))[0]
+# ind_nodep = np.where(np.logical_and(np.logical_and(data['PHQ9 W0']<10, data['PHQ9 W3']<10), data['PHQ9 W6']<10))[0]
 
 # option 2: average <> 10
 # ind_dep = np.where(data['PHQ9 W0']+data['PHQ9 W3']+data['PHQ9 W6']>=30)[0]
 # ind_nodep = np.where(data['PHQ9 W0']+data['PHQ9 W3']+data['PHQ9 W6']<30)[0]
 
 # option 3: |change| <> 5
-# ind_dep = np.where(data['PHQ9 W6']-data['PHQ9 W0']>=5)[0]
-# ind_nodep = np.where(data['PHQ9 W6']-data['PHQ9 W0']<=-5)[0]
+ind_dep = np.where(data['PHQ9 W6']-data['PHQ9 W0']>=5)[0]
+ind_nodep = np.where(data['PHQ9 W6']-data['PHQ9 W0']<=-5)[0]
 
 data_dep = data.loc[ind_dep, list(location_top)]
 data_nodep = data.loc[ind_nodep, list(location_top)]
@@ -166,7 +166,7 @@ plt.legend(['depression (n={})'.format(data_dep.shape[0]),'no depression (n={})'
 plt.title('non-normalized')
 
 
-# In[9]:
+# In[8]:
 
 # same plot, normalized
 plt.figure(figsize=[7,4])
@@ -212,7 +212,7 @@ plt.xticks(np.arange(data_dep_norm.shape[1])+.1, remove_parentheses(data_dep_nor
 
 # # Anxiety (GAD-7)
 
-# In[10]:
+# In[9]:
 
 # compare anxious to non-anxious
 
@@ -220,16 +220,16 @@ import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
 
 # option 1: all <> 10
-ind_anx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']>=10, data['GAD7 W3']>=10), data['GAD7 W6']>=10))[0]
-ind_noanx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']<10, data['GAD7 W3']<10), data['GAD7 W6']<10))[0]
+# ind_anx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']>=10, data['GAD7 W3']>=10), data['GAD7 W6']>=10))[0]
+# ind_noanx = np.where(np.logical_and(np.logical_and(data['GAD7 W0']<10, data['GAD7 W3']<10), data['GAD7 W6']<10))[0]
 
 # option 2: average <> 10
 # ind_anx = np.where(data['GAD7 W0']+data['GAD7 W3']+data['GAD7 W6']>=30)[0]
 # ind_noanx = np.where(data['GAD7 W0']+data['GAD7 W3']+data['GAD7 W6']<30)[0]
 
 # option 3: change <> 0
-# ind_anx = np.where(data['GAD7 W6']-data['GAD7 W0']>=5)[0]
-# ind_noanx = np.where(data['GAD7 W6']-data['GAD7 W0']<=-5)[0]
+ind_anx = np.where(data['GAD7 W6']-data['GAD7 W0']>=5)[0]
+ind_noanx = np.where(data['GAD7 W6']-data['GAD7 W0']<=-5)[0]
 
 data_anx = data.loc[ind_anx, list(location_top)]
 data_noanx = data.loc[ind_noanx, list(location_top)]
@@ -285,7 +285,7 @@ for (i,loc) in enumerate(location_top):
 
 # # Social Anxiety (SPIN)
 
-# In[12]:
+# In[404]:
 
 # SPIN
 
@@ -316,7 +316,7 @@ plt.legend(['SPIN>=31 (n={})'.format(data_1.shape[0]),'SPIN<=30 (n={})'.format(d
 plt.title('non-normalized')
 
 
-# In[13]:
+# In[405]:
 
 # same but normalized
 from scipy.stats import ttest_ind,ranksums

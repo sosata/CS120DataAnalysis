@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[98]:
+# In[1]:
 
 # read top 10 states
 
@@ -16,7 +16,7 @@ f.close()
 #     state_top10[i] = s.replace('"','')
 
 
-# In[99]:
+# In[24]:
 
 # foursquare
 
@@ -35,12 +35,19 @@ for (k,lab) in enumerate(labels):
 
 auc_mean_fsq = np.array([])
 auc_ci_fsq = np.array([])
+auc_std_fsq = np.array([])
+auc_all = np.array([])
 for (j, a) in enumerate(auc_top10):
     auc_mean_fsq = np.append(auc_mean_fsq, np.nanmean(a))
     auc_ci_fsq = np.append(auc_ci_fsq, 2*np.nanstd(a)/np.sqrt(len(labels)))
+    auc_std_fsq = np.append(auc_std_fsq, np.nanstd(a))
+    auc_all = np.append(auc_all, a, axis=0)
+
+aucall_mean_fsq = np.nanmean(auc_all)
+aucall_ci_fsq = 2*np.nanstd(auc_all)/np.sqrt(len(labels))
 
 
-# In[100]:
+# In[22]:
 
 # sensor only
 
@@ -68,12 +75,19 @@ for (k,lab) in enumerate(labels):
 
 auc_mean_sensor = np.array([])
 auc_ci_sensor = np.array([])
+auc_std_sensor = np.array([])
+auc_all = np.array([])
 for (j, a) in enumerate(auc_top10):
     auc_mean_sensor = np.append(auc_mean_sensor, np.nanmean(a))
     auc_ci_sensor = np.append(auc_ci_sensor, 2*np.nanstd(a)/np.sqrt(len(labels)))
+    auc_std_sensor = np.append(auc_std_sensor, np.nanstd(a))
+    auc_all = np.append(auc_all, a, axis=0)
+
+aucall_mean_sensor = np.nanmean(auc_all)
+aucall_ci_sensor = 2*np.nanstd(auc_all)/np.sqrt(len(labels))
 
 
-# In[127]:
+# In[17]:
 
 # sensor + foursquare 
 
@@ -97,12 +111,19 @@ for (k,lab) in enumerate(labels):
 
 auc_mean_all = np.array([])
 auc_ci_all = np.array([])
+auc_std_all = np.array([])
+auc_all = np.array([])
 for (j, a) in enumerate(auc_top10):
     auc_mean_all = np.append(auc_mean_all, np.nanmean(a))
     auc_ci_all = np.append(auc_ci_all, 2*np.nanstd(a)/np.sqrt(len(labels)))
+    auc_std_all = np.append(auc_std_all, np.nanstd(a))
+    auc_all = np.append(auc_all, a, axis=0)
+
+aucall_mean_all = np.nanmean(auc_all)
+aucall_ci_all = 2*np.nanstd(auc_all)/np.sqrt(len(labels))
 
 
-# In[145]:
+# In[ ]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
@@ -127,12 +148,12 @@ axes.set_xlim([-1, len(state_top10)])
 axes.set_ylim([0, 1])
 axes.yaxis.grid()
 
-print np.nanmean(auc_mean_fsq)
-print np.nanmean(auc_mean_sensor)
-print np.nanmean(auc_mean_all)
+print auc_mean_all
+# print np.nanmean(auc_mean_sensor)
+# print np.nanmean(auc_mean_all)
 
 
-# In[61]:
+# In[ ]:
 
 auc_ci_fsq
 
@@ -154,7 +175,7 @@ for (i,c_row) in enumerate(conf_top10_fsq):
     for (j,c) in enumerate(c_row):
         conf[i,j] = np.sum(conf_top10_fsq[i][j])
 cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
-plot_confusion_matrix(cm_normalized, state_top10, title='confusion matrix: foursquare')
+plot_confusion_matrix(cm_normalized, state_top10, title='confurion matrix: foursquare')
 print cm_normalized[3,:]
 
 
