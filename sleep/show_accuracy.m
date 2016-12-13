@@ -21,11 +21,9 @@ acc_global_sensor = out.performance(:,1);
 
 figure(1)
 n = sqrt(length(acc_personal_all))/1.98;
-b = bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none');
-% ed = get(b, 'edgecolor');
-% set(ed, 'edgestyle', 'none');
+bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','k','linestyle','none');
 hold on
-bar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.6 .6 1],'edgecolor','none')
+bar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.6 .6 1],'edgecolor','k','linestyle','none')
 errorbar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],[nanstd(acc_global_sensor)/n,nanstd(acc_global_time)/n,nanstd(acc_global_all)/n],'.k',...
     'linewidth',2);
 errorbar([1.1 2.1 3.1],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],[nanstd(acc_personal_sensor)/n,nanstd(acc_personal_time)/n,nanstd(acc_personal_all)/n],'.k',...
@@ -39,13 +37,15 @@ box off
 ylabel('Classification Accuracy','fontsize',14)
 l = legend('Global Models','Personal Models','location','northwest');
 set(l, 'fontsize', 12);
+% im_hatch = applyhatch_pluscolor(gcf,'/.',1,[1 1],[1 .6 .6; .6 .6 1],200,3,2);
+% imwrite(im_hatch,'fig2A.png','png');
 
-figure(2)
+figure
 [y,x] = hist(acc_global_all,[.5:.025:1]);
-plot(x,y,'color',[1 .6 .6],'linestyle','-','linewidth',2);
+plot(x,y,'color',[0 0 0],'linestyle','--','linewidth',2);
 hold on
 [y,x] = hist(acc_personal_all,[.5:.025:1]);
-plot(x,y,'color',[.6 .6 1],'linestyle','-','linewidth',2);
+plot(x,y,'color',[0 0 0],'linestyle','-','linewidth',2);
 xlabel('Classification Accuracy','fontsize',14)
 ylabel('Number of Subjects','fontsize',14)
 box off
@@ -53,7 +53,7 @@ l = legend('Global Models','Personal Models','location','northwest');
 set(l, 'fontsize', 12);
 
 %% global vs personal models
-h = figure(3);
+figure
 % set(h,'position',[520   649   460   400])
 plot([.5 1],[.5 1],'linewidth',3,'color',[.5 .5 .5])
 hold on
@@ -123,7 +123,7 @@ acc_personal_corrected_time_good(ind_bad) = [];
 acc_persnal_corrected_sensor_good = acc_persnal_corrected_sensor;
 acc_persnal_corrected_sensor_good(ind_bad) = [];
 
-figure(4)
+figure
 bar([.9 1.9 2.9],[nanmean(acc_personal_sensor),nanmean(acc_personal_time),nanmean(acc_personal_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor','none')
 hold on
 bar([1.1 2.1 3.1],[nanmean(acc_persnal_corrected_sensor),nanmean(acc_personal_corrected_time),nanmean(acc_personal_corrected_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none')
@@ -145,6 +145,8 @@ ylabel('Classification Accuracy','fontsize',14)
 l = legend('Before Quality Improvement','After Quality Improvement (Step 1)','After Quality Improvement (Step 2)','location','northwest');
 set(l,'fontsize',12)
 title('Personal Models','fontsize',14);
+% im_hatch = applyhatch_pluscolor(gcf,'/.',1,[1 1],[1 .6 .6; .6 .6 1],200,3,2);
+% imwrite(im_hatch,'fig7B.png','png');
 
 %% final accuracies of global models
 load('results_global_corrected')
@@ -161,7 +163,7 @@ acc_global_corrected_time_good(ind_bad) = [];
 acc_global_corrected_sensor_good = acc_global_corrected_sensor;
 acc_global_corrected_sensor_good(ind_bad) = [];
 
-figure(5)
+figure
 bar([.9 1.9 2.9],[nanmean(acc_global_sensor),nanmean(acc_global_time),nanmean(acc_global_all)],'barwidth',.2,'facecolor',[.7 .7 .7],'edgecolor','none')
 hold on
 bar([1.1 2.1 3.1],[nanmean(acc_global_corrected_sensor),nanmean(acc_global_corrected_time),nanmean(acc_global_corrected_all)],'barwidth',.2,'facecolor',[1 .6 .6],'edgecolor','none')
@@ -183,3 +185,5 @@ ylabel('Classification Accuracy','fontsize',14)
 l = legend('Before Quality Improvement','After Quality Improvement (Step 1)','After Quality Improvement (Step 2)', 'location','northwest');
 set(l,'fontsize',12)
 title('Global Models','fontsize',14);
+% im_hatch = applyhatch_pluscolor(gcf,'/.',1,[1 1],[1 .6 .6; .6 .6 1],200,3,2);
+% imwrite(im_hatch,'fig7A.png','png');

@@ -40,11 +40,11 @@ res = 1;
 hist_edges = 0:res:24;
 hist_centers = (hist_edges(1)+res/2):res:(hist_edges(end)-res/2);
 [n, ~] = histcounts(wake_time_all, hist_edges);
-plot(hist_centers, n, 'linewidth',3,'color',[1 .6 .6])
+plot(hist_centers, n, '--k','linewidth',2)
 xlim([0 24]);
 hold on
 [n, ~] = histcounts(sleep_time_all, hist_edges);
-plot(hist_centers, n, 'linewidth',3,'color',[.6 .6 1])
+plot(hist_centers, n, 'k','linewidth',2)
 box off
 set(gca,'fontsize',12)
 ylabel('Samples','fontsize',14)
@@ -53,6 +53,8 @@ set(gca,'xtick',1:24);
 l = legend('Sleep End Time','Sleep Start Time','location','north');
 set(l,'fontsize',14)
 set(gca,'xgrid','on')
+
+return
 
 h = figure;
 set(h,'position',[245   252   714   571])

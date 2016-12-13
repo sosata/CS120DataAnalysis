@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[40]:
+# In[2]:
 
 def convert_date_to_age(date):
     y_study = 2015
@@ -13,7 +13,7 @@ def convert_date_to_age(date):
     return age
 
 
-# In[41]:
+# In[4]:
 
 import pandas as pd
 import os
@@ -29,9 +29,10 @@ gender = df.loc[ind_subject, 'demo09'].astype(int)
 age = df.loc[ind_subject, 'demo08'].astype(str)
 age = age.apply(convert_date_to_age)
 employment = df.loc[ind_subject, 'slabels02'].astype(int)
+education = df.loc[ind_subject, 'demo12'].astype(int)
 
-demo = pd.concat([subjects, gender, age, employment], axis=1)
-demo.columns = ['ID','gender','age','employment']
+demo = pd.concat([subjects, gender, age, employment, education], axis=1)
+demo.columns = ['ID','gender','age','employment','education']
 demo = demo.reset_index(drop=True)
 
 with open('demo.dat','w') as f:
@@ -39,7 +40,12 @@ with open('demo.dat','w') as f:
 f.close()
 
 
-# In[42]:
+# In[5]:
 
 demo
+
+
+# In[23]:
+
+np.sum(demo['education']==9)
 

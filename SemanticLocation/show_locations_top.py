@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[57]:
+# In[23]:
 
 def remove_parentheses(ss):
     ss = np.array(ss)
@@ -14,7 +14,7 @@ def remove_parentheses(ss):
     return ss
 
 
-# In[ ]:
+# In[3]:
 
 import numpy as np
 import pandas as pd
@@ -30,7 +30,7 @@ def bootstrap(x, n_boot):
 
 # # Loading data
 
-# In[66]:
+# In[24]:
 
 # Visualizes the location visit durations across different demographic (e.g., emplotyment) and mental health (e.g. depression)
 # groups
@@ -75,12 +75,12 @@ loc_uniq = np.unique(loc_all)
 
 # # Overall Distribution
 
-# In[74]:
+# In[29]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')
 
-n = 50
+n = 58
 
 loc_freq = np.zeros(loc_uniq.size)
 for i in range(loc_uniq.size):
@@ -104,11 +104,12 @@ plt.tick_params(
     right='off',      # ticks along the bottom edge are off
     left='off',         # ticks along the top edge are off
     labelbottom='on') # labels along the bottom edge are off
-plt.tight_layout()
-plt.savefig('distribution.png',format='png',dpi=200, pad_inches=0)
+# plt.tight_layout()
+plt.ylim([-.5,n])
+# plt.savefig('distribution.png',format='png',dpi=200, pad_inches=0)
 
 
-# In[41]:
+# In[22]:
 
-len('asdasd')
+remove_parentheses(loc_uniq[-n:])
 

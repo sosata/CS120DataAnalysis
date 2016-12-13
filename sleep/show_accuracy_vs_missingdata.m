@@ -29,35 +29,33 @@ ind_bad = find(p_nan>.5);
 
 %% global model accuracy vs missing sensor data
 figure(1)
-mdl = fitlm(p_nan, acc_global);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+% mdl = fitlm(p_nan, acc_global);
+% plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
 hold on
 plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
-text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan,acc_global,'pearson')),'fontweight','normal','fontsize',14);
+text(.6,.95, sprintf('r = %.2f', mycorr(p_nan,acc_global,'pearson')),'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
-title('Global Model');
-set(gca, 'fontsize',14);
+title('Global Model','fontsize',12,'fontweight','normal');
+set(gca, 'fontsize',12);
 set(gca, 'Ticklength', [0 0])
 
 
 %% personal model accuracy vs missing sensor data
 figure(2)
-mdl = fitlm(p_nan, acc_personal);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+% mdl = fitlm(p_nan, acc_personal);
+% plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
 hold on
 plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7])
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
-text(.7,mdl.Coefficients.Estimate(2)*.7+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','normal','fontsize',14);
+text(.6,.7, sprintf('r = %.2f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
-title('Personal Model');
-set(gca, 'fontsize',14);
+title('Personal Model','fontsize',12,'fontweight','normal');
+set(gca, 'fontsize',12);
 set(gca, 'Ticklength', [0 0])
 
 % for i=1:length(feature)
@@ -94,34 +92,44 @@ end
 
 %% global model accuracy vs missing data in EMA
 figure(3)
-mdl = fitlm(p_nan, acc_global);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
 hold on
+% plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+% mdl = fitlm(p_nan, acc_global, 'poly1');
+% ezplot(sprintf('(%f)+(%f)*x',mdl.Coefficients.Estimate))
+% mdl = fitlm(p_nan, acc_global, 'poly2');
+% ezplot(sprintf('(%f)+(%f)*x+(%f)*x^2',mdl.Coefficients.Estimate))
+% mdl = fitlm(p_nan, acc_global, 'poly3');
+% ezplot(sprintf('(%f)+(%f)*x+(%f)*x^2+(%f)*x^3',mdl.Coefficients.Estimate))
+% mdl = fitlm(p_nan, acc_global, 'poly4');
+% ezplot(sprintf('(%f)+(%f)*x+(%f)*x^2+(%f)*x^3+(%f)*x^4',mdl.Coefficients.Estimate))
+% mdl = fitlm(p_nan, acc_global, 'poly5');
+% ezplot(sprintf('(%f)+(%f)*x+(%f)*x^2+(%f)*x^3+(%f)*x^4+(%f)*x^5',mdl.Coefficients.Estimate))
+% mdl = fitlm(p_nan, acc_global, 'poly6');
+% ezplot(sprintf('(%f)+(%f)*x+(%f)*x^2+(%f)*x^3+(%f)*x^4+(%f)*x^5+(%f)*x^6',mdl.Coefficients.Estimate))
 plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
-text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan,acc_global,'pearson')),'fontweight','normal','fontsize',14);
+text(.6,.95, sprintf('r = %.2f', mycorr(p_nan,acc_global,'pearson')),'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
-title('Global Model');
-set(gca, 'fontsize',14);
+xlim([0 1]);
+title('Global Model','fontweight','normal','fontsize',12);
+set(gca, 'fontsize',12);
 set(gca, 'Ticklength', [0 0])
 
 %% personal model accuracy vs missing data in EMA
 figure(4)
-mdl = fitlm(p_nan, acc_personal);
-plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
+% mdl = fitlm(p_nan, acc_personal);
+% plot([0 1], mdl.Coefficients.Estimate(2)*[0 1]+mdl.Coefficients.Estimate(1),'color',[.5 .5 .5], 'linewidth', 3);
 hold on
 plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
-text(.5,mdl.Coefficients.Estimate(2)*.5+mdl.Coefficients.Estimate(1)+.01,...
-    sprintf('r = %.3f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','normal','fontsize',14);
+text(.6,.7, sprintf('r = %.2f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
-title('Personal Model');
-set(gca, 'fontsize',14);
+title('Personal Model','fontweight','normal','fontsize',12);
+set(gca, 'fontsize',12);
 set(gca, 'Ticklength', [0 0])
 
 if save_bad_subjects

@@ -113,17 +113,21 @@ for (i,ft) in enumerate(feature.columns):
     delta_auc_lo[i] = np.nanmin(auc_ref-auc_fold)
     delta_auc_hi[i] = np.nanmax(auc_ref-auc_fold)
     print delta_auc_mean[i], delta_auc_lo[i], delta_auc_hi[i]
+    
+with open('feature_importance.dat','w') as f:
+    pickle.dump([delta_auc_mean,delta_auc_lo,delta_auc_hi],f)
+f.close()
 
 
-# In[1]:
+# In[2]:
 
-auc_ref-auc_fold
-
-
-# In[30]:
-
+import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+
+with open('feature_importance.dat') as f:
+    delta_auc_mean,delta_auc_lo,delta_auc_hi = pickle.load(f)
+f.close()
 
 dic = {'lgt mean':'Light Intensity Mean', 'lgt std':'Light Intensity Variance', 'lgt off':'Darkness Duration', 'lgt zcrossing':'Light Intensity Change',       'lgt skew':'Light Intensity Skewness', 'lgt kurt':'Light Intensity Kurtosis', 'aud mean':'Sound Amplitude Mean',        'aud std':'Sound Amplitude Variance', 'aud skew':'Sound Amplitude Skewness', 'aud kurt':'Sound Amplitude Kurtosis',       'aud frq mean':'Sound Frequency Mean', 'aud frq std':'Sound Frequency Variance', 'aud frq skew':'Sound Frequency Skewness',       'aud frq kurt':'Sound Frequency Kurtosis', 'scr frq':'Screen On/Off Frequency', 'scr dur mean':'Screen On Duration Mean',        'scr dur std':'Screen On Duration Variance', 'still':'Activity "Still" Time', 'tilting':'Activity "Tilting" Time', 'walking':'Activity "Walking" Time',       'unknown act':'Activity "Unknown" Time', 'still-walking':'"Still"-"Walking" Transition', 'still-tilting':'"Still"-"Tilting" Transition',       'still-unknown':'"Still"-"Unknown" Transition', 'walking-unknown':'"Walking"-"Unknown" Transition', 'call in':'Incoming Calls', 'call out':       'Outgoing Calls', 'sms in':'Incoming SMS', 'sms out':'Outgoing SMS', 'call missed':'Missed Calls', 'n wifi':       'Wifi Networks', 'temperature':'Outside Temperature', 'dew point':'Outside Windchill', 'weather':'Weather Condition',        'lat mean':'Latitude', 'lng mean':'Longitude', 'loc var':'Location Variance', 'duration':'Visit Timespan',       'midtime':'Visit Unix Timestamp', 'midhour':'Visit Time of Day', 'dow start':'Arrive Day of Week', 'dow end':       'Leave Day of Week', 'fsq 0':'Foursquare Nightlife Spot', 'fsq 1':'Foursquare Outdoors & Recreation', 'fsq 2':'Foursquare Arts & Entertainment'       , 'fsq 3':'Foursquare Professional or Medical Office', 'fsq 4':'Foursquare Food', 'fsq 5':'Foursquare Home',        'fsq 6':'Foursquare Shop or Store', 'fsq 7':'Foursquare Travel or Transport', 'fsq 8':'Foursquare Unknown', 'fsq distance':       'Foursquare Distance to Closest Location', 'LT frequency':'Visit Frequency', 'LT interval mean':'Mean Time Between Visits', 'n gps':'Visit Duration'}
 
