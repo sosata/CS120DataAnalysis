@@ -35,7 +35,8 @@ hold on
 plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
-text(.6,.95, sprintf('r = %.2f', mycorr(p_nan,acc_global,'pearson')),'fontweight','bold','fontsize',14);
+[r,p] = mycorr(p_nan,acc_global,'spearman');
+text(.6,.7, ['\rho = ', num2str(r,'%.2f'),'**'],'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
 title('Global Model','fontsize',12,'fontweight','normal');
@@ -51,7 +52,8 @@ hold on
 plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7])
 xlabel('Proportion of Missing Sensor Data');
 ylabel('Classification Accuracy');
-text(.6,.7, sprintf('r = %.2f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','bold','fontsize',14);
+[r,p] = mycorr(p_nan,acc_personal,'spearman');
+text(.6,.7, ['\rho = ', num2str(r,'%.2f'),'*'],'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
 title('Personal Model','fontsize',12,'fontweight','normal');
@@ -109,7 +111,8 @@ hold on
 plot(p_nan, acc_global,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
-text(.6,.95, sprintf('r = %.2f', mycorr(p_nan,acc_global,'pearson')),'fontweight','bold','fontsize',14);
+[r,p] = mycorr(p_nan,acc_global,'spearman');
+text(.6,.7, ['\rho = ', num2str(r,'%.2f'),'***'],'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
 xlim([0 1]);
@@ -125,9 +128,11 @@ hold on
 plot(p_nan, acc_personal,'.','markersize',8,'color',[.2 .2 .7]);
 xlabel('Proportion of Missing EMA Data');
 ylabel('Classification Accuracy');
-text(.6,.7, sprintf('r = %.2f', mycorr(p_nan,acc_personal,'pearson')),'fontweight','bold','fontsize',14);
+[r,p] = mycorr(p_nan,acc_personal,'spearman');
+text(.6,.7, ['\rho = ', num2str(r,'%.2f'), '***'],'fontweight','bold','fontsize',14);
 box off;
 ylim([.55 1]);
+xlim([0 1]);
 title('Personal Model','fontweight','normal','fontsize',12);
 set(gca, 'fontsize',12);
 set(gca, 'Ticklength', [0 0])

@@ -4,10 +4,10 @@ close all;
 addpath('../Functions/');
 load('../settings.mat');
 
-subject = '1054952';
+subject = '765488';
 
-%data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
-data_dir = 'D:/CS120_data/pt_data/'
+data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
+% data_dir = 'D:/CS120_data/pt_data/'
 
 tab = readtable([data_dir, '\', subject, '\ems.csv'],'readvariablenames',false,'delimiter','\t');
 

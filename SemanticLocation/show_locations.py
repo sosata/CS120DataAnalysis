@@ -28,7 +28,7 @@ def bootstrap(x, n_boot):
 
 # # Loading data
 
-# In[5]:
+# In[3]:
 
 # Visualizes the location visit durations across different demographic (e.g., emplotyment) and mental health (e.g. depression)
 # groups
@@ -105,6 +105,11 @@ for fol in folders:
 #             print 'no data for subject {} instance {}'.format(fol, subf)
 #     data.loc[ind_subject, location_top] /= ((tmax-tmin)/86400.0) #normalize
     data.loc[ind_subject, location_top] /= dur_all #normalize
+
+
+# In[12]:
+
+np.sum(data['gender']==2)
 
 
 # # Overall Distribution
@@ -336,7 +341,9 @@ for (i,loc) in enumerate(location_top):
         plt.plot(i+.3, 0.05, '*', markersize=10, color=(0,1,0))
 
 
-# In[406]:
+# # Gender
+
+# In[4]:
 
 # gender
 

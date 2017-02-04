@@ -53,7 +53,7 @@ l = legend('Global Models','Personal Models','location','northwest');
 set(l, 'fontsize', 12);
 
 %% global vs personal models
-figure
+figure(3)
 % set(h,'position',[520   649   460   400])
 plot([.5 1],[.5 1],'linewidth',3,'color',[.5 .5 .5])
 hold on

@@ -23,7 +23,7 @@ for i, d in enumerate(dirs):
         ids = np.append(ids, d)
 
 
-# In[50]:
+# In[52]:
 
 from bokeh.io import output_file, show
 from bokeh.models import (
@@ -50,7 +50,7 @@ source = ColumnDataSource(
         ids=ids,
     )
 )
-circle = Circle(x="lon", y="lat", size=5, fill_color=(150,0,0), fill_alpha=1, line_color=None)
+circle = Circle(x="lon", y="lat", size=8, fill_color=(150,0,0), fill_alpha=1, line_color=None)
 plot.add_glyph(source, circle)
 
 hover = HoverTool()

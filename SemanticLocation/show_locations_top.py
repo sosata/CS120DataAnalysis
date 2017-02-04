@@ -109,7 +109,12 @@ plt.ylim([-.5,n])
 # plt.savefig('distribution.png',format='png',dpi=200, pad_inches=0)
 
 
-# In[22]:
+# In[31]:
 
-remove_parentheses(loc_uniq[-n:])
+remove_parentheses(loc_uniq)
+
+
+# In[30]:
+
+loc_uniq
 

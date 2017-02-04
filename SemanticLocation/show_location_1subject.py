@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[333]:
+# In[2]:
 
 import pickle
 import os
@@ -39,7 +39,7 @@ lngs = [lngs[i] for i in range(len(locs)) if locs[i] in location_top]
 locs = [locs[i] for i in range(len(locs)) if locs[i] in location_top]
 
 
-# In[305]:
+# In[3]:
 
 import datetime
 def timestamp_to_date(t_range):
@@ -49,7 +49,7 @@ def timestamp_to_date(t_range):
     return ts
 
 
-# In[316]:
+# In[4]:
 
 def remove_parentheses(ss):
     for (i,_) in enumerate(ss):
@@ -59,7 +59,7 @@ def remove_parentheses(ss):
     return ss
 
 
-# In[ ]:
+# In[5]:
 
 import matplotlib.pyplot as plt
 get_ipython().magic(u'matplotlib inline')

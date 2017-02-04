@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[ ]:
 
 # This code uses the traditional measure of features importance, i.e. the increase in validation error by removing each feature
 
@@ -119,7 +119,7 @@ with open('feature_importance.dat','w') as f:
 f.close()
 
 
-# In[2]:
+# In[1]:
 
 import pickle
 import matplotlib.pyplot as plt
