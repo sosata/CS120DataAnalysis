@@ -6,7 +6,7 @@ from copy import deepcopy
 import os
 import math
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 write_to = 'coverage.csv'
 cs120_key = 'cs120'
 pr_key = 'pr'

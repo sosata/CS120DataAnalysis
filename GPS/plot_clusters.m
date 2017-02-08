@@ -4,8 +4,7 @@ close all;
 addpath('../Features');
 addpath('../Functions');
 
-data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
-% data_dir = 'C:\Users\cbits\Dropbox\Data\CS120\';
+data_dir = '/data/CS120/';
 
 folders = dir(data_dir);
 folders(1:2) = [];

@@ -93,7 +93,7 @@ for (i,loc) in enumerate(locs):
 
 # original data
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'+subject+'/'
+data_dir = '/data/CS120/'+subject+'/'
 df = pd.read_csv(data_dir+'fus.csv',sep='\t', header=None)
 
 plt.figure(figsize=(15,5))

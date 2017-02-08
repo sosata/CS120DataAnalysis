@@ -11,7 +11,7 @@ import os
 import numpy as np
 
 data_dir = 'data/'
-fsq_data_dir = '/home/sohrob/Dropbox/Data/CS120FourSquare/'
+fsq_data_dir = '/data/CS120FourSquare/'
 
 subjects = os.listdir(data_dir)
 

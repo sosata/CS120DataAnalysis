@@ -13,9 +13,9 @@ import shutil
 
 probes = ['act','app','aud','bat','cal','coe','fus','lgt','run','scr','tch','wif','wtr']
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
-weather_data_dir = '/home/sohrob/Dropbox/Data/CS120Weather/'
-fsq_data_dir = '/home/sohrob/Dropbox/Data/CS120FourSquare/'
+data_dir = '/data/CS120/'
+weather_data_dir = '/data/CS120Weather/'
+fsq_data_dir = '/data/CS120FourSquare/'
 out_dir = 'data/'
 
 subjects = os.listdir(data_dir)

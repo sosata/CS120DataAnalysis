@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 
 subjects = os.listdir(data_dir)
 

@@ -13,7 +13,7 @@ sleep_dur_max = zeros(length(subject_sleep),1);
 sleep_dur_mean = zeros(length(subject_sleep),1);
 for i=1:length(subject_sleep),
     
-    filename = ['C:\Users\Sohrob\Dropbox\Data\CS120\',subject_sleep{i},'\ems.csv'];
+    filename = ['/data/CS120/',subject_sleep{i},'\ems.csv'];
     
     if exist(filename,'file'),
         tab = readtable(filename, 'delimiter','\t','readvariablenames',false);

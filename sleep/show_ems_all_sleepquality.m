@@ -5,7 +5,7 @@ addpath('../Functions/');
 load('features_sleepdetection');
 load('../settings.mat');
 
-data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120';
+data_dir = '/data/CS120';
 timezones = readtable('../general/timezones.csv', 'readvariablenames',false,'delimiter','\t');
 
 sleep_duration_all = [];

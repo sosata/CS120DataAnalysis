@@ -18,7 +18,7 @@ subjects = subjects.astype(str)
 subjects_employed = subjects[emply['slabels02']==1]
 subjects_unemployed = subjects[np.logical_and(emply['slabels02']>=2,emply['slabels02']<=5)]
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 subjects = os.listdir(data_dir)
 
 loc_subject = []

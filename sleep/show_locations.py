@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import numpy as np
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 dirs = os.listdir(data_dir)
 
 lat = np.array([])

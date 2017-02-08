@@ -6,7 +6,7 @@
 import pandas as pd
 import numpy as np
 
-data = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Baseline.xlsx')
+data = pd.ExcelFile('/data/CS120Clinical/CS120Final_Baseline.xlsx')
 data = data.parse('Sheet1')
 
 ind_subject = np.where(data.loc[0:999,'ID'].astype(str)!='nan')[0]
@@ -35,7 +35,7 @@ print np.sum(n_job_loc1==i)+np.sum(n_job_loc2==i)+np.sum(n_job_loc3==i)+np.sum(n
 
 # In[75]:
 
-data = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Screener.xlsx')
+data = pd.ExcelFile('/data/CS120Clinical/CS120Final_Screener.xlsx')
 data = data.parse('Sheet1')
 
 ind_subject = np.where(data.loc[0:999,'ID'].astype(str)!='nan')[0]

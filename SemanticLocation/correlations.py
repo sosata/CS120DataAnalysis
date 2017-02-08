@@ -12,7 +12,7 @@ from utils import *
 import pickle
 
 # read assessment data
-with open('/home/sohrob/Dropbox/Code/MATLAB/CS120/Assessment/assessment.dat') as f:
+with open('../Assessment/assessment.dat') as f:
     assessment = pickle.load(f)
 f.close()
 subjects = assessment['ID']

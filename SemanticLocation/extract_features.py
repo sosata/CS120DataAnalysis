@@ -31,7 +31,7 @@ def extract_features(subjects):
     remove_vehicle = True
 
     data_dir = 'data/'
-#     data_dir_orig = '/home/sohrob/Dropbox/Data/CS120/'
+#     data_dir_orig = '/data/CS120/'
 
     fsq_map = {'Nightlife Spot':'Nightlife Spot (Bar, Club)', 'Outdoors & Recreation':'Outdoors & Recreation',              'Arts & Entertainment':'Arts & Entertainment (Theater, Music Venue, Etc.)',              'Professional & Other Places':'Professional or Medical Office',              'Food':'Food (Restaurant, Cafe)', 'Residence':'Home', 'Shop & Service':'Shop or Store',               'Travel & Transport':'Travel or Transport (Airport, Bus Stop, Train Station, Etc.)'}
 

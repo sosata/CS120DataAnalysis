@@ -3,7 +3,7 @@ close all;
 
 addpath('../functions/');
 
-data_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120\';
+data_dir = '/data/CS120/';
 sensors = {'act','app','aud','bat','cal','coe','emc','eml','emm','ems','fus','lgt','run','scr','tch','wif'};
 
 subject = 'FJ227MJ';

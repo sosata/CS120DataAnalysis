@@ -10,8 +10,7 @@ query_weather = true;
 
 plot_clusters = false;
 
-% weather_dir = '~/Dropbox/Data/CS120Weather/';
-weather_dir = 'C:\Users\cbits\Dropbox\Data\CS120Weather\';
+weather_dir = '/data/CS120Weather/';
 
 % latitude parameters (independent of location)
 lat_km = 111;

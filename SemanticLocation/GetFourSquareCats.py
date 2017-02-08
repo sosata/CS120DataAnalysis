@@ -12,8 +12,8 @@ from copy import deepcopy
 import time
 import os
 
-data_root_dir = '/home/sohrob/Dropbox/Data/CS120/'
-data_write_dir = '/home/sohrob/Dropbox/Data/CS120FourSquare/'
+data_root_dir = '/data/CS120/'
+data_write_dir = '/data/CS120FourSquare/'
 
 subjects = os.listdir(data_root_dir)
 subjects = subjects[53:]
@@ -91,7 +91,7 @@ for (i,subject) in enumerate(subjects):
 # In[4]:
 
 import os
-data_root_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_root_dir = '/data/CS120/'
 subjects = os.listdir(data_root_dir)
 print subjects
 

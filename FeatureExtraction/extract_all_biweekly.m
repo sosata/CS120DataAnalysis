@@ -13,8 +13,7 @@ addpath('../features');
 addpath('../functions');
 clear date_start date_end timestamp_start;
 
-% weather_dir = 'C:\Users\Sohrob\Dropbox\Data\CS120Weather\';
-weather_dir = '~/Dropbox/Data/CS120Weather/';
+weather_dir = '/data/CS120Weather/';
 
 probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'tch', 'wif', 'wtr', 'emc', 'eml', 'emm', 'ems'};
 probes_remove_duplicate = {'fus'};  % probes for which duplicate timestamps data are removed

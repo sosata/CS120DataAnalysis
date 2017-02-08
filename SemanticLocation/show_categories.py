@@ -11,7 +11,7 @@ from sklearn import preprocessing
 
 get_ipython().magic(u'matplotlib inline')
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 
 subjects = os.listdir(data_dir)
 #subjects = [subjects[0]]

@@ -20,7 +20,7 @@ import os
 import pickle
 import numpy as np
 
-xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Baseline.xlsx')
+xl = pd.ExcelFile('/data/CS120Clinical/CS120Final_Baseline.xlsx')
 df = xl.parse('Sheet1')
 
 ind_subject = np.where(df.loc[0:999,'ID'].astype(str)!='nan')[0]

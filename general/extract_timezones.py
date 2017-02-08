@@ -2,7 +2,7 @@ import csv
 import os
 import googlemaps
 
-data_dir = '/home/sohrob/Dropbox/Data/CS120/'
+data_dir = '/data/CS120/'
 write_to = 'timezones.csv'
 
 gmaps = googlemaps.Client(key='AIzaSyCwHqrSA8yHkAYDjzkQXmC8YqjmgJHUOFg')

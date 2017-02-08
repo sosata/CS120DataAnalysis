@@ -13,7 +13,7 @@ acc_global = out.performance(:,1);
 clear feature feature_label state 
 
 %% finding screener PHQ9 scores
-data = readtable('C:/Users/Sohrob/Dropbox/Data/CS120Clinical/CS120Final_Screener.xlsx');
+data = readtable('/data/CS120Clinical/CS120Final_Screener.xlsx');
 
 phq = [];
 gad = [];
