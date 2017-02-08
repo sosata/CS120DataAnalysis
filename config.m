@@ -19,10 +19,7 @@ data_dir = '/data/CS120/';
 
 addpath('functions');
 
-% subjects_info = 'C:\Users\sst485\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
-% subjects_info = 'C:\Users\Sohrob\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
-% subjects_info = '~/Dropbox/Code/Python/PG2CSV_CS120/subject_info_cs120.csv';
-% subjects_info = 'C:\Users\cbits\Dropbox\Code\Python\PG2CSV_CS120\subject_info_cs120.csv';
+% subjects_info = '../../Python/PG2CSV_CS120/subject_info_cs120.csv';
 
 % finding start times
 

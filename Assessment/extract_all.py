@@ -5,12 +5,8 @@ import pandas as pd
 import os
 import pickle
 
-#data_dir = '/home/sohrob/Dropbox/Data/CS120/'
-#subjects = os.listdir(data_dir)
-#subjects_df = pd.DataFrame(subjects, columns=['Subject'])
-
 # screener
-xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Screener.xlsx')
+xl = pd.ExcelFile('/data/CS120Clinical/CS120Final_Screener.xlsx')
 df = xl.parse('Sheet1')
 
 ind_subject = np.where(df.loc[0:999,'ID'].astype(str)!='nan')[0]
@@ -38,7 +34,7 @@ for (i,subject) in enumerate(subjects):
         gad0.loc[i] = np.nan
 
 # week 0 (baseline)
-xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_Baseline.xlsx')
+xl = pd.ExcelFile('/data/CS120Clinical/CS120Final_Baseline.xlsx')
 df = xl.parse('Sheet1')
 spin0 = pd.DataFrame(index=range(len(subjects)),columns=['SPIN W0'],dtype=object)
 for (i,subject) in enumerate(subjects):
@@ -52,7 +48,7 @@ for (i,subject) in enumerate(subjects):
         spin0.loc[i] = np.nan
         
 # week 3
-xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_3week.xlsx')
+xl = pd.ExcelFile('/data/CS120Clinical/CS120Final_3week.xlsx')
 df = xl.parse('Sheet1')
 phq3 = pd.DataFrame(index=range(len(subjects)),columns=['PHQ9 W3'],dtype=object)
 gad3 = pd.DataFrame(index=range(len(subjects)),columns=['GAD7 W3'],dtype=object)
@@ -80,7 +76,7 @@ for (i,subject) in enumerate(subjects):
         spin3.loc[i] = np.nan
 
 # week 6
-xl = pd.ExcelFile('/home/sohrob/Dropbox/Data/CS120Clinical/CS120Final_6week.xlsx')
+xl = pd.ExcelFile('/data/CS120Clinical/CS120Final_6week.xlsx')
 df = xl.parse('Sheet1')
 phq6 = pd.DataFrame(index=range(len(subjects)),columns=['PHQ9 W6'],dtype=object)
 gad6 = pd.DataFrame(index=range(len(subjects)),columns=['GAD7 W6'],dtype=object)
