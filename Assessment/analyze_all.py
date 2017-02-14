@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[217]:
+# In[2]:
 
 import pickle
 
@@ -110,9 +110,4 @@ confusion
 # In[214]:
 
 plot_confusion_matrix(np.array(confusion).astype(float), confusion.columns, xsize=5, ysize=5)
-
-
-# In[216]:
-
-
 
