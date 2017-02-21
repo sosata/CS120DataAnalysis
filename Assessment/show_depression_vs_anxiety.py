@@ -70,9 +70,9 @@ plt.xlim([-1,25])
 plt.ylim([-1,25])
 
 
-# In[90]:
+# In[91]:
 
-a_noise = .1
+a_noise = .2
 plt.figure(figsize=[6,6])
 plt.plot([10,10],[-1,25],color=(.3,.6,.3),linestyle='-')
 plt.plot([-1,25],[10,10],color=(.3,.6,.3),linestyle='-')

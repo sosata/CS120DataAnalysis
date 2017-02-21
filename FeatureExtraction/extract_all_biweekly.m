@@ -19,7 +19,7 @@ probes = {'act', 'app', 'aud', 'bat', 'cal', 'coe', 'fus', 'lgt', 'scr', 'tch', 
 probes_remove_duplicate = {'fus'};  % probes for which duplicate timestamps data are removed
 
 win_size = 14;
-win_shift_size = 7;
+win_shift_size = 1;
 
 % start and end time will be determined by the affect self-report data
 cnt = 1;
@@ -173,17 +173,17 @@ parfor i = 1:length(subjects),
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_sleep(datac.ems);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_sleep(datac.ems);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
 %         [ft, ft_lab] = extract_features_locationreport(datac.eml);
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
 
-        [ft, ft_lab] = extract_features_slinter(datac);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_slinter(datac);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
         % adding all features to the main feature vector
         feature{i} = [feature{i}; feature_win];
@@ -196,5 +196,5 @@ end
 if save_results,
     feature_label = feature_label{1};
     subject_feature = subjects;
-    save(sprintf('features_biweekly_%s.mat',runtype), 'feature', 'feature_label', 'subject_feature');
+    save(sprintf('features_biweekly_1weekslide_%s.mat',runtype), 'feature', 'feature_label', 'subject_feature');
 end
