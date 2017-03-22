@@ -141,33 +141,33 @@ parfor i = 1:length(subjects),
         feature_win = ft;
         feature_win_lab = ft_lab;
         
-        [ft, ft_lab] = extract_features_usage(datac.scr, 30, Inf);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_usage(datac.scr, 30, Inf);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_weather(datac.wtr);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_weather(datac.wtr);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
-        [ft, ft_lab] = extract_features_activity(datac.act);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_activity(datac.act);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_communication(datac.coe);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_communication(datac.coe);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_audio(datac.aud);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_audio(datac.aud);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
-        [ft, ft_lab] = extract_features_light(datac.lgt);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_light(datac.lgt);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
         
-        [ft, ft_lab] = extract_features_app(datac.app);
-        feature_win = [feature_win, ft];
-        feature_win_lab = [feature_win_lab, ft_lab];
+%         [ft, ft_lab] = extract_features_app(datac.app);
+%         feature_win = [feature_win, ft];
+%         feature_win_lab = [feature_win_lab, ft_lab];
 
 %         [ft, ft_lab] = extract_features_affect(datac.emm);
 %         feature_win = [feature_win, ft];
@@ -185,6 +185,10 @@ parfor i = 1:length(subjects),
 %         feature_win = [feature_win, ft];
 %         feature_win_lab = [feature_win_lab, ft_lab];
 
+        % adding a timestamp
+        feature_win = [feature_win, d*86400];
+        feature_win_lab = [feature_win_lab, 'timestamp'];
+
         % adding all features to the main feature vector
         feature{i} = [feature{i}; feature_win];
         feature_label{i} = feature_win_lab;
@@ -196,5 +200,5 @@ end
 if save_results,
     feature_label = feature_label{1};
     subject_feature = subjects;
-    save(sprintf('features_biweekly_1weekslide_%s.mat',runtype), 'feature', 'feature_label', 'subject_feature');
+    save(sprintf('features_gps_1day_%s.mat',runtype), 'feature', 'feature_label', 'subject_feature');
 end
