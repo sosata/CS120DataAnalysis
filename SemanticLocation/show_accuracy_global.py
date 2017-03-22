@@ -16,7 +16,7 @@ f.close()
 #     state_top10[i] = s.replace('"','')
 
 
-# In[24]:
+# In[23]:
 
 # foursquare
 
@@ -27,11 +27,16 @@ with open(file) as f:
 f.close()
     
 auc_top10 = list(np.array([]) for ii in range(len(state_top10)))
+conf_top10_foursquare = list([np.array([]) for iii in range(len(state_top10))] for ii in range(len(state_top10)))
 for (k,lab) in enumerate(labels):
     for (j,state) in enumerate(state_top10):
         if state in lab:
             ind = np.where(lab==state)[0]
             auc_top10[j] = np.append(auc_top10[j], aucs[k][ind])
+            for (j2,state2) in enumerate(state_top10):
+                if state2 in lab:
+                    ind2 = np.where(lab==state2)[0]
+                    conf_top10_foursquare[j][j2] = np.append(conf_top10_foursquare[j][j2], confs[k][ind,ind2])
 
 auc_mean_fsq = np.array([])
 auc_ci_fsq = np.array([])
@@ -47,7 +52,7 @@ aucall_mean_fsq = np.nanmean(auc_all)
 aucall_ci_fsq = 2*np.nanstd(auc_all)/np.sqrt(len(labels))
 
 
-# In[22]:
+# In[2]:
 
 # sensor only
 
@@ -67,11 +72,16 @@ f.close()
 #         labels[j][k] = l.replace('"','')
     
 auc_top10 = list(np.array([]) for ii in range(len(state_top10)))
+conf_top10_sensor = list([np.array([]) for iii in range(len(state_top10))] for ii in range(len(state_top10)))
 for (k,lab) in enumerate(labels):
     for (j,state) in enumerate(state_top10):
         if state in lab:
             ind = np.where(lab==state)[0]
             auc_top10[j] = np.append(auc_top10[j], aucs[k][ind])
+            for (j2,state2) in enumerate(state_top10):
+                if state2 in lab:
+                    ind2 = np.where(lab==state2)[0]
+                    conf_top10_sensor[j][j2] = np.append(conf_top10_sensor[j][j2], confs[k][ind,ind2])
 
 auc_mean_sensor = np.array([])
 auc_ci_sensor = np.array([])
@@ -87,7 +97,7 @@ aucall_mean_sensor = np.nanmean(auc_all)
 aucall_ci_sensor = 2*np.nanstd(auc_all)/np.sqrt(len(labels))
 
 
-# In[17]:
+# In[9]:
 
 # sensor + foursquare 
 
@@ -153,33 +163,99 @@ print auc_mean_all
 # print np.nanmean(auc_mean_all)
 
 
-# In[ ]:
+# In[12]:
 
-auc_ci_fsq
+from soplata import plot_confusion_matrix
+import matplotlib.pyplot as plt
+import pandas as pd
+get_ipython().magic(u'matplotlib inline')
 
-
-# In[ ]:
-
-conf = np.zeros([10,10])
+conf = np.zeros([11,11])
 for (i,c_row) in enumerate(conf_top10):
     for (j,c) in enumerate(c_row):
         conf[i,j] = np.sum(conf_top10[i][j])
-cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
-plot_confusion_matrix(cm_normalized, state_top10, title='confusion matrix - sensor+fousquare')
+cm_normalized = conf / conf.sum(axis=0)[np.newaxis,:]
+plot_confusion_matrix(cm_normalized, state_top10, cmap=plt.cm.gray_r,                       vmin=0, vmax=np.max(cm_normalized), xsize=7, ysize=7)
+plt.xlabel('True Class',fontsize=13)
+plt.ylabel('Predicted Class',fontsize=13)
+plt.colorbar(fraction=.04)
+plt.text(11,-.5,'Samples\n(Normalized)')
+plt.title('confusion matrix - sensor + foursquare')
+
+tab = pd.DataFrame(columns=['ACC','SEN','SPEC'])
+for i in range(11):
+    tab.loc[i,'SEN'] = conf[i,i]/np.sum(conf[:,i])
+    tab.loc[i,'SPEC'] = (np.sum(conf[:i,:i])+np.sum(conf[i+1:,i+1:])+np.sum(conf[:i,i+1:])+np.sum(conf[i+1:,:i]))/(np.sum(conf[:,:i])+np.sum(conf[:,i+1:]))
+    tab.loc[i,'ACC'] = (conf[i,i]+np.sum(conf[:i,:i])+np.sum(conf[i+1:,i+1:])+np.sum(conf[:i,i+1:])+np.sum(conf[i+1:,:i]))/np.sum(conf)
+# print tab
+# print
+# print tab.mean()
 
 
-# In[ ]:
+# In[19]:
 
-conf = np.zeros([10,10])
-for (i,c_row) in enumerate(conf_top10_fsq):
+# tab
+np.mean(tab)
+
+
+# In[43]:
+
+from soplata import plot_confusion_matrix
+import matplotlib.pyplot as plt
+import pandas as pd
+get_ipython().magic(u'matplotlib inline')
+
+conf = np.zeros([11,11])
+for (i,c_row) in enumerate(conf_top10_sensor):
     for (j,c) in enumerate(c_row):
-        conf[i,j] = np.sum(conf_top10_fsq[i][j])
-cm_normalized = conf.astype('float') / conf.sum(axis=1)[:, np.newaxis]
-plot_confusion_matrix(cm_normalized, state_top10, title='confurion matrix: foursquare')
-print cm_normalized[3,:]
+        conf[i,j] = np.sum(conf_top10_sensor[i][j])
+cm_normalized = conf / conf.sum(axis=0)[np.newaxis,:]
+plot_confusion_matrix(cm_normalized, state_top10, cmap=plt.cm.gray_r,                       vmin=0, vmax=np.max(cm_normalized), xsize=7, ysize=7)
+plt.xlabel('True Class',fontsize=13)
+plt.ylabel('Predicted Class',fontsize=13)
+plt.colorbar(fraction=.04)
+plt.text(11,-.5,'Samples\n(Normalized)')
+plt.title('confusion matrix - sensor')
+
+tab = pd.DataFrame(columns=['ACC','SEN','SPEC'])
+for i in range(11):
+    tab.loc[i,'SEN'] = conf[i,i]/np.sum(conf[:,i])
+    tab.loc[i,'SPEC'] = (np.sum(conf[:i,:i])+np.sum(conf[i+1:,i+1:])+np.sum(conf[:i,i+1:])+np.sum(conf[i+1:,:i]))/(np.sum(conf[:,:i])+np.sum(conf[:,i+1:]))
+    tab.loc[i,'ACC'] = (conf[i,i]+np.sum(conf[:i,:i])+np.sum(conf[i+1:,i+1:])+np.sum(conf[:i,i+1:])+np.sum(conf[i+1:,:i]))/np.sum(conf)
 
 
-# In[ ]:
+# In[46]:
 
-np.random.random(10)
+tab
+
+
+# In[47]:
+
+from soplata import plot_confusion_matrix
+import matplotlib.pyplot as plt
+import pandas as pd
+get_ipython().magic(u'matplotlib inline')
+
+conf = np.zeros([11,11])
+for (i,c_row) in enumerate(conf_top10_foursquare):
+    for (j,c) in enumerate(c_row):
+        conf[i,j] = np.sum(conf_top10_foursquare[i][j])
+cm_normalized = conf / conf.sum(axis=0)[np.newaxis,:]
+plot_confusion_matrix(cm_normalized, state_top10, cmap=plt.cm.gray_r,                       vmin=0, vmax=np.nanmax(cm_normalized), xsize=7, ysize=7)
+plt.xlabel('True Class',fontsize=13)
+plt.ylabel('Predicted Class',fontsize=13)
+plt.colorbar(fraction=.04)
+plt.text(11,-.5,'Samples\n(Normalized)')
+plt.title('confusion matrix - sensor')
+
+tab = pd.DataFrame(columns=['ACC','SEN','SPEC'])
+for i in range(11):
+    tab.loc[i,'SEN'] = conf[i,i]/np.sum(conf[:,i])
+    tab.loc[i,'SPEC'] = (np.sum(conf[:i,:i])+np.sum(conf[(i+1):,(i+1):])+np.sum(conf[:i,(i+1):])+np.sum(conf[(i+1):,:i]))/(np.sum(conf[:,:i])+np.sum(conf[:,(i+1):]))
+    tab.loc[i,'ACC'] = (conf[i,i]+np.sum(conf[:i,:i])+np.sum(conf[(i+1):,(i+1):])+np.sum(conf[:i,(i+1):])+np.sum(conf[(i+1):,:i]))/np.sum(conf)
+
+
+# In[54]:
+
+tab
 
