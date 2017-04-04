@@ -71,7 +71,7 @@ text(1,nanmean(p_nan_light)+nanstd(p_nan_light)/n+.1,'Light','horizontalalignmen
 text(2,nanmean(p_nan_sound)+nanstd(p_nan_sound)/n+.1,'Sound','horizontalalignment','center');
 text(3,nanmean(p_nan_gps)+nanstd(p_nan_gps)/n+.1,'GPS','horizontalalignment','center');
 text(4,nanmean(p_nan_battery)+nanstd(p_nan_battery)/n+.1,'Battery','horizontalalignment','center');
-text(5,nanmean(p_nan_wifi)+nanstd(p_nan_wifi)/n+.1,'Wifi','horizontalalignment','center');
+text(5,nanmean(p_nan_wifi)+nanstd(p_nan_wifi)/n+.1,'WiFi','horizontalalignment','center');
 text(8,nanmean(p_nan)+nanstd(p_nan)/n+.1,'All','horizontalalignment','center');
 set(gca,'xtick',[]);
 set(gca, 'xcolor', [1 1 1]);

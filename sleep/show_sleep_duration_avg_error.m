@@ -107,7 +107,7 @@ fprintf('duration error median: %.1f (%.2f)\n', nanmean(med_dur), nanstd(med_dur
 fprintf('start error median: %.1f (%.2f)\n', nanmean(med_start), nanstd(med_start)/sqrt(length(med_start)))
 fprintf('end error median: %.1f (%.2f)\n', nanmean(med_end), nanstd(med_end)/sqrt(length(med_end)))
 
-return;
+% return;
 
 %% Visualize aligned data for example subject
 
