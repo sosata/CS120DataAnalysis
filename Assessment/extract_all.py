@@ -103,10 +103,10 @@ for (i,subject) in enumerate(subjects):
         gad6.loc[i] = np.nan
         spin6.loc[i] = np.nan
 
-print subjects
+print(subjects)
 
 assessment = pd.concat([subjects_df, phq0, gad0, spin0, phq3, gad3, spin3, phq6, gad6, spin6], axis=1)
 
-with open('assessment.dat','w') as f:
+with open('assessment.dat','wb') as f:
 	pickle.dump(assessment, f)
 f.close()

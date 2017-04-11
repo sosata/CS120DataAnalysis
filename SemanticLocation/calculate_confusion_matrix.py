@@ -8,7 +8,7 @@ from sklearn.preprocessing import OneHotEncoder
 def calculate_confusion_matrix(y, y_t):
 
     if len(y)!=len(y_t):
-        print 'error: vectors must have the same length'
+        print('error: vectors must have the same length!')
         return []
 
     # convert strings to codes
@@ -50,7 +50,7 @@ def calculate_confusion_matrix(y, y_t):
             roc_auc[i] = auc(fpr, tpr)
         else:
             roc_auc[i] = np.nan
-            print 'ROC AUC set to nan due to lack of data'
+            print('ROC AUC set to nan due to lack of data')
 
     # removing classes that are not in the target
     roc_auc = np.delete(roc_auc, ind_out)

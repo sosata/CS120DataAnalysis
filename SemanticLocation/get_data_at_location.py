@@ -18,7 +18,7 @@ def get_data_at_location(path, t_start, t_end, sensor_name):
                             data_value.append(data_row)
         file_in.close()
     else:
-        print 'warning: sensor '+sensor_name+' not found.'
+        print('warning: sensor '+sensor_name+' not found.')
         return []
 
     return data_value
