@@ -1,3 +1,5 @@
+import numpy as np
+
 def remove_extra_characters(x):
     x = x.replace('"','')
     x = x.replace('[','')
@@ -21,6 +23,27 @@ def remove_extra_space(x):
             if xi:
                 y += [xi]
     return y
+
+def title_case(x):
+    y = x.title()
+    # make letters after apostrophe lowercase
+    if "'" in y:
+        ind = y.find("'")
+        y_temp = ''
+        for (j,l) in enumerate(y):
+            if j==ind+1:
+                y_temp += l.lower()
+            else:
+                y_temp += l
+        y = y_temp
+    return y
+        
+def remove_parentheses(ss):
+    s = ss.split('(')
+    ss = s[0]
+    if ss.endswith(' '):
+        ss = ss[:-1]
+    return ss
 
 def correct_order(x):
     if ',' in x:
@@ -72,6 +95,8 @@ def preprocess_location(location, parse=True):
     if type(location)==str:
         location = remove_extra_characters(location)
         location = remove_extra_space(location)
+        location = title_case(location)
+        location = remove_parentheses(location)
     else:
         location_new = []
         for l in location:
