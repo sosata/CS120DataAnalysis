@@ -1,5 +1,6 @@
 import numpy as np
-from sklearn.metrics import roc_curve, auc
+#from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_auc_score
 #from sklearn.preprocessing import label_binarize
 from sklearn import preprocessing
 from sklearn.preprocessing import OneHotEncoder
@@ -43,17 +44,24 @@ def calculate_confusion_matrix(y, y_t):
     y_bin = enc.transform(y.reshape(-1,1)).toarray()
     y_t_bin = enc.transform(y_t.reshape(-1,1)).toarray()
     
-    roc_auc = np.zeros(n_class)
+    #roc_auc = np.zeros(n_class)
+    roc_auc = np.array([])
     for i in range(n_class):
-        fpr, tpr, _ = roc_curve(y_bin[:, i], y_t_bin[:, i])
-        if fpr.size>=2:
-            roc_auc[i] = auc(fpr, tpr)
-        else:
-            roc_auc[i] = np.nan
-            print('ROC AUC set to nan due to lack of data')
+        if i in ind_out:
+            continue
+        #print(np.sum(y_t_bin[:, i]))
+        roc_auc = np.append(roc_auc, roc_auc_score(y_t_bin[:, i], y_bin[:, i]))
+        #fpr, tpr, _ = roc_curve(y_t_bin[:, i], y_bin[:, i])
+        #if fpr.size>=2:
+        #    roc_auc = np.append(roc_auc, auc(fpr, tpr))
+        #    #roc_auc[i] = auc(fpr, tpr)
+        #else:
+        #    roc_auc = np.append(roc_auc, np.nan)
+        #    #roc_auc[i] = np.nan
+        #    print('ROC AUC set to nan due to lack of data')
 
     # removing classes that are not in the target
-    roc_auc = np.delete(roc_auc, ind_out)
+    #roc_auc = np.delete(roc_auc, ind_out)
     conf = np.delete(conf, ind_out, axis=0)
     conf = np.delete(conf, ind_out, axis=1)
     
