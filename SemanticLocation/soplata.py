@@ -3,8 +3,8 @@ import numpy as np
 
 def onpick3(event):
     ind = event.ind
-    print 'hello'
-    #print 'onpick3 scatter:', ind, npy.take(x, ind), npy.take(y, ind)
+    #print('hello')
+    #print('onpick3 scatter:', ind, npy.take(x, ind), npy.take(y, ind))
 
 def plot_confusion_matrix(cm, labels, title='', cmap=plt.cm.seismic, xsize=12, ysize=12, vmin=-1, vmax=1):
 

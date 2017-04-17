@@ -1,12 +1,10 @@
-# This code assumes that output variables are encoded, from 0 to nclass-1
+# this function calculates the ROC curve AUC from predicted (y) and grond truth (y_t) outputs.
+# It assumes that output variables are integer codes from 0 to n_class-1
 
 import numpy as np
-from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
-#from sklearn.preprocessing import label_binarize
 from sklearn import preprocessing
 from sklearn.preprocessing import OneHotEncoder
-
 
 def calculate_auc(y, y_t, n_class):
 
@@ -30,10 +28,8 @@ def calculate_auc(y, y_t, n_class):
     
     roc_auc = np.zeros(n_class)
     for i in range(n_class):
-        #if np.sum(y_t_bin[:,i])>=2:
-            #roc_auc = np.append(roc_auc, roc_auc_score(y_bin[:, i], y_t_bin[:, i])) #incorrect
         if np.sum(y_t_bin[:, i])>0:
-            roc_auc[i] = roc_auc_score(y_t_bin[:, i], y_bin[:, i]) #correct
+            roc_auc[i] = roc_auc_score(y_t_bin[:, i], y_bin[:, i])
         else:
             roc_auc[i] = np.nan
 
