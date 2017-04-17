@@ -1,5 +1,5 @@
 import numpy as np
-#from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import roc_auc_score
 #from sklearn.preprocessing import label_binarize
 from sklearn import preprocessing
@@ -49,8 +49,11 @@ def calculate_confusion_matrix(y, y_t):
     for i in range(n_class):
         if i in ind_out:
             continue
-        #print(np.sum(y_t_bin[:, i]))
-        roc_auc = np.append(roc_auc, roc_auc_score(y_t_bin[:, i], y_bin[:, i]))
+        if np.sum(y_t_bin[:,i])>=2:
+            roc_auc = np.append(roc_auc, roc_auc_score(y_bin[:, i], y_t_bin[:, i])) #incorrect
+            #roc_auc = np.append(roc_auc, roc_auc_score(y_t_bin[:, i], y_bin[:, i])) #correct
+        else:
+            roc_auc = np.append(roc_auc, np.nan)
         #fpr, tpr, _ = roc_curve(y_t_bin[:, i], y_bin[:, i])
         #if fpr.size>=2:
         #    roc_auc = np.append(roc_auc, auc(fpr, tpr))

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import scipy.stats as stats
 
 def calculate_covariance(data):
@@ -26,26 +27,31 @@ def calculate_covariance(data):
 
     return data_cov, pval
 
+# This function stratifies over target classes (y) by oversampling
 def stratify(x, y):
     
-    import collections as col
-    counts = col.Counter(y)
-    n_max = np.max(counts.values())
+    xarr = np.array(x)
+    yarr = np.array(y)
+
+    n_max = max(np.histogram(yarr)[0])
     
-    y_uniq = np.unique(y)
+    y_uniq = np.unique(yarr)
     y_out_class = [[] for i in range(y_uniq.size)]
     x_out_class = [[] for i in range(y_uniq.size)]
     for (i,y_u) in enumerate(y_uniq):
-        inds = y==y_u
-        y_class = y[inds]
-        x_class = x[inds,:]
+        inds = np.where(yarr==y_u)[0]
+        y_class = yarr[inds]
+        x_class = xarr[inds,:]
         inds = np.random.choice(np.arange(0,y_class.size), n_max, replace=True)
         y_out_class[i] = y_class[inds]
         x_out_class[i] = x_class[inds]
         
-    y = np.concatenate(y_out_class)
-    x = np.concatenate(x_out_class, axis=0)
-    
+    yarr = np.concatenate(y_out_class)
+    xarr = np.concatenate(x_out_class, axis=0)
+
+    x = pd.DataFrame(xarr, columns=x.columns)
+    y = pd.Series(yarr)
+
     return x,y
 
 def one_hot_encoder(x, xset):
